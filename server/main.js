@@ -56,5 +56,11 @@ app.use(session({
     saveUninitialized: true
 }));
 
-
+//===============API ROUTING===============
 app.use('/api', api);
+
+//===============SERVER ERROR HANDLING===============
+app.use(function(err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
