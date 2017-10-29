@@ -1,6 +1,10 @@
-module.exports = {
-    entry: './src/index.js',
+var path = require('path');
 
+module.exports = {
+    entry: [
+        './src/index.js',
+        './src/style/style.scss'
+    ],
     output: {
         path: __dirname + '/public/',
         filename: 'bundle.js'
@@ -14,12 +18,15 @@ module.exports = {
                     cacheDirectory: true,
                     presets: ['es2015', 'react']
                 })],
+                exclude: /node_modules/,
+            },
             {
                 test: /\.scss$/,
                 loader: 'style-loader!css-loader?sourceMap!sass-loader?sourceMap'
             }
-                exclude: /node_modules/,
-            }
         ]
+    },
+    resolve: {
+        root: path.resolve('./src')
     }
 };

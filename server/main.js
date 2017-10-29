@@ -58,7 +58,10 @@ app.use(session({
 
 //===============API ROUTING===============
 app.use('/api', api);
-
+//support client side routing
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, './../public/index.html'));
+});
 //===============SERVER ERROR HANDLING===============
 app.use(function(err, req, res, next) {
   console.error(err.stack);

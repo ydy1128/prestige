@@ -1,10 +1,12 @@
 var webpack = require('webpack');
+var path = require('path');
 
 module.exports = {
     entry: [
         './src/index.js',
         'webpack-dev-server/client?http://0.0.0.0:4000',
-        'webpack/hot/only-dev-server'
+        'webpack/hot/only-dev-server',
+        './src/style/style.scss'
     ],
 
     output: {
@@ -46,13 +48,16 @@ module.exports = {
                     cacheDirectory: true,
                     presets: ['es2015', 'react']
                 })],
+                exclude: /node_modules/,
+            },
             {
                 test: /\.scss$/,
                 loader: 'style-loader!css-loader?sourceMap!sass-loader?sourceMap'
             }
-                exclude: /node_modules/,
-            }
         ]
+    },
+    resolve: {
+        root: path.resolve('./src')
     }
 
 

@@ -1,0 +1,9 @@
+@font-face {
+  font-family: "HYSUPM";
+  src: url(../fonts/HYSUPM.TTF) format("truetype");
+}
+
+@font-face {
+  font-family: "HYSUPB";
+  src: url(../fonts/HYSUPB.TTF) format("truetype");
+}
