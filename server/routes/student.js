@@ -4,22 +4,41 @@ import Student from '../models/student';
 const router = express.Router();
 
 router.post('/signup', (req, res) => {
+    // CHECK USERNAME FORMAT
+    let usernameRegex = /^[a-z0-9]+$/;
+
+    if(!usernameRegex.test(req.body.username)) {
+        return res.status(400).json({
+            error: "BAD USERNAME",
+            code: 1
+        });
+    }
+
+    // CHECK PASS LENGTH
+    if(req.body.password.length < 4 || typeof req.body.password !== "string") {
+        return res.status(400).json({
+            error: "BAD PASSWORD",
+            code: 2
+        });
+    }
+
+    // CHECK USER EXISTANCE
     Student.findOne({ username: req.body.username }, (err, exists) => {
         if (err) throw err;
-        // FIND IF USER EXISTS
         if(exists){
             return res.status(409).json({
                 error: "USERNAME EXISTS",
-                code: 1
+                code: 3
             });
         }
 
-        // CREATE TEACHER ACCOUNT
+        // CREATE ACCOUNT
         let account = new Student({
             username: req.body.username,
             password: req.body.password,
-		    name:  req.body.name,
-    		classes:  req.body.classes
+            name: req.body.name,
+            school: '',
+            class: ''
         });
 
         account.password = account.generateHash(account.password);
@@ -31,10 +50,10 @@ router.post('/signup', (req, res) => {
         });
 
     });
-    res.json({ success: true });
 });
 
 router.post('/signin', (req, res) => {
+
     if(typeof req.body.password !== "string") {
         return res.status(401).json({
             error: "LOGIN FAILED",
@@ -74,7 +93,6 @@ router.post('/signin', (req, res) => {
             success: true
         });
     });
-    res.json({ success: true });
 });
 
 router.get('/getinfo', (req, res) => {

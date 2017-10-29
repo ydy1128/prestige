@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const Schema = mongoose.Schema;
 
@@ -8,7 +9,6 @@ const Student = new Schema({
     name: String,
     school: String,
     class: String,
-    level: String,
     created: { type: Date, default: Date.now }
 });
 
