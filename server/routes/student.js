@@ -37,7 +37,8 @@ router.post('/signup', (req, res) => {
             username: req.body.username,
             password: req.body.password,
             name: req.body.name,
-            school: '',
+            school: req.body.school,
+            level: req.body.level,
             class: ''
         });
 
@@ -104,6 +105,39 @@ router.get('/getinfo', (req, res) => {
 
     res.json({ info: req.session.loginInfo });
 });
+
+router.put('/:id', (req, res)=>{
+    Student.findById(req.params.id, (err, std) => {
+        if(err) throw err;
+
+        // IF MEMO DOES NOT EXIST
+        if(!std) {
+            return res.status(404).json({
+                error: "NO RESOURCE",
+                code: 4
+            });
+        }
+
+        console.log(std);
+        console.log(req.body.obj);
+        std.class = req.body.obj.class;
+        std.name = req.body.obj.name;
+        std.school = req.body.obj.school;
+        std.level = req.body.obj.level;
+        console.log(req.body.class);
+        console.log(std);
+
+        std.save((err, std) => {
+            if(err) throw err;
+            return res.json({
+                success: true,
+                std
+            });
+        });
+        
+    });
+})
+
 router.post('/logout', (req, res) => {
     req.session.destroy(err => { if(err) throw err; });
     return res.json({ sucess: true });

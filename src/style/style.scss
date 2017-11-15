@@ -1,6 +1,8 @@
 $point-color: #86272d;
 $active-color: #f8c709;
 $button-color: #839b44;
+$back-color: #E6DDDD;
+$deem-color: #939393;
 
 *{
 	box-sizing: border-box;
@@ -13,12 +15,44 @@ html, body{
 	height: 100%;
 	width: 100%;
 	font-family: 'HYSUPM';
-	background-color: #E6DDDD;
+	background-color: $back-color;
 }
 a{
 	color: black;
     cursor: pointer;
 }
+
+#root{
+	height: 100%;
+	width: 100%;
+}
+
+.App{
+	background-color: #E6DDDD;
+	height: 100%;
+	width: 100%;
+	-webkit-transition: 0.4s;
+    transition: 0.4s;
+    .App-Contents{
+		height: calc(100% - 120px);
+		width: 100%;
+    }
+    .Main{
+    	height: calc(100% - 80px);
+		width: 100%;
+		margin: 0;
+    }
+	h1{
+		font-family: 'HYSUPM';
+		font-size: 45px;
+		margin: 0;
+		padding: 40px;
+		height: 130px;
+		text-align: center;
+
+	}
+}
+
 .App-Header{
 	height: 80px;
 	background-color: $point-color;
@@ -36,18 +70,20 @@ a{
 		border-radius: 8px;
 		color: white;
 	}
-	.account-logo{
+	.header-buttons{
 		font-size: 40px;
 		height: 40px;
 		margin: 20px 20px;
 		cursor: pointer;
+		color: white;
 		&:hover{
 			color: $active-color;
 		}
 	}
+	.dropdown-button{
+		float: right;
+	}
 }
-
-
 
 /* Authentication */
 .auth {
@@ -86,11 +122,212 @@ a{
 		// background-color: $button-color;
 	    width: 90%;
 	}
+	.error-message{
+		margin-top: -35px;
+	}
 	.footer {
 	    border-top: 1px solid #E9E9E9;
 	    padding-bottom: 21px;
 	    a{
 	    	color: $point-color;
 	    }
+	}
+}
+.Main-contents{
+	height: 100%;
+	width: 95%;
+	margin-bottom: 0;
+	.Main-buttons{
+		height: 55%;
+		.card{
+			height: 100%;
+			box-shadow: 0 0 20px #3f3f3f;
+			.card-image{
+				height:100%;
+				cursor: pointer;
+				img{
+					height: 100%;
+					width: 100%;
+					-webkit-filter: grayscale(30%) brightness(25%);
+				    filter: grayscale(30%) brightness(25%);
+				}
+				span{
+					font-size: 28px;
+					color: #f8c709;
+					border: 6px solid #f8c709;
+					width: 50%;
+					left: 25%;
+					bottom: 40px;
+					text-align: center;
+				}
+				&:hover{
+					img{
+						-webkit-filter: grayscale(0%) brightness(55%);
+					    filter: grayscale(0%) brightness(55%);	
+					}
+				}
+			}
+		}
+	}
+	.Main-footer{
+		height: calc(45% - 140px);
+		.Register-button{
+			cursor: pointer;
+			text-align: center;
+			display: block;
+			margin: auto;
+			padding-top: 50px;
+			width: 140px;
+			font-size: 32px;
+			border-bottom: 3.5px solid black;
+			&:hover{
+				color: $point-color;
+				border-bottom: 3.5px solid $point-color;
+			}
+		}
+	}
+}
+
+.Main-loggedin{
+	margin: 0;
+	height: 100%;
+	.Side-menu{
+		display: inline-block;
+		vertical-align: top;
+		height: 100%;
+		width: 23%;
+		padding: 0;
+		background-color: #1c240d;
+		ul{
+			width: 100%;
+			margin: 0;
+			li{
+				margin: 0;
+				height: 80px;
+				font-size: 28px;
+				a{
+					margin: 0;
+					color: $back-color;
+					padding: 18px 0;
+					width: 100%;
+					text-align: center;
+					border-bottom: 2px solid $back-color;
+					&:hover{
+						background-color: $back-color;
+						color: black;
+					}
+					&.active{
+						background-color: $back-color;
+						color: black;
+					}
+				}
+			}
+		}
+	}
+	.Boards-wrapper{
+		display: inline-block;
+		vertical-align: top;
+		height: 100%;
+		width: 77%;
+		overflow-y: auto;
+		.Boards{
+			height: calc(100% - 4.5em);
+			margin: 2em;
+			.Board-header{
+				*{
+					height: 65px;
+				}
+				span{
+					font-size: 35px;
+					padding: 15px;
+					cursor: pointer;
+					&:hover{
+						color: $point-color;
+					}
+					&.inactive{
+						color: $deem-color;
+						cursor: default;
+						&:hover{
+							color: $deem-color;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-floating){
+	color: $deem-color;
+	&:hover{
+		color: $point-color !important;
+	}
+}
+
+.modal{
+	width: 80%;
+	height: 90%;
+}
+
+.classday{
+	label{
+		margin-right: 30px;
+	}
+}
+.modal-header{
+	margin-bottom: 0;
+}
+.modal-content{
+	padding-bottom: 0 !important;
+	.Edit-students{
+		height: calc(100% - 160px);
+		margin: 0;
+		.Students-list{
+			height: calc(100% - 50px);
+			margin: 0;
+			ul{
+				height: 100%;
+				padding: 0;
+				&.collection{
+					margin: -1px 0 0 0;
+				}
+				&.with-header{
+					margin: 0;
+					height: 85px;
+				}
+
+				.scroll{
+					height: 100%;
+					width: 100%;
+					overflow-y: auto;
+				}
+				.collection-header{
+					margin-bottom: 0;
+				}
+				.Student-obj{
+					cursor: pointer;
+					padding: 0 15px;
+					p{
+						margin: 5px 0 0 0;
+						padding-top: 5px;
+					}
+					.col.s2{
+						visibility: hidden;
+					}
+					&.selected{
+						background-color: #d3d3d3;
+						.col.s2{
+							visibility: visible;
+						}
+					}
+				}
+			}
+		}
+		.Students-buttons{
+			height: 50px;
+			margin: 0;
+		}
+		a{
+			text-align: center;
+		}
 	}
 }

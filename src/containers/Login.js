@@ -17,7 +17,8 @@ class Login extends React.Component {
 					// create session data
 					let loginData = {
                         isLoggedIn: true,
-                        username: id
+                        username: id,
+                        role: url_ref
                     };
 
                     document.cookie = 'key=' + btoa(JSON.stringify(loginData));

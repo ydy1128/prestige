@@ -11,9 +11,9 @@ class Register extends React.Component {
         this.handleRegister = this.handleRegister.bind(this);    
     }
     
-    handleRegister(id, pw, name, url_ref) {
+    handleRegister(id, pw, name, school, level, url_ref) {
     	console.log(url_ref, '2')
-        return this.props.registerRequest(id, pw, name,url_ref).then(
+        return this.props.registerRequest(id, pw, name, school, level, url_ref).then(
             () => {
                 if(this.props.status === "SUCCESS") {
                     Materialize.toast('Success! Please log in.', 2000);
@@ -58,8 +58,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        registerRequest: (id, pw, name, url_ref) => {
-            return dispatch(registerRequest(id, pw, name, url_ref));
+        registerRequest: (id, pw, name, school, level, url_ref) => {
+            return dispatch(registerRequest(id, pw, name, school, level, url_ref));
         }
     };
 };

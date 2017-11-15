@@ -1,5 +1,6 @@
 import express from 'express';
 import Teacher from '../models/teacher';
+import Student from '../models/student';
 
 const router = express.Router();
 
@@ -52,6 +53,7 @@ router.post('/signup', (req, res) => {
 });
 
 router.post('/signin', (req, res) => {
+
     if(typeof req.body.password !== "string") {
         return res.status(401).json({
             error: "LOGIN FAILED",
@@ -91,7 +93,6 @@ router.post('/signin', (req, res) => {
             success: true
         });
     });
-    res.json({ success: true });
 });
 
 router.get('/getinfo', (req, res) => {
@@ -103,6 +104,18 @@ router.get('/getinfo', (req, res) => {
 
     res.json({ info: req.session.loginInfo });
 });
+
+router.get('/getstudentsinfo', (req, res) =>{
+    if(typeof req.session.loginInfo === "undefined") {
+        return res.status(401).json({
+            error: 1
+        });
+    }
+    Student.find({}, (err, accounts) =>{
+        return res.json({ info: accounts });
+    })
+});
+
 router.post('/logout', (req, res) => {
     req.session.destroy(err => { if(err) throw err; });
     return res.json({ sucess: true });

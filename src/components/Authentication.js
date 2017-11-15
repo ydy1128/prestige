@@ -4,22 +4,47 @@ import { Link } from 'react-router';
 class Authentication extends React.Component {
     constructor(props) {
         super(props);
+
+        let loginData = this.getCookie('key');
+        loginData = JSON.parse(atob(loginData));
+
+        let initial_ref = loginData.role == undefined ? 'student' : loginData.role;
+
         this.state = {
             username: "",
             password: "",
             name: "",
             school: "",
-            ref: "student"
+            level: "",
+            level_max: "6",
+            ref: initial_ref
         };
+
         this.handleChange = this.handleChange.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
         this.handleRegister = this.handleRegister.bind(this);
         this.handleEnterPress = this.handleEnterPress.bind(this);
     }
+    getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
     handleChange(e) {
         let nextState = {};
+        if(e.target.name == 'school' && e.target.value[2] == '초'){
+            nextState['level_max'] = '6';
+        }
+        else{
+            nextState['level_max'] = '3';
+        }
+        if(e.target.name == 'level' && e.target.value > this.state.level_max){
+            e.target.value = this.state.level_max;
+        }
+
         nextState[e.target.name] = e.target.value;
         this.setState(nextState);
+
     }
     handleLogin() {
         let id = this.state.username;
@@ -39,10 +64,12 @@ class Authentication extends React.Component {
         let id = this.state.username;
         let pw = this.state.password;
         let name = this.state.name;
+        let school = this.state.school;
+        let level = this.state.level;
 
         let url_ref = this.state.ref;
-        console.log(url_ref, '1')
-        this.props.onRegister(id, pw, name, url_ref).then(
+
+        this.props.onRegister(id, pw, name, school, level, url_ref).then(
             (result) => {
                 if(!result) {
                     this.setState({
@@ -88,7 +115,8 @@ class Authentication extends React.Component {
                     type="text"
                     className="validate"
                     onChange={this.handleChange}
-                    value={this.state.username}/>
+                    value={this.state.username} 
+                    />
                 </div>
                 <div className="input-field col s12">
                     <label>패스워드</label>
@@ -125,15 +153,29 @@ class Authentication extends React.Component {
             </div>
         );
         const studentView = (
-            <div className="input-field col s12 school">
-                <label>학교</label>
-                <input
-                name="school"
-                type="text"
-                className="validate"
-                onChange={this.handleChange}
-                value={this.state.school}
-                onKeyPress={!this.props.mode && this.state.ref=='student' ? this.handleEnterPress : undefined}/>
+            <div>
+                <div className="input-field col s12 school">
+                    <label>학교</label>
+                    <input
+                    name="school"
+                    type="text"
+                    className="validate"
+                    onChange={this.handleChange}
+                    value={this.state.school} 
+
+                    />
+                </div>
+                <div className="input-field col s12 level">
+                    <label>학년</label>
+                    <input
+                        name="level"
+                        type="number"
+                        className="validate"
+                        onChange={this.handleChange}
+                        value={this.state.level}
+                        min="1"
+                        max={this.state.level_max}/>
+                </div>
             </div>
         )
         const registerView = (
