@@ -43,11 +43,11 @@ if(process.env.NODE_ENV == 'development') {
 //===============DB Setup===============
 const db = mongoose.connection;
 db.on('error', console.error);
-db.once('open', () => { 
-	console.log('Connected to mongodb server'); 
+db.once('open', () => {
+	console.log('Connected to mongodb server');
 });
 
-mongoose.connect('mongodb://localhost/prestige');
+mongoose.connect('mongodb://localhost/prestige', { useMongoClient: true });
 
 //MongoDB Session
 app.use(session({
@@ -62,6 +62,7 @@ app.use('/api', api);
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, './../public/index.html'));
 });
+
 //===============SERVER ERROR HANDLING===============
 app.use(function(err, req, res, next) {
   console.error(err.stack);

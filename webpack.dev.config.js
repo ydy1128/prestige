@@ -8,7 +8,6 @@ module.exports = {
         'webpack/hot/only-dev-server',
         './src/style/style.scss'
     ],
-
     output: {
         path: '/',
         filename: 'bundle.js'
@@ -32,19 +31,16 @@ module.exports = {
           chunkModules: false
         }
     },
-
-
     plugins: [
-        new webpack.optimize.OccurenceOrderPlugin(),
+        new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoErrorsPlugin()
+        new webpack.NoEmitOnErrorsPlugin()
     ],
-
     module: {
         loaders: [
             {
                 test: /\.js$/,
-                loaders: ['react-hot', 'babel?' + JSON.stringify({
+                loaders: ['react-hot-loader', 'babel-loader?' + JSON.stringify({
                     cacheDirectory: true,
                     presets: ['es2015', 'react']
                 })],
@@ -57,8 +53,7 @@ module.exports = {
         ]
     },
     resolve: {
-        root: path.resolve('./src')
+        //alias: {'/': path.resolve('./src')},
+        modules: [path.join(__dirname, 'src') , 'node_modules']
     }
-
-
 };
