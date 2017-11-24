@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getStudentsInfoRequest, studentsInfoEditRequest, classEditRequest } from 'actions/makeclass';
+import { studentsInfoEditRequest, classEditRequest, getStudentsInfoRequest } from 'actions/makeclass';
 import FontAwesome from 'react-fontawesome';
+import update from 'react-addons-update';
 
 import StudentObj from './StudentObj';
 
@@ -14,6 +15,8 @@ class MakeClass extends React.Component {
             dayarray: ['','','','','','',''],
             starttime: '',
             endtime: '',
+            students: [],
+            selectedStudents: [],
             mode: true,
             newClass: true,
             edittingIndex: -1,
@@ -26,22 +29,22 @@ class MakeClass extends React.Component {
         this.changeMode = this.changeMode.bind(this);
         this.toggleDisabled = this.toggleDisabled.bind(this);
         this.addToClass = this.addToClass.bind(this);
+        this.removeFromClass = this.removeFromClass.bind(this);
         this.handlePost = this.handlePost.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
     }
+    componentWillMount(){
+        let thisObj = this;
+        this.props.getStudentsInfoRequest().then(function(){
+            console.log('new: ', thisObj.props.studentsData)
+        })
+    }
 	componentDidMount(){
-        console.log(this.state.classname)
 
-        this.props.getStudentsInfoRequest(this.state.classname).then(
-            () => {
-                console.log('data: ', this.props.studentsData);
-            }
-        );
-        console.log('current class: ', this.props.currentClass)
 	}
     componentWillReceiveProps(nextProps) {
         console.log('next props: ', nextProps)
-        let tempdayarray = [];
+        let tempdayarray = [], selectedStudents = [], students = [];
         nextProps.currentClass.days.split('').map(function(day, i){
             switch(day){
                 case '월':
@@ -75,6 +78,15 @@ class MakeClass extends React.Component {
             }
         })
 
+        this.props.studentsData.map(function(obj, i){
+            // console.log(obj.class, obj.name)
+            if(nextProps.currentClass.students.includes(obj._id)){
+                selectedStudents.push(Object.assign({}, obj));
+            }
+            else{
+                students.push(Object.assign({}, obj));
+            }
+        });
         let nextState = {
             classname: nextProps.currentClass.name,
             starttime: nextProps.currentClass.starttime,
@@ -83,14 +95,25 @@ class MakeClass extends React.Component {
             edittingId: nextProps.currentClass._id,
             newClass: false,
             dayarray: tempdayarray,
+            selectedStudents: selectedStudents,
+            students: students,
             mode: nextProps.currentClass.flag
         };
+
         this.setState(nextState);
     }
     handleChange(e) {
         let nextState = {};
         nextState[e.target.name] = e.target.value;
-        console.log(e.target.value)
+        let selectedStudents = [];
+        if(e.target.name == 'classname'){
+            selectedStudents = [...this.state.selectedStudents];
+            selectedStudents.map(function(std, i){
+                std.class = e.target.value;
+            })
+            console.log(selectedStudents)
+            nextState.selectedStudents = selectedStudents;
+        }
         this.setState(nextState);
     }
     dayChange(e){
@@ -131,10 +154,23 @@ class MakeClass extends React.Component {
             endtime: '',
             edittingIndex: -1,
             edittingIndex: '',
-            newClass: true
+            newClass: true,
+            mode: true
         }
+        for (let key in this.refs){
+            let stdobj = this.refs[key].getObj();
+            let [side, id] = key.split('-');
+            let index = this.props.studentsData.findIndex(x => x._id==id);
+            if(index != -1){
+                stdobj.class = this.props.studentsData[index].class;
+            }
+        }
+
+        defaultState.students = [];
+        defaultState.selectedStudents = [];
         this.setState(defaultState);
         $('.filled-in').prop('checked',false);
+
     }
     changeMode(){
         let nextState = {mode: !this.state.mode};
@@ -158,16 +194,56 @@ class MakeClass extends React.Component {
             }
         }
     }
+    shouldComponentUpdate(nextProps, nextState){
+        if(nextState != this.state){
+            return true;
+        }
+        return false;
+    }
     addToClass(){
+        let students = [...this.state.students], selectedStudents = [...this.state.selectedStudents];
         for (let key in this.refs){
             let newObj = this.refs[key].addToClass();
             if(newObj != undefined){
-                newObj.class = this.state.classname;
-                this.props.studentsInfoEditRequest(newObj._id, newObj).then(() =>{
+                let index = students.indexOf(newObj);
+                if(index != -1){
+                    newObj.class = this.state.classname;
 
-                });
+                    students.splice(index, 1);
+                    selectedStudents.push(newObj);
+                    console.log(index, students, selectedStudents);
+                }
+            //     this.props.studentsInfoEditRequest(newObj._id, newObj).then(() =>{
+
+            //     });
             }
         }
+        this.setState({
+            selectedStudents: selectedStudents,
+            students: students
+        })
+    }
+    removeFromClass(){
+        let students = [...this.state.students], selectedStudents = [...this.state.selectedStudents];
+        for (let key in this.refs){
+            let newObj = this.refs[key].addToClass();
+            if(newObj != undefined){
+                let index = selectedStudents.indexOf(newObj);
+                if(index != -1){
+                    newObj.class = '';
+                    selectedStudents.splice(index, 1);
+                    students.push(newObj);
+                    console.log(index, students, selectedStudents);
+                }
+            //     this.props.studentsInfoEditRequest(newObj._id, newObj).then(() =>{
+
+            //     });
+            }
+        }
+        this.setState({
+            selectedStudents: selectedStudents,
+            students: students
+        })
     }
     handlePost(){
         let contents = {
@@ -181,14 +257,45 @@ class MakeClass extends React.Component {
         })
     }
     handleEdit() {
-        let contents = {
+        let contents = { 
             name: this.state.classname,
             days: this.state.dayarray.join(''),
             startTime: this.state.starttime,
-            endTime: this.state.endtime
+            endTime: this.state.endtime,
+            students: this.state.selectedStudents
         }
+        let success = true;
+        let props = this.props;
+        let addingStudents = this.state.selectedStudents.filter( function( el ) {
+            let index = props.studentsData.findIndex(x => x._id==el._id);
+            if(props.studentsData[index].class != el.class){
+                console.log(el._id, index, el.name);
+                props.studentsInfoEditRequest(el._id, index, el).then(() =>{
+                    //TODO: REST가 SUCCESS를 리턴하지 않아서 에러 메세지를 띄우는것이 불가능
+                    // if(props.editStatus.status !== 'SUCCESS'){
+                    //     let $toastContent = $('<span style="color: #FFB4BA">학생 정보 수정 에러</span>');
+                    //     Materialize.toast($toastContent, 2000);    
+                    // }
+                });
+            }
+        });
+
+        let removingStudents = this.state.students.filter( function( el ) {
+            let index = props.studentsData.findIndex(x => x._id==el._id);
+            if(props.studentsData[index].class != el.class){
+                props.studentsInfoEditRequest(el._id, index, el).then(() =>{
+                    //TODO: REST가 SUCCESS를 리턴하지 않아서 에러 메세지를 띄우는것이 불가능
+                    // if(props.editStudentsStatus.status !== 'SUCCESS'){
+                    //     let $toastContent = $('<span style="color: #FFB4BA">학생 정보 수정 에러</span>');
+                    //     Materialize.toast($toastContent, 2000);    
+                    // }
+                });
+            }
+        });
+
         let request = this.props.classEditRequest(this.state.edittingId, this.state.edittingIndex, contents).then(
             () => {
+                console.log(this.props.classEditStatus.status)
                 if(this.props.classEditStatus.status==="SUCCESS") {
                     Materialize.toast('수업 정보가 수정 되었습니다.', 2000);
                     this.handleCancel();
@@ -216,7 +323,7 @@ class MakeClass extends React.Component {
                 }
             }
         );
-        
+
         return request;
     }
     render() {
@@ -224,7 +331,7 @@ class MakeClass extends React.Component {
     		<div>
                 <div className="input-field col s12 classname">
                     <input 
-                        placeholder=" "
+                        placeholder="-"
                         type="text" 
                         name="classname"
                         className="validate"
@@ -277,18 +384,16 @@ class MakeClass extends React.Component {
     	)
         const mapToComponents1 = data => {
             return data.map((stdobj, i) => {
-                let childname = 'child'+i;
-                if(stdobj != undefined && stdobj.state){
-                    return (<StudentObj ref={childname} data={stdobj.data} key={stdobj.data._id}/>);
-                }
+                let childname = 'child1-'+stdobj._id;
+                if(stdobj.class == '')
+                    return (<StudentObj ref={childname} data={stdobj} key={stdobj._id}/>);
             });
         };
         const mapToComponents2 = data => {
             return data.map((stdobj, i) => {
-                let childname = 'child'+i;
-                if(stdobj != undefined && !stdobj.state){
-                    return (<StudentObj ref={childname} data={stdobj.data} key={stdobj.data._id}/>);
-                }
+                let childname = 'child2-'+stdobj._id;
+                if(stdobj.class == this.state.classname)
+                    return (<StudentObj ref={childname} data={stdobj} key={stdobj._id}/>);
             });
         };
     	const studentsInfo = (
@@ -311,7 +416,7 @@ class MakeClass extends React.Component {
                             <li className="collection-header row">
                                 <span className="col s2">
                                     <input type="checkbox" id="all-box2"/>
-                                    <label htmlFor="all-box1\2"></label>
+                                    <label htmlFor="all-box2"></label>
                                 </span>
                                 <span className="col s3">이름</span>
                                 <span className="col s3">학교</span>
@@ -319,10 +424,10 @@ class MakeClass extends React.Component {
                             </li>
                         </ul>
                         <ul className="collection col s6">
-                            <div className="scroll">{mapToComponents1(this.props.studentsData)}</div>
+                            <div className="scroll">{mapToComponents1(this.state.students)}</div>
                         </ul>
                         <ul className="collection col s6">
-                            <div className="scroll">{mapToComponents2(this.props.studentsData)}</div>
+                            <div className="scroll">{mapToComponents2(this.state.selectedStudents)}</div>
                         </ul>
                 </div>
                 <div className="row Students-buttons">
@@ -330,7 +435,7 @@ class MakeClass extends React.Component {
                         <a className="right waves-effect waves-green btn-flat" onClick={this.addToClass}><FontAwesome name="plus" /> 추가</a>
                     </div>
                     <div className="col s6">
-                        <a className="right waves-effect waves-green btn-flat"><FontAwesome name="minus" /> 제거</a>
+                        <a className="right waves-effect waves-green btn-flat"onClick={this.removeFromClass}><FontAwesome name="minus" /> 제거</a>
                     </div>
                 </div>
             </div>
@@ -358,17 +463,25 @@ MakeClass.propTypes = {
 
 MakeClass.defaultProps = {
     studentsData: [],
-    currentClass: undefined,
+    currentClass: {
+        days: '',
+        starttime: '',
+        endtime: '',
+        flag: true,
+        index: -1,
+        name: '',
+        students: []
+    },
     onPost: (contents) => { console.error('post function not defined'); }
 };
 
 
 const mapStateToProps = (state) => {
     return {
-        studentsData: state.makeclass.getstudents.data,
         editStatus: state.makeclass.editStudents,
         currentClass: state.makeclass.editClassPrep,
-        classEditStatus: state.makeclass.editClass
+        classEditStatus: state.makeclass.editClass,
+        studentsData: state.makeclass.getStudents.data
     };
 };
 
@@ -377,8 +490,9 @@ const mapDispatchToProps = (dispatch) => {
         getStudentsInfoRequest: (classname) => {
             return dispatch(getStudentsInfoRequest(classname));
         },
-        studentsInfoEditRequest: (id, obj) => {
-            return dispatch(studentsInfoEditRequest(id, obj));
+        studentsInfoEditRequest: (id, index, obj) => {
+            console.log(id, index, obj.name);
+            return dispatch(studentsInfoEditRequest(id, index, obj));
         },
         classEditRequest: (id, index, contents) => {
             return dispatch(classEditRequest(id, index, contents));

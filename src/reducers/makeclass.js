@@ -2,7 +2,7 @@ import * as types from 'actions/ActionTypes';
 import update from 'react-addons-update';
 
 const initialState = {
-    getstudents: {
+    getStudents: {
         status: 'INIT',
         data: []
     },
@@ -20,10 +20,14 @@ const initialState = {
         error: -1
     },
     editClassPrep: {
-        classname: '', 
-        classday: '', 
-        starttime: '', 
-        endtime: ''
+        name: '',
+        days: '',
+        starttime: '',
+        endtime: '',
+        students: '',
+        index: '',
+        _id: '',
+        flag: true
     },
     editClass: {
         status: 'INIT',
@@ -32,47 +36,50 @@ const initialState = {
 };
 
 export default function makeclass(state, action) {
+    
     if(typeof state === "undefined")
         state = initialState;
     switch(action.type) {
         case types.GET_STUDENTS_INFO:
             return update(state, {
-                getstudents: {
+                getStudents: {
                     status: { $set: 'WAITING' },
                 }
             });
         case types.GET_STUDENTS_INFO_SUCCESS: 
 
             return update(state, {
-                getstudents: {
+                getStudents: {
                     status: { $set: 'SUCCESS' },
                     data: { $set: action.data }
                 }
             })
         case types.GET_STUDENTS_INFO_FAILURE:
             return update(state, {
-                getstudents: {
+                getStudents: {
                     status: { $set: 'FAILURE' }
                 }
             })
-        case types.STUDENTS_INFO_EDIT: 
+        case types.STUDENT_INFO_EDIT: 
             return update(state, {
                 editStudents: {
                     status: { $set: 'WAITING' },
-                    error: { $set: -1 },
-                    studentsInfo: { $set: undefined }
+                    error: { $set: -1 }
                 }
             });
-        case types.STUDENTS_INFO_EDIT_SUCCESS:
+        case types.STUDENT_INFO_EDIT_SUCCESS:
             return update(state, {
                 editStudents: {
                     status: { $set: 'SUCCESS' },
                 },
-                getstudents: {
-                    [action.index] : { $set: action.data }
+                getStudents: {
+                    data: {
+                        [action.index] : { $set: action.data }
+                    }
                 }
             });
-        case types.STUDENTS_INFO_EDIT_FAILIURE:
+            
+        case types.STUDENT_INFO_EDIT_FAILIURE:
             return update(state, {
                 editStudents: {
                     status: { $set: 'FAILURE' },
@@ -126,6 +133,7 @@ export default function makeclass(state, action) {
                     days: { $set: action.days },
                     starttime: { $set: action.starttime },
                     endtime: { $set: action.endtime },
+                    students: { $set: action.students },
                     index: { $set: action.index },
                     _id: { $set: action._id },
                     flag: { $set: action.flag }
@@ -160,4 +168,5 @@ export default function makeclass(state, action) {
         default:
             return state;
     }
+    console.log('after switch')
 }

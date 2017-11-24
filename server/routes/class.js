@@ -90,6 +90,7 @@ router.put('/:id', (req, res) => {
         cls.days = req.body.contents.days;
         cls.startTime = req.body.contents.startTime;
         cls.endTime = req.body.contents.endTime;
+        cls.students = req.body.contents.students;
         console.log(cls);
         cls.save((err, cls) => {
             if(err) throw err;

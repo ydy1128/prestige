@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import FontAwesome from 'react-fontawesome';
-import { classBoardRequest, classPostRequest } from 'actions/makeclass';
+import { classBoardRequest, classPostRequest, getStudentsInfoRequest } from 'actions/makeclass';
 
 import { ClassBoard } from 'components';
 import { MakeClass } from 'components';
@@ -12,6 +12,9 @@ class Home extends React.Component {
     constructor(props) {
         super(props);        
         this.handlePost = this.handlePost.bind(this);
+    }
+    componentWillMount(){
+
     }
     componentDidMount(){
         $('.modal').modal({
@@ -138,7 +141,7 @@ class Home extends React.Component {
     	
         return (
         	<div className="row Main">
-                <MakeClass onPost={this.handlePost}/>
+                <MakeClass onPost={this.handlePost} studentsData={this.props.studentsData} />
 	        	{ this.props.isLoggedIn ? afterLoginView : beforeLoginView }
         	</div>
         );
@@ -149,12 +152,13 @@ const mapStateToProps = (state) => {
     return {
         isLoggedIn: state.authentication.status.isLoggedIn,
         classData: state.makeclass.board.data,
-        postStatus: state.makeclass.post
+        postStatus: state.makeclass.post,
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
     return {
+
         classPostRequest: (contents) => {
             return dispatch(classPostRequest(contents));
         },

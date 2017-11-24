@@ -19,9 +19,11 @@ class StudentObj extends React.Component{
 	}
 	addToClass(){
 		if(this.state.selected){
-			console.log('alert from '+ this.props.data.username);
 			return this.props.data;
 		}
+	}
+	getObj(){
+		return this.props.data;
 	}
 	toggleSelected(){
 		if(this.state.selected)

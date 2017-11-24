@@ -27,15 +27,7 @@ export function getStudentsInfoRequest(classname) {
         let url = '/api/teacher/getStudentsInfo';
         return axios.get(url)
         .then((response) => {
-            let data = response.data.info.map((obj, i) =>{
-                if(obj.class == ''){
-                    return {data: obj, state: true};
-                }
-                else if(obj.class == classname){
-                    return {data: obj, state: false};
-                }
-            })
-            dispatch(getStudentsInfoSuccess(data));
+            dispatch(getStudentsInfoSuccess(response.data.info));
         })
         .catch((error) => {
             dispatch(getStudentsInfoFailure());
@@ -66,14 +58,13 @@ export function getStudentsInfoFailure(error) {
 }
 
 /* Students EDIT */
-export function studentsInfoEditRequest(id, obj) {
+export function studentsInfoEditRequest(id, index, obj) {
     return (dispatch) => {
         dispatch(studentsInfoEdit());
-        console.log(id)
-        console.log(obj);
         return axios.put('/api/student/' + id, {obj})
         .then((response) => {
-            dispatch(studentsInfoEditSuccess(response.data.std));
+            console.log(id, index, response.data.std.name)
+            dispatch(studentsInfoEditSuccess(id, index, response.data.std));
         }).catch((error) => {
             dispatch(studentsInfoEditFailure(error.response.data.code));
         });
@@ -86,10 +77,12 @@ export function studentsInfoEdit() {
     };
 }
 
-export function studentsInfoEditSuccess(studentsInfo) {
+export function studentsInfoEditSuccess(id, index, data) {
+    console.log('success called in actions')
     return {
         type: STUDENT_INFO_EDIT_SUCCESS,
-        studentsInfo
+        index,
+        data
     };
 }
 
@@ -172,7 +165,7 @@ export function classPostFailure(error) {
 }
 
 /* Class Edit */
-export function classEditPrep(name, days, starttime, endtime, index, _id, flag){
+export function classEditPrep(name, days, starttime, endtime, index, _id, students, flag){
     return {
         type: CLASS_EDIT_PREP,
         name, 
@@ -181,6 +174,7 @@ export function classEditPrep(name, days, starttime, endtime, index, _id, flag){
         endtime, 
         index, 
         _id,
+        students,
         flag
     };
 }

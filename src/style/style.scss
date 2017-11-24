@@ -256,13 +256,26 @@ a{
 		}
 	}
 }
-.card .card-action a:not(.btn):not(.btn-large):not(.btn-floating){
-	color: $deem-color;
-	&:hover{
-		color: $point-color !important;
+.card{
+	.card-action a:not(.btn):not(.btn-large):not(.btn-floating){
+		color: $deem-color;
+		&:hover{
+			color: $point-color !important;
+		}
+	}
+	.color-bar{
+		width: 100%;
+		height: 10px;
 	}
 }
-
+.card-content{
+	.card-input{
+		vertical-align: middle;
+		&:after{
+			border-color: black !important;
+		}
+	}
+}
 .modal{
 	width: 80%;
 	height: 90%;
