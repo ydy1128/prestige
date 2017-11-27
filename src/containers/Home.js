@@ -12,23 +12,26 @@ import { MakeClass } from 'components';
 class Home extends React.Component {
     constructor(props) {
         super(props);        
+
+        // TEACHER_DASHBOARD, TEACHER_STUDENTBOARD, TEACHER_CLASSBOARD, TEACHER_LECTUREBOARD, TEACHER_HWBOARD 
+        // STUDENT_DASHBOARD, STUDENT_LECTUREBOARD, STUDENT_HWBOARD
+        this.state = {
+            view_type: 'TEACHER_DASHBOARD' 
+        }
+
         this.handleClassPost = this.handleClassPost.bind(this);
         this.handleClassEdit = this.handleClassEdit.bind(this);
         this.handleClassRemove = this.handleClassRemove.bind(this);
+
+        this.handleMenuClick = this.handleMenuClick.bind(this);
+        this.setMenuActive = this.setMenuActive.bind(this);
     }
     componentWillMount(){
-        this.props.getStudentsInfoRequest().then(function(){
-        })
+        this.props.getStudentsInfoRequest().then(() =>{})
     }
     componentDidMount(){
-        $('.modal').modal({
-            dismissible: false,
-        });
-        this.props.classBoardRequest().then(
-            () => {
-
-            }
-        );
+        $('.modal').modal({dismissible: false});
+        this.props.classBoardRequest().then(() => {});
     }
     getCookie(name) {
         var value = "; " + document.cookie;
@@ -37,13 +40,10 @@ class Home extends React.Component {
     }
     getLoginData(){
     	let loginData = this.getCookie('key');
-        if(loginData == undefined){
+        if(loginData == undefined)
             loginData = {};
-        }
-        else{
+        else
         	loginData = JSON.parse(atob(loginData));
-        }
-
     	return loginData;
     }
     handleClick(ref){
@@ -128,6 +128,43 @@ class Home extends React.Component {
             }
         });
     }
+    handleMenuClick(e){
+        this.setState({
+            view_type: e.target.name
+        })
+    }
+    getView(){
+        switch(this.state.view_type){
+            case 'TEACHER_DASHBOARD':
+                return (<div>DashBoard</div>);
+            case 'TEACHER_STUDENTBOARD':
+                return (<div>StudentBoard</div>);
+            case 'TEACHER_CLASSBOARD':
+                return (<ClassBoard data={this.props.classData}
+                                studentsData={this.props.studentsData}
+                                onRemove={this.handleClassRemove}
+                                onStudentEdit={this.props.studentsInfoEditRequest}
+                                />);
+            case 'TEACHER_LECTUREBOARD':
+                return (<div>LectureBoard</div>);
+            case 'TEACHER_HWBOARD':
+                return (<div>HWBoard</div>);
+            case 'STUDENT_DASHBOARD':
+                return (<div>DASHBOARD</div>);
+            case 'STUDENT_LECTUREBOARD':
+                return (<div>LECTUREBOARD</div>);
+            case 'STUDENT_HWBOARD':
+                return (<div>HWBOARD</div>);
+            default:
+                return (<div>Get View Error</div>);
+        }
+    }
+    setMenuActive(view_type){
+        if(this.state.view_type === view_type){
+            return 'active';
+        }
+        return '';
+    }
     render() {
     	const beforeLoginView = (
         	<div className="row Main-contents">
@@ -159,11 +196,11 @@ class Home extends React.Component {
     	);
     	const teacherMenu = (
 			<ul className="">
-				<li><a className="waves-effect active">대시보드</a></li>
-				<li><a className="waves-effect">수업관리</a></li>
-				<li><a className="waves-effect">강의관리</a></li>
-				<li><a className="waves-effect">숙제관리</a></li>
-				<li><a className="waves-effect">질문관리</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_DASHBOARD')} name="TEACHER_DASHBOARD" onClick={this.handleMenuClick}>대시보드</a></li>
+                <li><a className={'waves-effect '+this.setMenuActive('TEACHER_STUDENTBOARD')} name="TEACHER_STUDENTBOARD" onClick={this.handleMenuClick}>학생관리</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_CLASSBOARD')} name="TEACHER_CLASSBOARD" onClick={this.handleMenuClick}>수업관리</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_LECTUREBOARD')} name="TEACHER_LECTUREBOARD" onClick={this.handleMenuClick}>강의관리</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_HWBOARD')} name="TEACHER_HWBOARD" onClick={this.handleMenuClick}>숙제관리</a></li>
 			</ul>
     	)
     	const studentMenu = (
@@ -183,11 +220,7 @@ class Home extends React.Component {
     		<div className="row Main-loggedin">
     			{ sideMenu }
     			<div className="Boards-wrapper">
-                    <ClassBoard data={this.props.classData}
-                                studentsData={this.props.studentsData}
-                                onRemove={this.handleClassRemove}
-                                onStudentEdit={this.props.studentsInfoEditRequest}
-                                />
+                    { this.getView() }
     			</div>
 
     		</div>
