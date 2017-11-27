@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { studentsInfoEditRequest, classEditRequest, getStudentsInfoRequest } from 'actions/makeclass';
 import FontAwesome from 'react-fontawesome';
 import update from 'react-addons-update';
 
@@ -34,10 +33,7 @@ class MakeClass extends React.Component {
         this.handleEdit = this.handleEdit.bind(this);
     }
     componentWillMount(){
-        let thisObj = this;
-        this.props.getStudentsInfoRequest().then(function(){
-            console.log('new: ', thisObj.props.studentsData)
-        })
+
     }
 	componentDidMount(){
 
@@ -77,9 +73,7 @@ class MakeClass extends React.Component {
                     break;
             }
         })
-
         this.props.studentsData.map(function(obj, i){
-            // console.log(obj.class, obj.name)
             if(nextProps.currentClass.students.includes(obj._id)){
                 selectedStudents.push(Object.assign({}, obj));
             }
@@ -93,7 +87,7 @@ class MakeClass extends React.Component {
             endtime: nextProps.currentClass.endtime,
             edittingIndex: nextProps.currentClass.index,
             edittingId: nextProps.currentClass._id,
-            newClass: false,
+            newClass: nextProps.currentClass.name == ''?true:false,
             dayarray: tempdayarray,
             selectedStudents: selectedStudents,
             students: students,
@@ -111,13 +105,11 @@ class MakeClass extends React.Component {
             selectedStudents.map(function(std, i){
                 std.class = e.target.value;
             })
-            console.log(selectedStudents)
             nextState.selectedStudents = selectedStudents;
         }
         this.setState(nextState);
     }
     dayChange(e){
-        console.log(e.target.id)
         let tempdayarray = this.state.dayarray;
         switch(e.target.id.split('-')[1]){
             case 'mon':
@@ -143,7 +135,6 @@ class MakeClass extends React.Component {
                 break;
         }
         let daystring = tempdayarray.join('');
-        console.log(daystring)
     }
     handleCancel(){
         let defaultState = {
@@ -208,14 +199,9 @@ class MakeClass extends React.Component {
                 let index = students.indexOf(newObj);
                 if(index != -1){
                     newObj.class = this.state.classname;
-
                     students.splice(index, 1);
                     selectedStudents.push(newObj);
-                    console.log(index, students, selectedStudents);
                 }
-            //     this.props.studentsInfoEditRequest(newObj._id, newObj).then(() =>{
-
-            //     });
             }
         }
         this.setState({
@@ -233,11 +219,7 @@ class MakeClass extends React.Component {
                     newObj.class = '';
                     selectedStudents.splice(index, 1);
                     students.push(newObj);
-                    console.log(index, students, selectedStudents);
                 }
-            //     this.props.studentsInfoEditRequest(newObj._id, newObj).then(() =>{
-
-            //     });
             }
         }
         this.setState({
@@ -246,17 +228,19 @@ class MakeClass extends React.Component {
         })
     }
     handlePost(){
+        console.log('handlePost called: ', this.state.newClass)
         let contents = {
             name: this.state.classname,
             days: this.state.dayarray.join(''),
             startTime: this.state.starttime,
             endTime: this.state.endtime
         }
-        this.props.onPost(contents).then(() =>{
+        this.props.onClassPost(contents).then(() =>{
             this.handleCancel();
         })
     }
     handleEdit() {
+        console.log('handleEdit called: ', this.state.newClass)
         let contents = { 
             name: this.state.classname,
             days: this.state.dayarray.join(''),
@@ -269,8 +253,7 @@ class MakeClass extends React.Component {
         let addingStudents = this.state.selectedStudents.filter( function( el ) {
             let index = props.studentsData.findIndex(x => x._id==el._id);
             if(props.studentsData[index].class != el.class){
-                console.log(el._id, index, el.name);
-                props.studentsInfoEditRequest(el._id, index, el).then(() =>{
+                props.onStudentEdit(el._id, index, el).then(() =>{
                     //TODO: REST가 SUCCESS를 리턴하지 않아서 에러 메세지를 띄우는것이 불가능
                     // if(props.editStatus.status !== 'SUCCESS'){
                     //     let $toastContent = $('<span style="color: #FFB4BA">학생 정보 수정 에러</span>');
@@ -283,7 +266,7 @@ class MakeClass extends React.Component {
         let removingStudents = this.state.students.filter( function( el ) {
             let index = props.studentsData.findIndex(x => x._id==el._id);
             if(props.studentsData[index].class != el.class){
-                props.studentsInfoEditRequest(el._id, index, el).then(() =>{
+                props.onStudentEdit(el._id, index, el).then(() =>{
                     //TODO: REST가 SUCCESS를 리턴하지 않아서 에러 메세지를 띄우는것이 불가능
                     // if(props.editStudentsStatus.status !== 'SUCCESS'){
                     //     let $toastContent = $('<span style="color: #FFB4BA">학생 정보 수정 에러</span>');
@@ -292,39 +275,9 @@ class MakeClass extends React.Component {
                 });
             }
         });
-
-        let request = this.props.classEditRequest(this.state.edittingId, this.state.edittingIndex, contents).then(
-            () => {
-                console.log(this.props.classEditStatus.status)
-                if(this.props.classEditStatus.status==="SUCCESS") {
-                    Materialize.toast('수업 정보가 수정 되었습니다.', 2000);
-                    this.handleCancel();
-                } 
-                else {
-                    let errorMessage = [
-                        '',
-                        '모든 정보를 채워주세요.',
-                        '세션이 만료 되었습니다. <br />로그인 하세요.',
-                        '수업이 더이상 존재하지 않습니다.',
-                        '권한이 없습니다.'
-                    ];
-                    
-                    let error = this.props.classEditStatus.error;
-                    
-                    // NOTIFY ERROR
-                    let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[error - 1] + '</span>');
-                    Materialize.toast($toastContent, 2000);
-                
-                    // IF NOT LOGGED IN, REFRESH THE PAGE AFTER 2 SECONDS
-                    if(error === 3) {
-                        setTimeout(()=> {location.reload(false)}, 2000);
-                    }
-                    
-                }
-            }
-        );
-
-        return request;
+        this.props.onClassEdit(this.state.edittingId, this.state.edittingIndex, contents).then(() => {
+            this.handleCancel();
+        })
     }
     render() {
     	const classInfo = (
@@ -458,7 +411,8 @@ class MakeClass extends React.Component {
 
 MakeClass.propTypes = {
     studentsData: React.PropTypes.array,
-    onPost: React.PropTypes.func
+    onClassPost: React.PropTypes.func,
+    onClassEdit: React.PropTypes.func
 };
 
 MakeClass.defaultProps = {
@@ -472,7 +426,8 @@ MakeClass.defaultProps = {
         name: '',
         students: []
     },
-    onPost: (contents) => { console.error('post function not defined'); }
+    onClassPost: (contents) => { console.error('post function not defined'); },
+    onClassEdit: (contents) => { console.error('edit function not defined'); }
 };
 
 
@@ -480,23 +435,12 @@ const mapStateToProps = (state) => {
     return {
         editStatus: state.makeclass.editStudents,
         currentClass: state.makeclass.editClassPrep,
-        classEditStatus: state.makeclass.editClass,
-        studentsData: state.makeclass.getStudents.data
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        getStudentsInfoRequest: (classname) => {
-            return dispatch(getStudentsInfoRequest(classname));
-        },
-        studentsInfoEditRequest: (id, index, obj) => {
-            console.log(id, index, obj.name);
-            return dispatch(studentsInfoEditRequest(id, index, obj));
-        },
-        classEditRequest: (id, index, contents) => {
-            return dispatch(classEditRequest(id, index, contents));
-        }
+
     };
 };
 

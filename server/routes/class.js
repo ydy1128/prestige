@@ -36,7 +36,7 @@ router.post('/', (req, res) => {
     })
     cls.save( err => {
         if(err) throw err;
-        return res.json({ success: true });
+        return res.json({ success: true, data: cls });
     });
 });
 
@@ -120,12 +120,11 @@ router.delete('/:id', (req, res) => {
             code: 2
         });
     }
-
     // Find memo by id
     Class.findById(req.params.id, (err, cls) => {
         if(err) throw err;
-
         if(!cls) {
+            console.log('case 3');
             return res.status(404).json({
                 error: "NO RESOURCE",
                 code: 3
@@ -133,6 +132,7 @@ router.delete('/:id', (req, res) => {
         }
         //check if teacher is valid
         if(cls.teacher != req.session.loginInfo._id) {
+            console.log('case 4');
             return res.status(403).json({
                 error: "PERMISSION FAILURE",
                 code: 4

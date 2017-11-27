@@ -32,6 +32,10 @@ const initialState = {
     editClass: {
         status: 'INIT',
         error: -1,
+    },
+    removeClass: {
+        status: 'INIT',
+        error: -1
     }
 };
 
@@ -117,6 +121,11 @@ export default function makeclass(state, action) {
             return update(state, {
                 post: {
                     status: { $set: 'SUCCESS' }
+                },
+                board: {
+                    data: {
+                        $push: [action.data]
+                    }
                 }
             });
         case types.CLASS_POST_FAILURE:
@@ -165,8 +174,30 @@ export default function makeclass(state, action) {
                     error: { $set: action.error }
                 }
             });
+        case types.CLASS_REMOVE:
+            return update(state, {
+                removeClass: {
+                    status: { $set: 'WAITING' },
+                    error: { $set: -1 }
+                }
+            });
+        case types.CLASS_REMOVE_SUCCESS:
+            return update(state, {
+                removeClass:{
+                    status: { $set: 'SUCCESS' }
+                },
+                board: {
+                    data: { $splice: [[action.index, 1]] }
+                }
+            });
+        case types.CLASS_REMOVE_FAILURE:
+            return update(state, {
+                removeClass: {
+                    status: { $set: 'FAILURE' },
+                    error: { $set: action.error }
+                }
+            });
         default:
             return state;
     }
-    console.log('after switch')
 }

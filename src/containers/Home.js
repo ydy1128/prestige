@@ -2,7 +2,8 @@ import React from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import FontAwesome from 'react-fontawesome';
-import { classBoardRequest, classPostRequest, getStudentsInfoRequest } from 'actions/makeclass';
+import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest, 
+         getStudentsInfoRequest, studentsInfoEditRequest } from 'actions/makeclass';
 
 import { ClassBoard } from 'components';
 import { MakeClass } from 'components';
@@ -11,10 +12,13 @@ import { MakeClass } from 'components';
 class Home extends React.Component {
     constructor(props) {
         super(props);        
-        this.handlePost = this.handlePost.bind(this);
+        this.handleClassPost = this.handleClassPost.bind(this);
+        this.handleClassEdit = this.handleClassEdit.bind(this);
+        this.handleClassRemove = this.handleClassRemove.bind(this);
     }
     componentWillMount(){
-
+        this.props.getStudentsInfoRequest().then(function(){
+        })
     }
     componentDidMount(){
         $('.modal').modal({
@@ -22,7 +26,7 @@ class Home extends React.Component {
         });
         this.props.classBoardRequest().then(
             () => {
-                console.log('classData(Home): ', this.props.classData);
+
             }
         );
     }
@@ -44,22 +48,20 @@ class Home extends React.Component {
     }
     handleClick(ref){
     	let loginData = this.getLoginData();
-    	console.log(loginData);
     	loginData.role = ref;
     	document.cookie='key=' + btoa(JSON.stringify(loginData));
     }
-    handlePost(contents){
+
+    handleClassPost(contents){
         return this.props.classPostRequest(contents).then(
             () => {
-                console.log(this.props.postStatus.status)
-                if(this.props.postStatus.status === "SUCCESS") {
-                    // TRIGGER LOAD NEW MEMO
-                    // TO BE IMPLEMENTED
+                console.log(this.props.classPostStatus.status)
+                if(this.props.classPostStatus.status === "SUCCESS") {
                     Materialize.toast('수업이 개설 되었습니다!', 2000);
                 }
                 else {
                     let $toastContent;
-                    switch(this.props.postStatus.error) {
+                    switch(this.props.classPostStatus.error) {
                         case 1:
                             $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
                             Materialize.toast($toastContent, 2000);
@@ -74,9 +76,57 @@ class Home extends React.Component {
                             Materialize.toast($toastContent, 2000);
                             break;
                     }
+                    
                 }
             }
         );
+    }
+    handleClassEdit(id, index, contents){
+        return this.props.classEditRequest(id, index, contents).then(
+            () => {
+                if(this.props.classEditStatus.status==="SUCCESS") {
+                    Materialize.toast('수업 정보가 수정 되었습니다.', 2000);
+                } 
+                else {
+                    let errorMessage = [
+                        '',
+                        '모든 정보를 채워주세요.',
+                        '세션이 만료 되었습니다. <br />로그인 하세요.',
+                        '수업이 더이상 존재하지 않습니다.',
+                        '권한이 없습니다.'
+                    ];
+                    let error = this.props.classEditStatus.error;
+                    // NOTIFY ERROR
+                    let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[error - 1] + '</span>');
+                    Materialize.toast($toastContent, 2000);
+                    // IF NOT LOGGED IN, REFRESH THE PAGE AFTER 2 SECONDS
+                    if(error === 3) {
+                        setTimeout(()=> {location.reload(false)}, 2000);
+                    }
+                }
+            }
+        );
+    }
+    handleClassRemove(id, index){
+        this.props.classRemoveRequest(id, index).then(() => {
+            if(this.props.classRemoveStatus.status==="SUCCESS") {
+                Materialize.toast('수업이 삭제 되었습니다!', 2000);
+            } else {
+                let errorMessage = [
+                    '잘못된 접근입니다.',
+                    '세션이 만료되었습니다. <br /> 다시 로그인 하세요.',
+                    '수업이 존재하지 않습니다.',
+                    '권한이 없습니다.'
+                ];
+                 // NOTIFY ERROR
+                let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.classRemoveStatus.error - 1] + '</span>');
+                Materialize.toast($toastContent, 2000);
+                // IF NOT LOGGED IN, REFRESH THE PAGE
+                if(this.props.classRemoveStatus.error === 2) {
+                    setTimeout(()=> {location.reload(false)}, 2000);
+                }
+            }
+        });
     }
     render() {
     	const beforeLoginView = (
@@ -133,7 +183,11 @@ class Home extends React.Component {
     		<div className="row Main-loggedin">
     			{ sideMenu }
     			<div className="Boards-wrapper">
-                    <ClassBoard data={this.props.classData}/>
+                    <ClassBoard data={this.props.classData}
+                                studentsData={this.props.studentsData}
+                                onRemove={this.handleClassRemove}
+                                onStudentEdit={this.props.studentsInfoEditRequest}
+                                />
     			</div>
 
     		</div>
@@ -141,7 +195,11 @@ class Home extends React.Component {
     	
         return (
         	<div className="row Main">
-                <MakeClass onPost={this.handlePost} studentsData={this.props.studentsData} />
+                <MakeClass onClassPost={this.handleClassPost} 
+                            onClassEdit={this.handleClassEdit}
+                            studentsData={this.props.studentsData} 
+                            onStudentEdit={this.props.studentsInfoEditRequest}
+                            />
 	        	{ this.props.isLoggedIn ? afterLoginView : beforeLoginView }
         	</div>
         );
@@ -151,19 +209,36 @@ class Home extends React.Component {
 const mapStateToProps = (state) => {
     return {
         isLoggedIn: state.authentication.status.isLoggedIn,
+
         classData: state.makeclass.board.data,
-        postStatus: state.makeclass.post,
+        studentsData: state.makeclass.getStudents.data,
+
+        classPostStatus: state.makeclass.post,
+        classEditStatus: state.makeclass.editClass,
+        classRemoveStatus: state.makeclass.removeClass,
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
     return {
+        getStudentsInfoRequest: (classname) => {
+            return dispatch(getStudentsInfoRequest(classname));
+        },
+        studentsInfoEditRequest: (id, index, obj) => {
+            return dispatch(studentsInfoEditRequest(id, index, obj));
+        },
 
+        classBoardRequest: (isInitial, listType, id, username) => {
+            return dispatch(classBoardRequest(isInitial, listType, id, username));
+        },
         classPostRequest: (contents) => {
             return dispatch(classPostRequest(contents));
         },
-        classBoardRequest: (isInitial, listType, id, username) => {
-            return dispatch(classBoardRequest(isInitial, listType, id, username));
+        classEditRequest: (id, index, contents) => {
+            return dispatch(classEditRequest(id, index, contents));
+        },
+        classRemoveRequest: (id, index) => {
+            return dispatch(classRemoveRequest(id, index));
         }
     };
 };
