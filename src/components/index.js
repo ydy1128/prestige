@@ -12,7 +12,6 @@ export {
     Authentication,
     MakeClass,
     StudentObj,
-    ClassBoard,
     ClassObj,
     HWBoard,
     ClassBoard,
