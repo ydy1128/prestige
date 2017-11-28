@@ -16,6 +16,7 @@ import {
     CLASS_EDIT_SUCCESS,
     CLASS_EDIT_FAILURE
 } from './ActionTypes';
+
 import axios from 'axios';
 
 /* GET Student Info */
@@ -97,9 +98,9 @@ export function studentsInfoEditFailure(error) {
 export function classBoardRequest(isInitial, listType, id, username) {
     return (dispatch) => {
         dispatch(classBoard());
-        
+
         let url = '/api/class';
-          
+
         return axios.get(url)
         .then((response) => {
             console.log('actions: ', response.data)
@@ -168,11 +169,11 @@ export function classPostFailure(error) {
 export function classEditPrep(name, days, starttime, endtime, index, _id, students, flag){
     return {
         type: CLASS_EDIT_PREP,
-        name, 
-        days, 
-        starttime, 
-        endtime, 
-        index, 
+        name,
+        days,
+        starttime,
+        endtime,
+        index,
         _id,
         students,
         flag

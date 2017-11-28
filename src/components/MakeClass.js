@@ -257,7 +257,7 @@ class MakeClass extends React.Component {
         })
     }
     handleEdit() {
-        let contents = { 
+        let contents = {
             name: this.state.classname,
             days: this.state.dayarray.join(''),
             startTime: this.state.starttime,
@@ -274,7 +274,7 @@ class MakeClass extends React.Component {
                     //TODO: REST가 SUCCESS를 리턴하지 않아서 에러 메세지를 띄우는것이 불가능
                     // if(props.editStatus.status !== 'SUCCESS'){
                     //     let $toastContent = $('<span style="color: #FFB4BA">학생 정보 수정 에러</span>');
-                    //     Materialize.toast($toastContent, 2000);    
+                    //     Materialize.toast($toastContent, 2000);
                     // }
                 });
             }
@@ -287,7 +287,7 @@ class MakeClass extends React.Component {
                     //TODO: REST가 SUCCESS를 리턴하지 않아서 에러 메세지를 띄우는것이 불가능
                     // if(props.editStudentsStatus.status !== 'SUCCESS'){
                     //     let $toastContent = $('<span style="color: #FFB4BA">학생 정보 수정 에러</span>');
-                    //     Materialize.toast($toastContent, 2000);    
+                    //     Materialize.toast($toastContent, 2000);
                     // }
                 });
             }
@@ -299,7 +299,7 @@ class MakeClass extends React.Component {
                 if(this.props.classEditStatus.status==="SUCCESS") {
                     Materialize.toast('수업 정보가 수정 되었습니다.', 2000);
                     this.handleCancel();
-                } 
+                }
                 else {
                     let errorMessage = [
                         '',
@@ -308,18 +308,18 @@ class MakeClass extends React.Component {
                         '수업이 더이상 존재하지 않습니다.',
                         '권한이 없습니다.'
                     ];
-                    
+
                     let error = this.props.classEditStatus.error;
-                    
+
                     // NOTIFY ERROR
                     let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[error - 1] + '</span>');
                     Materialize.toast($toastContent, 2000);
-                
+
                     // IF NOT LOGGED IN, REFRESH THE PAGE AFTER 2 SECONDS
                     if(error === 3) {
                         setTimeout(()=> {location.reload(false)}, 2000);
                     }
-                    
+
                 }
             }
         );
@@ -330,9 +330,9 @@ class MakeClass extends React.Component {
     	const classInfo = (
     		<div>
                 <div className="input-field col s12 classname">
-                    <input 
+                    <input
                         placeholder="-"
-                        type="text" 
+                        type="text"
                         name="classname"
                         className="validate"
                         onChange={this.handleChange}
@@ -379,7 +379,7 @@ class MakeClass extends React.Component {
                         onChange={this.handleChange}
                         value={this.state.endtime}
                         />
-                </div> 
+                </div>
             </div>
     	)
         const mapToComponents1 = data => {
@@ -444,7 +444,7 @@ class MakeClass extends React.Component {
             <div id="classInfoModal" className="modal modal-fixed-footer">
                 <div className="modal-content">
                     <h4>{ this.state.mode ? "반편성" : "학생관리" }</h4>
-                    { this.state.mode ? classInfo : studentsInfo }           
+                    { this.state.mode ? classInfo : studentsInfo }
 	            </div>
                 <div className="modal-footer">
                     <a className="modal-action modal-close waves-effect waves-green btn-flat left">반 제거</a>
