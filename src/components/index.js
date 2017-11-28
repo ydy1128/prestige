@@ -2,7 +2,8 @@ import Header from './Header';
 import Authentication from './Authentication';
 import MakeClass from './MakeClass';
 import StudentObj from './StudentObj';
-import ClassBoard from './ClassBoard';
 import ClassObj from './ClassObj';
+import ClassBoard from './ClassBoard';
+import StudentBoard from './StudentBoard';
 
-export { Header, Authentication, MakeClass, StudentObj, ClassBoard, ClassObj };
+export { Header, Authentication, MakeClass, StudentObj, ClassObj, ClassBoard, StudentBoard };

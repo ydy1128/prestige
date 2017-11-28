@@ -86,7 +86,7 @@ class ClassBoard extends React.Component{
 	render(){
         const boardHeader = (
             <div className="Board-header col m12">
-                <div className="col m4"><h4 className="">수업관리</h4></div>
+                <div className="col m4"><h4>수업관리</h4></div>
                 <div className="icons col m8">
                     <a onClick={this.handleRemove}>
                         <FontAwesome className={'remove-button right ' + this.getPlusActive(false)} name="trash-o" />
