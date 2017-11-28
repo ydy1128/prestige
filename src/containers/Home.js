@@ -2,21 +2,19 @@ import React from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import FontAwesome from 'react-fontawesome';
-import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest, 
+import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest,
          getStudentsInfoRequest, studentsInfoEditRequest } from 'actions/makeclass';
 
-import { ClassBoard } from 'components';
-import { MakeClass } from 'components';
-
+import { ClassBoard, MakeClass, HWBoard } from 'components';
 
 class Home extends React.Component {
     constructor(props) {
-        super(props);        
+        super(props);
 
-        // TEACHER_DASHBOARD, TEACHER_STUDENTBOARD, TEACHER_CLASSBOARD, TEACHER_LECTUREBOARD, TEACHER_HWBOARD 
+        // TEACHER_DASHBOARD, TEACHER_STUDENTBOARD, TEACHER_CLASSBOARD, TEACHER_LECTUREBOARD, TEACHER_HWBOARD
         // STUDENT_DASHBOARD, STUDENT_LECTUREBOARD, STUDENT_HWBOARD
         this.state = {
-            view_type: 'TEACHER_DASHBOARD' 
+            view_type: 'TEACHER_DASHBOARD'
         }
 
         this.handleClassPost = this.handleClassPost.bind(this);
@@ -76,7 +74,7 @@ class Home extends React.Component {
                             Materialize.toast($toastContent, 2000);
                             break;
                     }
-                    
+
                 }
             }
         );
@@ -86,7 +84,7 @@ class Home extends React.Component {
             () => {
                 if(this.props.classEditStatus.status==="SUCCESS") {
                     Materialize.toast('수업 정보가 수정 되었습니다.', 2000);
-                } 
+                }
                 else {
                     let errorMessage = [
                         '',
@@ -148,7 +146,7 @@ class Home extends React.Component {
             case 'TEACHER_LECTUREBOARD':
                 return (<div>LectureBoard</div>);
             case 'TEACHER_HWBOARD':
-                return (<div>HWBoard</div>);
+                return (<HWBoard />);
             case 'STUDENT_DASHBOARD':
                 return (<div>DASHBOARD</div>);
             case 'STUDENT_LECTUREBOARD':
@@ -225,12 +223,12 @@ class Home extends React.Component {
 
     		</div>
     	)
-    	
+
         return (
         	<div className="row Main">
-                <MakeClass onClassPost={this.handleClassPost} 
+                <MakeClass onClassPost={this.handleClassPost}
                             onClassEdit={this.handleClassEdit}
-                            studentsData={this.props.studentsData} 
+                            studentsData={this.props.studentsData}
                             onStudentEdit={this.props.studentsInfoEditRequest}
                             />
 	        	{ this.props.isLoggedIn ? afterLoginView : beforeLoginView }
