@@ -14,7 +14,10 @@ import {
     CLASS_EDIT_PREP,
     CLASS_EDIT,
     CLASS_EDIT_SUCCESS,
-    CLASS_EDIT_FAILURE
+    CLASS_EDIT_FAILURE,
+    CLASS_REMOVE,
+    CLASS_REMOVE_SUCCESS,
+    CLASS_REMOVE_FAILURE
 } from './ActionTypes';
 
 import axios from 'axios';
@@ -43,8 +46,6 @@ export function getStudentsInfo() {
 }
 
 export function getStudentsInfoSuccess(data) {
-    console.log('success', data)
-
     return {
         type: GET_STUDENTS_INFO_SUCCESS,
         data
@@ -64,7 +65,6 @@ export function studentsInfoEditRequest(id, index, obj) {
         dispatch(studentsInfoEdit());
         return axios.put('/api/student/' + id, {obj})
         .then((response) => {
-            console.log(id, index, response.data.std.name)
             dispatch(studentsInfoEditSuccess(id, index, response.data.std));
         }).catch((error) => {
             dispatch(studentsInfoEditFailure(error.response.data.code));
@@ -79,7 +79,6 @@ export function studentsInfoEdit() {
 }
 
 export function studentsInfoEditSuccess(id, index, data) {
-    console.log('success called in actions')
     return {
         type: STUDENT_INFO_EDIT_SUCCESS,
         index,
@@ -103,7 +102,6 @@ export function classBoardRequest(isInitial, listType, id, username) {
 
         return axios.get(url)
         .then((response) => {
-            console.log('actions: ', response.data)
             dispatch(classBoardSuccess(response.data, isInitial, listType));
         }).catch((error) => {
             dispatch(classBoardFailure());
@@ -139,7 +137,8 @@ export function classPostRequest(contents) {
 
         return axios.post('/api/class', { contents })
         .then((response) => {
-            dispatch(classPostSuccess());
+            console.log(response.data.data)
+            dispatch(classPostSuccess(response.data.data));
         }).catch((error) => {
             dispatch(classPostFailure(error.response.data.code));
         });
@@ -152,9 +151,10 @@ export function classPost() {
     };
 }
 
-export function classPostSuccess() {
+export function classPostSuccess(data) {
     return {
-        type: CLASS_POST_SUCCESS
+        type: CLASS_POST_SUCCESS,
+        data
     };
 }
 
@@ -213,3 +213,39 @@ export function classEditFailure(error) {
         error
     };
 }
+<<<<<<< HEAD
+=======
+
+/* MEMO REMOVE */
+export function classRemoveRequest(id, index) {
+    return (dispatch) => {
+        dispatch(classRemove());
+        return axios.delete('/api/class/' + id)
+        .then((response) => {
+            dispatch(classRemoveSuccess(index));
+        }).catch((error) => {
+            dispatch(classRemoveFailure());
+        });
+    };
+}
+
+export function classRemove() {
+    return {
+        type: CLASS_REMOVE
+    };
+}
+
+export function classRemoveSuccess(index) {
+    return {
+        type: CLASS_REMOVE_SUCCESS,
+        index
+    };
+}
+
+export function classRemoveFailure(error) {
+    return {
+        type: CLASS_REMOVE_FAILURE,
+        error
+    };
+}
+>>>>>>> c36c2f0627f76bb82de934a07bcf780259f9deec

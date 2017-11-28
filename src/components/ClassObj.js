@@ -25,9 +25,11 @@ class ClassObj extends React.Component{
 		this.props.classEditPrep(data.name, data.days, data.startTime, data.endTime, this.props.index, data._id, data.students, false);		
 	}
 	handleClick(){
+		this.props.getClick(this.props.data, this.props.index, !this.state.selected);
 		this.setState({
 			selected: !this.state.selected
 		})
+		
 	}
 	handleSelected(){
 		if(this.state.selected){
@@ -36,6 +38,9 @@ class ClassObj extends React.Component{
 		else{
 			return 'white';
 		}
+	}
+	getObj(){
+		return {data: this.props.data, selected: this.state.selected};
 	}
 	render(){
 		const color_stock = ['red lighten-2', 'indigo lighten-2', 'teal lighten-1', 'yellow lighten-1', 'brown lighten-1', 'pink lighten-3', 'blue lighten-2', 'green lighten-1', 'amber lighten-2', 'grey lighten-1', 'purple lighten-2', 'light-blue lighten-3', 'light-green lighten-2', 'orange lighten-2', ]
@@ -65,6 +70,7 @@ class ClassObj extends React.Component{
 
 ClassObj.propTypes = {
     data: React.PropTypes.object,
+    getClick: React.PropTypes.func
 };
 
 ClassObj.defaultProps = {
@@ -78,7 +84,8 @@ ClassObj.defaultProps = {
         days: '월수금',
         
     },
-    index: -1
+    index: -1,
+    getClick: () =>{console.log('getClick not defined')}
 }
 
 const mapDispatchToProps = (dispatch) => {
