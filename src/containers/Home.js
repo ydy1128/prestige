@@ -5,7 +5,7 @@ import FontAwesome from 'react-fontawesome';
 import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest,
          getStudentsInfoRequest, studentsInfoEditRequest } from 'actions/makeclass';
 
-import { ClassBoard, MakeClass, HWBoard } from 'components';
+import { ClassBoard, MakeClass, StudentBoard, HWBoard } from 'components';
 
 class Home extends React.Component {
     constructor(props) {
@@ -136,7 +136,7 @@ class Home extends React.Component {
             case 'TEACHER_DASHBOARD':
                 return (<div>DashBoard</div>);
             case 'TEACHER_STUDENTBOARD':
-                return (<div>StudentBoard</div>);
+                return (<StudentBoard studentsData={this.props.studentsData} />);
             case 'TEACHER_CLASSBOARD':
                 return (<ClassBoard data={this.props.classData}
                                 studentsData={this.props.studentsData}
@@ -194,11 +194,11 @@ class Home extends React.Component {
     	);
     	const teacherMenu = (
 			<ul className="">
-				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_DASHBOARD')} name="TEACHER_DASHBOARD" onClick={this.handleMenuClick}>대시보드</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_DASHBOARD')}    name="TEACHER_DASHBOARD"    onClick={this.handleMenuClick}>대시보드</a></li>
                 <li><a className={'waves-effect '+this.setMenuActive('TEACHER_STUDENTBOARD')} name="TEACHER_STUDENTBOARD" onClick={this.handleMenuClick}>학생관리</a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_CLASSBOARD')} name="TEACHER_CLASSBOARD" onClick={this.handleMenuClick}>수업관리</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_CLASSBOARD')}   name="TEACHER_CLASSBOARD"   onClick={this.handleMenuClick}>수업관리</a></li>
 				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_LECTUREBOARD')} name="TEACHER_LECTUREBOARD" onClick={this.handleMenuClick}>강의관리</a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_HWBOARD')} name="TEACHER_HWBOARD" onClick={this.handleMenuClick}>숙제관리</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_HWBOARD')}      name="TEACHER_HWBOARD"      onClick={this.handleMenuClick}>숙제관리</a></li>
 			</ul>
     	)
     	const studentMenu = (

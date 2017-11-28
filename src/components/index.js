@@ -2,9 +2,10 @@ import Header from './Header';
 import Authentication from './Authentication';
 import MakeClass from './MakeClass';
 import StudentObj from './StudentObj';
-import ClassBoard from './ClassBoard';
 import ClassObj from './ClassObj';
 import HWBoard from './HWBoard';
+import ClassBoard from './ClassBoard';
+import StudentBoard from './StudentBoard';
 
 export {
     Header,
@@ -13,5 +14,7 @@ export {
     StudentObj,
     ClassBoard,
     ClassObj,
-    HWBoard
+    HWBoard,
+    ClassBoard,
+    StudentBoard
 };
