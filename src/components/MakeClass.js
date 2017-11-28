@@ -240,12 +240,8 @@ class MakeClass extends React.Component {
         })
     }
     handleEdit() {
-<<<<<<< HEAD
-        let contents = {
-=======
         console.log('handleEdit called: ', this.state.newClass)
-        let contents = { 
->>>>>>> c36c2f0627f76bb82de934a07bcf780259f9deec
+        let contents = {
             name: this.state.classname,
             days: this.state.dayarray.join(''),
             startTime: this.state.starttime,
@@ -279,45 +275,9 @@ class MakeClass extends React.Component {
                 });
             }
         });
-<<<<<<< HEAD
-
-        let request = this.props.classEditRequest(this.state.edittingId, this.state.edittingIndex, contents).then(
-            () => {
-                console.log(this.props.classEditStatus.status)
-                if(this.props.classEditStatus.status==="SUCCESS") {
-                    Materialize.toast('수업 정보가 수정 되었습니다.', 2000);
-                    this.handleCancel();
-                }
-                else {
-                    let errorMessage = [
-                        '',
-                        '모든 정보를 채워주세요.',
-                        '세션이 만료 되었습니다. <br />로그인 하세요.',
-                        '수업이 더이상 존재하지 않습니다.',
-                        '권한이 없습니다.'
-                    ];
-
-                    let error = this.props.classEditStatus.error;
-
-                    // NOTIFY ERROR
-                    let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[error - 1] + '</span>');
-                    Materialize.toast($toastContent, 2000);
-
-                    // IF NOT LOGGED IN, REFRESH THE PAGE AFTER 2 SECONDS
-                    if(error === 3) {
-                        setTimeout(()=> {location.reload(false)}, 2000);
-                    }
-
-                }
-            }
-        );
-
-        return request;
-=======
         this.props.onClassEdit(this.state.edittingId, this.state.edittingIndex, contents).then(() => {
             this.handleCancel();
         })
->>>>>>> c36c2f0627f76bb82de934a07bcf780259f9deec
     }
     render() {
     	const classInfo = (

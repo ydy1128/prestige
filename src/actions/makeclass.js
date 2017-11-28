@@ -213,8 +213,6 @@ export function classEditFailure(error) {
         error
     };
 }
-<<<<<<< HEAD
-=======
 
 /* MEMO REMOVE */
 export function classRemoveRequest(id, index) {
@@ -248,4 +246,3 @@ export function classRemoveFailure(error) {
         error
     };
 }
->>>>>>> c36c2f0627f76bb82de934a07bcf780259f9deec
