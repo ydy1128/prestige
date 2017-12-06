@@ -1,5 +1,5 @@
 import express from 'express';
-import Student from '../models/student';
+import Student from '../models/Student';
 
 const router = express.Router();
 
@@ -134,7 +134,7 @@ router.put('/:id', (req, res)=>{
                 std
             });
         });
-        
+
     });
 })
 

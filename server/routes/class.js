@@ -1,5 +1,5 @@
 import express from 'express';
-import Class from '../models/class';
+import Class from '../models/Class';
 import mongoose from 'mongoose';
 
 const router = express.Router();
@@ -99,7 +99,7 @@ router.put('/:id', (req, res) => {
                 cls
             });
         });
-        
+
     });
 });
 
