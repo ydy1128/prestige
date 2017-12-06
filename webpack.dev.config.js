@@ -4,22 +4,21 @@ var path = require('path');
 module.exports = {
     entry: [
         './src/index.js',
-        'webpack-dev-server/client?http://0.0.0.0:4000',
+        'webpack-dev-server/client?http://0.0.0.0:2828',
         'webpack/hot/only-dev-server',
         './src/style/style.scss'
     ],
     output: {
         path: '/',
-        filename: 'bundle.js'
+        filename: 'bundle.js',
     },
     devServer: {
-        hot: true,
         filename: 'bundle.js',
         publicPath: '/',
         historyApiFallback: true,
         contentBase: './public',
         proxy: {
-            "**": "http://localhost:3000"
+            "**": "http://localhost:2929"
         },
         stats: {
           assets: false,
@@ -48,7 +47,8 @@ module.exports = {
             },
             {
                 test: /\.scss$/,
-                loader: 'style-loader!css-loader?sourceMap!sass-loader?sourceMap'
+                loader: 'style-loader!css-loader?sourceMap!sass-loader?sourceMap',
+                exclude: /node_modules/
             }
         ]
     },
