@@ -1,6 +1,7 @@
 let Assignments = [
   {
     _id: "id",
+    teacherId: ""
     index: null, // class 안에서 추가된 순서
     title: null, // text
     content: null, // text
