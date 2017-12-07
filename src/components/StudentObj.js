@@ -1,4 +1,8 @@
 import React from 'react';
+import {
+    TableRow,
+    TableRowColumn
+} from 'material-ui/Table';
 
 class StudentObj extends React.Component{
 	constructor(props){
@@ -32,16 +36,23 @@ class StudentObj extends React.Component{
 			return "collection-item row Student-obj";
 	}
 	render(){
+		// const d = (
+		// 	<li className={this.toggleSelected()} onClick={this.clickHandler}>
+		// 		<p className="col s2">
+		// 			<input type="checkbox" id={this.getBoxId()} checked="checked" disabled="disabled" />
+		// 			<label htmlFor={this.getBoxId()}></label>
+		// 		</p>
+		// 		<p className="col s3">{this.props.data.name}</p>
+		// 		<p className="col s3">{this.props.data.school}</p>
+		// 		<p className="col s3">{this.props.data.level}학년</p>
+		// 	</li>
+		// )
 		return(
-			<li className={this.toggleSelected()} onClick={this.clickHandler}>
-				<p className="col s2">
-					<input type="checkbox" id={this.getBoxId()} checked="checked" disabled="disabled" />
-					<label htmlFor={this.getBoxId()}></label>
-				</p>
-				<p className="col s3">{this.props.data.name}</p>
-				<p className="col s3">{this.props.data.school}</p>
-				<p className="col s3">{this.props.data.level}학년</p>
-			</li>
+			<TableRow key={this.props.data._id}>
+                <TableRowColumn>{this.props.data.name}</TableRowColumn>
+                <TableRowColumn>{this.props.data.school}</TableRowColumn>
+                <TableRowColumn>{this.props.data.level}학년</TableRowColumn>
+			</TableRow>
 		)
 	}
 }

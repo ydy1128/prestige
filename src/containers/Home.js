@@ -20,6 +20,7 @@ class Home extends React.Component {
         this.handleClassPost = this.handleClassPost.bind(this);
         this.handleClassEdit = this.handleClassEdit.bind(this);
         this.handleClassRemove = this.handleClassRemove.bind(this);
+        this.handleStudentEdit = this.handleStudentEdit.bind(this);
 
         this.handleMenuClick = this.handleMenuClick.bind(this);
         this.setMenuActive = this.setMenuActive.bind(this);
@@ -49,7 +50,34 @@ class Home extends React.Component {
     	loginData.role = ref;
     	document.cookie='key=' + btoa(JSON.stringify(loginData));
     }
-
+    handleStudentEdit(stdobj, index, silent){
+        console.log(stdobj)
+        return this.props.studentsInfoEditRequest(stdobj._id, index, stdobj).then(() =>{
+            if(!silent){
+                if(this.props.classPostStatus.status === "SUCCESS") {
+                    Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
+                }
+                else {
+                    let $toastContent;
+                    switch(this.props.classPostStatus.error) {
+                        case 1:
+                            $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
+                            Materialize.toast($toastContent, 2000);
+                            setTimeout(()=> {location.reload(false);}, 2000);
+                            break;
+                        case 2:
+                            $toastContent = $('<span style="color: #FFB4BA">모든 정보를 채워주세요.</span>');
+                            Materialize.toast($toastContent, 2000);
+                            break;
+                        default:
+                            $toastContent = $('<span style="color: #FFB4BA">서버 에러 발생. <br /> 관리자에게 문의하세요.</span>');
+                            Materialize.toast($toastContent, 2000);
+                            break;
+                    }
+                }
+            }
+        })
+    }
     handleClassPost(contents){
         return this.props.classPostRequest(contents).then(
             () => {
@@ -136,12 +164,13 @@ class Home extends React.Component {
             case 'TEACHER_DASHBOARD':
                 return (<div>DashBoard</div>);
             case 'TEACHER_STUDENTBOARD':
-                return (<StudentBoard studentsData={this.props.studentsData} />);
+                return (<StudentBoard studentsData={this.props.studentsData} 
+                                onStudentEdit={this.handleStudentEdit}/>);
             case 'TEACHER_CLASSBOARD':
                 return (<ClassBoard data={this.props.classData}
                                 studentsData={this.props.studentsData}
                                 onRemove={this.handleClassRemove}
-                                onStudentEdit={this.props.studentsInfoEditRequest}
+                                onStudentEdit={this.handleStudentEdit}
                                 />);
             case 'TEACHER_LECTUREBOARD':
                 return (<div>LectureBoard</div>);
@@ -229,7 +258,7 @@ class Home extends React.Component {
                 <MakeClass onClassPost={this.handleClassPost}
                             onClassEdit={this.handleClassEdit}
                             studentsData={this.props.studentsData}
-                            onStudentEdit={this.props.studentsInfoEditRequest}
+                            onStudentEdit={this.handleStudentEdit}
                             />
 	        	{ this.props.isLoggedIn ? afterLoginView : beforeLoginView }
         	</div>
@@ -243,7 +272,7 @@ const mapStateToProps = (state) => {
 
         classData: state.makeclass.board.data,
         studentsData: state.makeclass.getStudents.data,
-
+        studentEditStatus: state.makeclass.editStudents,
         classPostStatus: state.makeclass.post,
         classEditStatus: state.makeclass.editClass,
         classRemoveStatus: state.makeclass.removeClass,

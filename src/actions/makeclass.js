@@ -5,6 +5,9 @@ import {
     STUDENT_INFO_EDIT,
     STUDENT_INFO_EDIT_SUCCESS,
     STUDENT_INFO_EDIT_FAILURE,
+    STUDENT_INFO_REMOVE,
+    STUDENT_INFO_REMOVE_SUCCESS,
+    STUDENT_INFO_REMOVE_FAILURE,
     CLASS_BOARD,
     CLASS_BOARD_SUCCESS,
     CLASS_BOARD_FAILURE,
@@ -92,6 +95,40 @@ export function studentsInfoEditFailure(error) {
         error
     };
 }
+
+/* CLASS REMOVE */
+export function studentsInfoRemoveRequest(id, index) {
+    return (dispatch) => {
+        dispatch(studentsInfoRemove());
+        return axios.delete('/api/student/' + id)
+        .then((response) => {
+            dispatch(studentsInfoRemoveSuccess(index));
+        }).catch((error) => {
+            dispatch(studentsInfoRemoveFailure());
+        });
+    };
+}
+
+export function studentsInfoRemove() {
+    return {
+        type: STUDENT_INFO_REMOVE
+    };
+}
+
+export function studentsInfoRemoveSuccess(index) {
+    return {
+        type: STUDENT_INFO_REMOVE_SUCCESS,
+        index
+    };
+}
+
+export function studentsInfoRemoveFailure(error) {
+    return {
+        type: STUDENT_INFO_REMOVE_FAILURE,
+        error
+    };
+}
+
 
 /* Class Board */
 export function classBoardRequest(isInitial, listType, id, username) {
@@ -214,7 +251,7 @@ export function classEditFailure(error) {
     };
 }
 
-/* MEMO REMOVE */
+/* CLASS REMOVE */
 export function classRemoveRequest(id, index) {
     return (dispatch) => {
         dispatch(classRemove());

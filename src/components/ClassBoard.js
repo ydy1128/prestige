@@ -32,8 +32,7 @@ class ClassBoard extends React.Component{
                 let std_idx = this.props.studentsData.findIndex(x => x._id == student_ids[i]);
                 let std_obj = this.props.studentsData[std_idx]
                 std_obj.class = '';
-                props.onStudentEdit(std_obj._id, std_idx, std_obj).then(() =>{})
-                // console.log(std_obj)
+                props.onStudentEdit(std_obj, std_idx, true);
             }
             this.setState({
                 selected: [],
@@ -110,7 +109,6 @@ class ClassBoard extends React.Component{
 		return(
             <div className="Boards">
                 { boardHeader }
-                <hr className="col m12"/>
 	            <div className="Board-contents row">
 	            	{mapToComponents(this.props.data)}
 	            </div>

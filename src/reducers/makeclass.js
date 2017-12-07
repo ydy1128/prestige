@@ -10,6 +10,10 @@ const initialState = {
         status: 'INIT',
         error: -1,
     },
+    removeStudents: {
+        status: 'INIT',
+        error: -1,
+    },
     board: {
         status: 'INIT',
         data: [],
@@ -86,6 +90,29 @@ export default function makeclass(state, action) {
         case types.STUDENT_INFO_EDIT_FAILIURE:
             return update(state, {
                 editStudents: {
+                    status: { $set: 'FAILURE' },
+                    error: { $set: action.error }
+                }
+            });
+        case types.STUDENT_INFO_REMOVE:
+            return update(state, {
+                removeStudents: {
+                    status: { $set: 'WAITING' },
+                    error: { $set: -1 }
+                }
+            });
+        case types.STUDENT_INFO_REMOVE_SUCCESS:
+            return update(state, {
+                removeStudents:{
+                    status: { $set: 'SUCCESS' }
+                },
+                getStudents: {
+                    data: { $splice: [[action.index, 1]] }
+                }
+            });
+        case types.STUDENT_INFO_REMOVE_FAILURE:
+            return update(state, {
+                removeStudents: {
                     status: { $set: 'FAILURE' },
                     error: { $set: action.error }
                 }
