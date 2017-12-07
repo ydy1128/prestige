@@ -2,9 +2,11 @@ var webpack = require('webpack');
 var path = require('path');
 
 module.exports = {
+    devtool: 'cheap-module-eval-source-map',
     entry: [
         './src/index.js',
         'webpack-dev-server/client?http://0.0.0.0:2828',
+        'react-hot-loader/patch',
         'webpack/hot/only-dev-server',
         './src/style/style.scss'
     ],
@@ -13,6 +15,8 @@ module.exports = {
         filename: 'bundle.js',
     },
     devServer: {
+        inline: true,
+        hot: true,
         filename: 'bundle.js',
         publicPath: '/',
         historyApiFallback: true,
@@ -31,6 +35,7 @@ module.exports = {
         }
     },
     plugins: [
+        new webpack.NamedModulesPlugin(),
         new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoEmitOnErrorsPlugin()
@@ -39,7 +44,7 @@ module.exports = {
         loaders: [
             {
                 test: /\.js$/,
-                loaders: ['react-hot-loader', 'babel-loader?' + JSON.stringify({
+                loaders: ['babel-loader?' + JSON.stringify({
                     cacheDirectory: true,
                     presets: ['es2015', 'react']
                 })],
