@@ -3,6 +3,16 @@ import { connect } from 'react-redux';
 import FontAwesome from 'react-fontawesome';
 import update from 'react-addons-update';
 
+import {
+    Table,
+    TableBody,
+    TableFooter,
+    TableHeader,
+    TableHeaderColumn,
+    TableRow,
+    TableRowColumn,
+} from 'material-ui/Table';
+
 import StudentObj from './StudentObj';
 
 class MakeClass extends React.Component {
@@ -16,6 +26,8 @@ class MakeClass extends React.Component {
             endtime: '',
             students: [],
             selectedStudents: [],
+            clickedStudents: [],
+            clickedSelectedStudents: [],
             mode: true,
             newClass: true,
             edittingIndex: -1,
@@ -31,6 +43,9 @@ class MakeClass extends React.Component {
         this.removeFromClass = this.removeFromClass.bind(this);
         this.handlePost = this.handlePost.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
+
+        this.onStudentCellClick = this.onStudentCellClick.bind(this);
+        this.onSelectedStudentCellClick = this.onSelectedStudentCellClick.bind(this);
     }
     componentWillMount(){
 
@@ -91,6 +106,8 @@ class MakeClass extends React.Component {
             dayarray: tempdayarray,
             selectedStudents: selectedStudents,
             students: students,
+            clickedStudents: [],
+            clickedSelectedStudents: [],
             mode: nextProps.currentClass.flag
         };
 
@@ -145,6 +162,8 @@ class MakeClass extends React.Component {
             endtime: '',
             edittingIndex: -1,
             edittingIndex: '',
+            clickedStudents: [],
+            clickedSelectedStudents: [],
             newClass: true,
             mode: true
         }
@@ -185,46 +204,41 @@ class MakeClass extends React.Component {
             }
         }
     }
-    shouldComponentUpdate(nextProps, nextState){
-        if(nextState != this.state){
-            return true;
-        }
-        return false;
-    }
     addToClass(){
         let students = [...this.state.students], selectedStudents = [...this.state.selectedStudents];
-        for (let key in this.refs){
-            let newObj = this.refs[key].addToClass();
-            if(newObj != undefined){
-                let index = students.indexOf(newObj);
-                if(index != -1){
-                    newObj.class = this.state.classname;
-                    students.splice(index, 1);
-                    selectedStudents.push(newObj);
-                }
-            }
+        console.log(this.state.clickedStudents)
+        for(let i = 0; i < this.state.clickedStudents.length; i++){
+            let index = this.state.clickedStudents[i];
+            let newObj = students[index];
+            newObj.class = this.state.classname;
+            selectedStudents.push(newObj);
+        }
+        for(let i = 0; i < this.state.clickedStudents.length; i++){
+            let index = this.state.clickedStudents[i];
+            students.splice(index, 1);
         }
         this.setState({
             selectedStudents: selectedStudents,
-            students: students
+            students: students,
+            clickedStudents: []
         })
     }
     removeFromClass(){
         let students = [...this.state.students], selectedStudents = [...this.state.selectedStudents];
-        for (let key in this.refs){
-            let newObj = this.refs[key].addToClass();
-            if(newObj != undefined){
-                let index = selectedStudents.indexOf(newObj);
-                if(index != -1){
-                    newObj.class = '';
-                    selectedStudents.splice(index, 1);
-                    students.push(newObj);
-                }
-            }
+        for(let i = 0; i < this.state.clickedSelectedStudents.length; i++){
+            let index = this.state.clickedSelectedStudents[i];
+            let newObj = selectedStudents[index];
+            newObj.class = this.state.classname;
+            students.push(newObj);
+        }
+        for(let i = 0; i < this.state.clickedSelectedStudents.length; i++){
+            let index = this.state.clickedSelectedStudents[i];
+            selectedStudents.splice(index, 1);
         }
         this.setState({
             selectedStudents: selectedStudents,
-            students: students
+            students: students,
+            clickedSelectedStudents: []
         })
     }
     handlePost(){
@@ -241,7 +255,7 @@ class MakeClass extends React.Component {
     }
     handleEdit() {
         console.log('handleEdit called: ', this.state.newClass)
-        let contents = {
+        let contents = { 
             name: this.state.classname,
             days: this.state.dayarray.join(''),
             startTime: this.state.starttime,
@@ -253,39 +267,45 @@ class MakeClass extends React.Component {
         let addingStudents = this.state.selectedStudents.filter( function( el ) {
             let index = props.studentsData.findIndex(x => x._id==el._id);
             if(props.studentsData[index].class != el.class){
-                props.onStudentEdit(el._id, index, el).then(() =>{
-                    //TODO: REST가 SUCCESS를 리턴하지 않아서 에러 메세지를 띄우는것이 불가능
-                    // if(props.editStatus.status !== 'SUCCESS'){
-                    //     let $toastContent = $('<span style="color: #FFB4BA">학생 정보 수정 에러</span>');
-                    //     Materialize.toast($toastContent, 2000);
-                    // }
-                });
+                props.onStudentEdit(el, index, true);
             }
         });
 
         let removingStudents = this.state.students.filter( function( el ) {
             let index = props.studentsData.findIndex(x => x._id==el._id);
             if(props.studentsData[index].class != el.class){
-                props.onStudentEdit(el._id, index, el).then(() =>{
-                    //TODO: REST가 SUCCESS를 리턴하지 않아서 에러 메세지를 띄우는것이 불가능
-                    // if(props.editStudentsStatus.status !== 'SUCCESS'){
-                    //     let $toastContent = $('<span style="color: #FFB4BA">학생 정보 수정 에러</span>');
-                    //     Materialize.toast($toastContent, 2000);
-                    // }
-                });
+                props.onStudentEdit(el, index, true);
             }
         });
         this.props.onClassEdit(this.state.edittingId, this.state.edittingIndex, contents).then(() => {
             this.handleCancel();
         })
     }
+    onStudentCellClick(rowNumber, columnId){
+        let clicked = [...this.state.clickedStudents];
+        let index = clicked.indexOf(rowNumber);
+        if(index == -1)
+            clicked.push(rowNumber);
+        else
+            clicked.splice(index, 1);
+        this.state.clickedStudents = clicked;
+    }
+    onSelectedStudentCellClick(rowNumber, columnId){
+        let clicked = [...this.state.clickedSelectedStudents];
+        let index = clicked.indexOf(rowNumber);
+        if(index == -1)
+            clicked.push(rowNumber);
+        else
+            clicked.splice(index, 1);
+        this.state.clickedSelectedStudents = clicked;
+    }
     render() {
     	const classInfo = (
     		<div>
                 <div className="input-field col s12 classname">
-                    <input
+                    <input 
                         placeholder="-"
-                        type="text"
+                        type="text" 
                         name="classname"
                         className="validate"
                         onChange={this.handleChange}
@@ -332,72 +352,84 @@ class MakeClass extends React.Component {
                         onChange={this.handleChange}
                         value={this.state.endtime}
                         />
-                </div>
+                </div> 
             </div>
     	)
-        const mapToComponents1 = data => {
+        const mapToComponents = data => {
             return data.map((stdobj, i) => {
-                let childname = 'child1-'+stdobj._id;
-                if(stdobj.class == '')
-                    return (<StudentObj ref={childname} data={stdobj} key={stdobj._id}/>);
-            });
-        };
-        const mapToComponents2 = data => {
-            return data.map((stdobj, i) => {
-                let childname = 'child2-'+stdobj._id;
-                if(stdobj.class == this.state.classname)
-                    return (<StudentObj ref={childname} data={stdobj} key={stdobj._id}/>);
+                return(
+                    <TableRow key={stdobj._id}>
+                        <TableRowColumn>{stdobj.name}</TableRowColumn>
+                        <TableRowColumn>{stdobj.school}</TableRowColumn>
+                        <TableRowColumn>{stdobj.level}학년</TableRowColumn>
+                    </TableRow>
+                )
             });
         };
     	const studentsInfo = (
             <div className="row Edit-students">
         		<div className="row Students-list">
-                        <ul className="collection with-header col s6">
-                            <li className="collection-header center"><b>전체 학생</b></li>
-                            <li className="collection-header row">
-                                <span className="col s2">
-                                    <input type="checkbox" id="all-box1"/>
-                                    <label htmlFor="all-box1"></label>
-                                </span>
-                                <span className="col s3"><b>이름</b></span>
-                                <span className="col s3"><b>학교</b></span>
-                                <span className="col s3"><b>학년</b></span>
-                            </li>
-                        </ul>
-                        <ul className="collection with-header col s6">
-                            <li className="collection-header center"><b>반 학생</b></li>
-                            <li className="collection-header row">
-                                <span className="col s2">
-                                    <input type="checkbox" id="all-box2"/>
-                                    <label htmlFor="all-box2"></label>
-                                </span>
-                                <span className="col s3">이름</span>
-                                <span className="col s3">학교</span>
-                                <span className="col s3">학년</span>
-                            </li>
-                        </ul>
-                        <ul className="collection col s6">
-                            <div className="scroll">{mapToComponents1(this.state.students)}</div>
-                        </ul>
-                        <ul className="collection col s6">
-                            <div className="scroll">{mapToComponents2(this.state.selectedStudents)}</div>
-                        </ul>
-                </div>
-                <div className="row Students-buttons">
                     <div className="col s6">
-                        <a className="right waves-effect waves-green btn-flat" onClick={this.addToClass}><FontAwesome name="plus" /> 추가</a>
+                        <Table style={{border: '1px solid #d3d3d3'}} onCellClick={this.onStudentCellClick} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
+                            <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
+                                <TableRow>
+                                    <TableHeaderColumn colSpan="3" style={{textAlign: 'center'}}>
+                                        전체 학생
+                                    </TableHeaderColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableHeaderColumn>이름</TableHeaderColumn>
+                                    <TableHeaderColumn>학교</TableHeaderColumn>
+                                    <TableHeaderColumn>학년</TableHeaderColumn>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody displayRowCheckbox={true} deselectOnClickaway={true} showRowHover={true} stripedRows={false}>
+                               {mapToComponents(this.state.students)}
+                            </TableBody>
+                            <TableFooter>
+                                <TableRow>
+                                    <TableRowColumn colSpan="3" style={{textAlign: 'right'}}>
+                                        <a className="right waves-effect waves-green btn-flat" onClick={this.addToClass}><FontAwesome name="plus" /> 추가</a>
+                                    </TableRowColumn>
+                                </TableRow>
+                            </TableFooter>
+                        </Table>
                     </div>
-                    <div className="col s6">
-                        <a className="right waves-effect waves-green btn-flat"onClick={this.removeFromClass}><FontAwesome name="minus" /> 제거</a>
+                    <div className="col s6" style={{height: '100%'}}>
+                        <Table style={{border: '1px solid #d3d3d3'}} onCellClick={this.onSelectedStudentCellClick} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
+                            <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
+                                <TableRow>
+                                    <TableHeaderColumn colSpan="3" style={{textAlign: 'center'}}>
+                                        반 학생
+                                    </TableHeaderColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableHeaderColumn>이름</TableHeaderColumn>
+                                    <TableHeaderColumn>학교</TableHeaderColumn>
+                                    <TableHeaderColumn>학년</TableHeaderColumn>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody displayRowCheckbox={true} deselectOnClickaway={true} showRowHover={true} stripedRows={false}>
+                               {mapToComponents(this.state.selectedStudents)}
+                            </TableBody>
+                            <TableFooter>
+                                <TableRow>
+                                    <TableRowColumn colSpan="3" style={{textAlign: 'right'}}>
+                                        <a className="right waves-effect waves-green btn-flat"onClick={this.removeFromClass}><FontAwesome name="minus" /> 제거</a>
+                                    </TableRowColumn>
+                                </TableRow>
+                            </TableFooter>
+                        </Table>
                     </div>
                 </div>
+
             </div>
     	)
         return (
             <div id="classInfoModal" className="modal modal-fixed-footer">
                 <div className="modal-content">
                     <h4>{ this.state.mode ? "반편성" : "학생관리" }</h4>
-                    { this.state.mode ? classInfo : studentsInfo }
+                    { this.state.mode ? classInfo : studentsInfo }           
 	            </div>
                 <div className="modal-footer">
                     <a className="modal-action modal-close waves-effect waves-green btn-flat left">반 제거</a>

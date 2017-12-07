@@ -143,4 +143,39 @@ router.post('/logout', (req, res) => {
     return res.json({ sucess: true });
 });
 
+router.delete('/:id', (req, res) => {
+    // Check id Validity
+    if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+            error: "INVALID ID",
+            code: 1
+        });
+    }
+
+    // Check login status
+    if(typeof req.session.loginInfo === 'undefined') {
+        return res.status(403).json({
+            error: "NOT LOGGED IN",
+            code: 2
+        });
+    }
+    // Find student by id
+    Student.findById(req.params.id, (err, std) => {
+        if(err) throw err;
+        if(!std) {
+            return res.status(404).json({
+                error: "NO RESOURCE",
+                code: 3
+            });
+        }
+
+        // Remove student
+        Student.remove({ _id: req.params.id }, err => {
+            if(err) throw err;
+            res.json({ success: true });
+        });
+    });
+});
+
+
 export default router;
