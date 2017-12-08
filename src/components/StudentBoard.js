@@ -61,7 +61,7 @@ class StudentBoard extends React.Component{
     handleClose(){
         this.setState({open: false, editidx: -1, editstd: {_id: '',username: '',name: '',school: '',level: ''}, clicked: [] })
     }
-    
+
     onRowClick(rowNumber, columnId){
         let clicked = [...this.state.clicked];
         let index = clicked.indexOf(rowNumber);

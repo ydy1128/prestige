@@ -5,7 +5,8 @@ import FontAwesome from 'react-fontawesome';
 import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest,
          getStudentsInfoRequest, studentsInfoEditRequest } from 'actions/makeclass';
 
-import { ClassBoard, MakeClass, StudentBoard, HWBoard } from 'components';
+import { ClassBoard, MakeClass, StudentBoard} from 'components';
+import HWBoard from '../components/HWBoard';
 
 class Home extends React.Component {
     constructor(props) {
@@ -14,7 +15,7 @@ class Home extends React.Component {
         // TEACHER_DASHBOARD, TEACHER_STUDENTBOARD, TEACHER_CLASSBOARD, TEACHER_LECTUREBOARD, TEACHER_HWBOARD
         // STUDENT_DASHBOARD, STUDENT_LECTUREBOARD, STUDENT_HWBOARD
         this.state = {
-            view_type: 'TEACHER_DASHBOARD'
+            view_type: 'TEACHER_HWBOARD'
         }
 
         this.handleClassPost = this.handleClassPost.bind(this);
@@ -164,7 +165,7 @@ class Home extends React.Component {
             case 'TEACHER_DASHBOARD':
                 return (<div>DashBoard</div>);
             case 'TEACHER_STUDENTBOARD':
-                return (<StudentBoard studentsData={this.props.studentsData} 
+                return (<StudentBoard studentsData={this.props.studentsData}
                                 onStudentEdit={this.handleStudentEdit}/>);
             case 'TEACHER_CLASSBOARD':
                 return (<ClassBoard data={this.props.classData}
@@ -287,7 +288,6 @@ const mapDispatchToProps = (dispatch) => {
         studentsInfoEditRequest: (id, index, obj) => {
             return dispatch(studentsInfoEditRequest(id, index, obj));
         },
-
         classBoardRequest: (isInitial, listType, id, username) => {
             return dispatch(classBoardRequest(isInitial, listType, id, username));
         },
