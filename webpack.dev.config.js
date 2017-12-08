@@ -4,9 +4,9 @@ var path = require('path');
 module.exports = {
     devtool: 'cheap-module-eval-source-map',
     entry: [
+        'react-hot-loader/patch',
         './src/index.js',
         'webpack-dev-server/client?http://0.0.0.0:2828',
-        'react-hot-loader/patch',
         'webpack/hot/only-dev-server',
         './src/style/style.scss'
     ],

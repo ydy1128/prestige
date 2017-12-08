@@ -5,7 +5,8 @@ import FontAwesome from 'react-fontawesome';
 import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest } from 'actions/makeclass';
 import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest } from 'actions/studentinfo';
 
-import { ClassBoard, MakeClass, StudentBoard, HWBoard } from 'components';
+import { ClassBoard, MakeClass, StudentBoard} from 'components';
+import HWBoard from '../components/HWBoard';
 
 class Home extends React.Component {
     constructor(props) {
@@ -14,7 +15,7 @@ class Home extends React.Component {
         // TEACHER_DASHBOARD, TEACHER_STUDENTBOARD, TEACHER_CLASSBOARD, TEACHER_LECTUREBOARD, TEACHER_HWBOARD
         // STUDENT_DASHBOARD, STUDENT_LECTUREBOARD, STUDENT_HWBOARD
         this.state = {
-            view_type: 'TEACHER_STUDENTBOARD'
+            view_type: 'TEACHER_DASHBOARD'
         }
 
         this.handleClassPost = this.handleClassPost.bind(this);
@@ -319,7 +320,6 @@ const mapDispatchToProps = (dispatch) => {
         studentsInfoRemoveRequest: (id, index) => {
             return dispatch(studentsInfoRemoveRequest(id, index));
         },
-
         classBoardRequest: (isInitial, listType, id, username) => {
             return dispatch(classBoardRequest(isInitial, listType, id, username));
         },
