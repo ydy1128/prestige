@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import FontAwesome from 'react-fontawesome';
-import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest,
-         getStudentsInfoRequest, studentsInfoEditRequest } from 'actions/makeclass';
+import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest } from 'actions/makeclass';
+import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest } from 'actions/studentinfo';
 
 import { ClassBoard, MakeClass, StudentBoard, HWBoard } from 'components';
 
@@ -14,13 +14,15 @@ class Home extends React.Component {
         // TEACHER_DASHBOARD, TEACHER_STUDENTBOARD, TEACHER_CLASSBOARD, TEACHER_LECTUREBOARD, TEACHER_HWBOARD
         // STUDENT_DASHBOARD, STUDENT_LECTUREBOARD, STUDENT_HWBOARD
         this.state = {
-            view_type: 'TEACHER_DASHBOARD'
+            view_type: 'TEACHER_STUDENTBOARD'
         }
 
         this.handleClassPost = this.handleClassPost.bind(this);
         this.handleClassEdit = this.handleClassEdit.bind(this);
         this.handleClassRemove = this.handleClassRemove.bind(this);
+
         this.handleStudentEdit = this.handleStudentEdit.bind(this);
+        this.handleStudentRemove = this.handleStudentRemove.bind(this);
 
         this.handleMenuClick = this.handleMenuClick.bind(this);
         this.setMenuActive = this.setMenuActive.bind(this);
@@ -53,13 +55,14 @@ class Home extends React.Component {
     handleStudentEdit(stdobj, index, silent){
         console.log(stdobj)
         return this.props.studentsInfoEditRequest(stdobj._id, index, stdobj).then(() =>{
+            console.log(this.props.studentEditStatus)
             if(!silent){
-                if(this.props.classPostStatus.status === "SUCCESS") {
+                if(this.props.studentEditStatus.status === "SUCCESS") {
                     Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
                 }
                 else {
                     let $toastContent;
-                    switch(this.props.classPostStatus.error) {
+                    switch(this.props.studentEditStatus.error) {
                         case 1:
                             $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
                             Materialize.toast($toastContent, 2000);
@@ -77,6 +80,27 @@ class Home extends React.Component {
                 }
             }
         })
+    }
+    handleStudentRemove(index, id){
+        this.props.studentsInfoRemoveRequest(id, index).then(() => {
+            if(this.props.studentRemoveStatus.status==="SUCCESS") {
+                Materialize.toast('학생 정보가 삭제 되었습니다!', 2000);
+            } else {
+                let errorMessage = [
+                    '잘못된 접근입니다.',
+                    '세션이 만료되었습니다. <br /> 다시 로그인 하세요.',
+                    '학생이 존재하지 않습니다.',
+                    '권한이 없습니다.'
+                ];
+                 // NOTIFY ERROR
+                let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.studentRemoveStatus.error - 1] + '</span>');
+                Materialize.toast($toastContent, 2000);
+                // IF NOT LOGGED IN, REFRESH THE PAGE
+                if(this.props.studentRemoveStatus.error === 2) {
+                    setTimeout(()=> {location.reload(false)}, 2000);
+                }
+            }
+        });
     }
     handleClassPost(contents){
         return this.props.classPostRequest(contents).then(
@@ -165,7 +189,10 @@ class Home extends React.Component {
                 return (<div>DashBoard</div>);
             case 'TEACHER_STUDENTBOARD':
                 return (<StudentBoard studentsData={this.props.studentsData} 
-                                onStudentEdit={this.handleStudentEdit}/>);
+                                classData={this.props.classData}
+                                onStudentEdit={this.handleStudentEdit}
+                                onStudentRemove={this.handleStudentRemove}
+                                onClassEdit={this.handleClassEdit}/>);
             case 'TEACHER_CLASSBOARD':
                 return (<ClassBoard data={this.props.classData}
                                 studentsData={this.props.studentsData}
@@ -271,11 +298,13 @@ const mapStateToProps = (state) => {
         isLoggedIn: state.authentication.status.isLoggedIn,
 
         classData: state.makeclass.board.data,
-        studentsData: state.makeclass.getStudents.data,
-        studentEditStatus: state.makeclass.editStudents,
         classPostStatus: state.makeclass.post,
         classEditStatus: state.makeclass.editClass,
         classRemoveStatus: state.makeclass.removeClass,
+
+        studentsData: state.studentinfo.getStudents.data,
+        studentEditStatus: state.studentinfo.editStudents,
+        studentRemoveStatus: state.studentinfo.removeStudents,
     };
 };
 
@@ -286,6 +315,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         studentsInfoEditRequest: (id, index, obj) => {
             return dispatch(studentsInfoEditRequest(id, index, obj));
+        },
+        studentsInfoRemoveRequest: (id, index) => {
+            return dispatch(studentsInfoRemoveRequest(id, index));
         },
 
         classBoardRequest: (isInitial, listType, id, username) => {
