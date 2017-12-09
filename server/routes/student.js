@@ -144,14 +144,6 @@ router.post('/logout', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-    // Check id Validity
-    if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
-        return res.status(400).json({
-            error: "INVALID ID",
-            code: 1
-        });
-    }
-
     // Check login status
     if(typeof req.session.loginInfo === 'undefined') {
         return res.status(403).json({

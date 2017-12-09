@@ -82,26 +82,28 @@ class Home extends React.Component {
             }
         })
     }
-    handleStudentRemove(index, id){
-        this.props.studentsInfoRemoveRequest(id, index).then(() => {
-            if(this.props.studentRemoveStatus.status==="SUCCESS") {
-                Materialize.toast('학생 정보가 삭제 되었습니다!', 2000);
-            } else {
-                let errorMessage = [
-                    '잘못된 접근입니다.',
-                    '세션이 만료되었습니다. <br /> 다시 로그인 하세요.',
-                    '학생이 존재하지 않습니다.',
-                    '권한이 없습니다.'
-                ];
-                 // NOTIFY ERROR
-                let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.studentRemoveStatus.error - 1] + '</span>');
-                Materialize.toast($toastContent, 2000);
-                // IF NOT LOGGED IN, REFRESH THE PAGE
-                if(this.props.studentRemoveStatus.error === 2) {
-                    setTimeout(()=> {location.reload(false)}, 2000);
+    handleStudentRemove(index, id, silent){
+        if(!silent){
+            return this.props.studentsInfoRemoveRequest(id, index).then(() => {
+                if(this.props.studentRemoveStatus.status==="SUCCESS") {
+                    Materialize.toast('학생 정보가 삭제 되었습니다!', 2000);
+                } else {
+                    let errorMessage = [
+                        '잘못된 접근입니다.',
+                        '세션이 만료되었습니다. <br /> 다시 로그인 하세요.',
+                        '학생이 존재하지 않습니다.',
+                        '권한이 없습니다.'
+                    ];
+                     // NOTIFY ERROR
+                    let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.studentRemoveStatus.error - 1] + '</span>');
+                    Materialize.toast($toastContent, 2000);
+                    // IF NOT LOGGED IN, REFRESH THE PAGE
+                    if(this.props.studentRemoveStatus.error === 2) {
+                        setTimeout(()=> {location.reload(false)}, 2000);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
     handleClassPost(contents){
         return this.props.classPostRequest(contents).then(

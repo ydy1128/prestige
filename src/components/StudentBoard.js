@@ -66,44 +66,37 @@ class StudentBoard extends React.Component{
     }
     handleRemove(){
         if(this.state.remove_active){
-            let props = this.props;
             let clicked = [...this.state.clicked];
-            let class_pair = [];
-            clicked.map((stdidx, i) =>{
-                let std_id = props.studentsData[stdidx]._id;
-                let std_class = props.studentsData[stdidx].class;
-                class_pair.push({class: std_class, std: std_id});
-                console.log(props.studentsData[stdidx])
-                // props.onRemove(stdidx, std_id);
-            })
-            for (let i = 0; i < class_pair.length; i++){
-                if(class_pair[i].class != ''){
-                    console.log('pair: ', class_pair[i])
-                    let classidx = this.props.classData.findIndex(x => { return x.name == class_pair[i].class; });
-                    console.log('class index: ', classidx)
-                    let class_obj = this.props.classData[classidx];
-                    console.log('class object: ', class_obj);
-                    let std_list_in_class = class_obj.students;
-                    let std_class_idx = std_list_in_class.indexOf(class_pair[i].std);
-                    console.log('student index: ', std_class_idx);
-                    // std_list_in_class.splice(std_class_idx, 1);
-                    // console.log(class_obj);
+            let deleting_stds = [];
+            let editting_classes = {};
+            for (let i = 0; i < clicked.length; i++){
+                let stdidx = clicked[i];
+                let std_id = this.props.studentsData[stdidx]._id;
+                let std_class = this.props.studentsData[stdidx].class;
+                if(std_class != ''){
+                    if(editting_classes[std_class] == undefined){
+                        editting_classes[std_class] = [];
+                    }
+                    editting_classes[std_class].push(std_id);
+                }
+                deleting_stds.push({index: stdidx, id: std_id});
+            }
+            for(let i = 0; i < deleting_stds.length; i++){
+                this.props.onStudentRemove(deleting_stds[i].index, deleting_stds[i].id).then(()=>{ console.log(this.props.studentsData)});
+                for(let j = 0; j < deleting_stds.length; j++){
+                    deleting_stds[j].index -= 1;
                 }
             }
-            // this.state.selected.map(function(obj, i){
-            //     student_ids = [...student_ids, ...obj.data.students];
-            //     props.onRemove(obj.data._id, obj.index);
-            // });
-            // for (let i = 0; i < student_ids.length; i++){
-            //     let std_idx = this.props.studentsData.findIndex(x => x._id == student_ids[i]);
-            //     let std_obj = this.props.studentsData[std_idx]
-            //     std_obj.class = '';
-            //     props.onStudentEdit(std_obj, std_idx, true);
-            // }
-            // this.setState({
-            //     selected: [],
-            //     plus_active: true
-            // })
+            for (let key in editting_classes) {
+                let classidx = this.props.classData.findIndex(x => { return x.name == key; });
+                let class_obj = this.props.classData[classidx];
+                for(let i = 0; i < editting_classes[key].length; i++){
+                    let std_list_in_class = class_obj.students;
+                    let std_class_idx = std_list_in_class.indexOf(editting_classes[key][i]);
+                    std_list_in_class.splice(std_class_idx, 1);
+                }
+                this.props.onClassEdit(class_obj._id, classidx, class_obj).then(()=>{ console.log(this.props.classData)});
+            }
         }
     }
     onRowClick(rowNumber, columnId){
@@ -116,17 +109,9 @@ class StudentBoard extends React.Component{
         console.log(clicked)
         this.state.clicked = clicked;
         this.state.remove_active = clicked.length == 0 ? false : true;
-        // this.setState({
-            // clicked: clicked,
-            // remove_active: clicked.length == 0 ? false : true
-        // })
-        // this.forceUpdate();
         this.getRemoveActive();
     }
     getRemoveActive(){
-        // console.log(this.state.clicked)
-        // console.log(this.state.remove_active)
-        // return this.state.remove_active ? '' : 'inactive'
         if(this.state.remove_active)
             $('#stdBoardRemove').removeClass('inactive');
         else
@@ -150,6 +135,7 @@ class StudentBoard extends React.Component{
                         <TableRowColumn><FontAwesome onClick={this.handleOpen} className={'edit-button'} name="pencil" style={{fontSize: "18px", cursor: "pointer"}}/></TableRowColumn>
                         <TableRowColumn>{stdobj.username}</TableRowColumn>
                         <TableRowColumn>{stdobj.name}</TableRowColumn>
+                        <TableRowColumn>{stdobj.class == '' ? '-' : stdobj.class}</TableRowColumn>
                         <TableRowColumn>{stdobj.school}</TableRowColumn>
                         <TableRowColumn>{stdobj.level}학년</TableRowColumn>
                     </TableRow>
@@ -180,11 +166,12 @@ class StudentBoard extends React.Component{
                                     <TableHeaderColumn></TableHeaderColumn>
                                     <TableHeaderColumn>아이디</TableHeaderColumn>
                                     <TableHeaderColumn>이름</TableHeaderColumn>
+                                    <TableHeaderColumn>수업</TableHeaderColumn>
                                     <TableHeaderColumn>학교</TableHeaderColumn>
                                     <TableHeaderColumn>학년</TableHeaderColumn>
                                 </TableRow>
                             </TableHeader>
-                            <TableBody displayRowCheckbox={true} deselectOnClickaway={true} showRowHover={true} stripedRows={false}>
+                            <TableBody displayRowCheckbox={true} deselectOnClickaway={false} showRowHover={true} stripedRows={false}>
                                {mapToComponents(this.props.studentsData)}
                             </TableBody>
                         </Table>
