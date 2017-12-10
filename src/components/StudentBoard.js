@@ -29,26 +29,46 @@ class StudentBoard extends React.Component{
                 username: '',
                 name: '',
                 school: '',
-                level: ''
+                level: '',
+                password: '',
+                check_password: ''
             },
             clicked: [],
-            remove_active: false
+            remove_active: false,
+            modal_state: true
         }
-        this.handleOpen = this.handleOpen.bind(this);
+        // this.handleOpen = this.handleOpen.bind(this);
+        this.handleInfoOpen = this.handleInfoOpen.bind(this);
+        this.handlePassOpen = this.handlePassOpen.bind(this);
+
         this.handleChange = this.handleChange.bind(this);
+        this.handlePwChange = this.handlePwChange.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleRemove = this.handleRemove.bind(this);
 
-        this.onRowClick = this.onRowClick.bind(this);
-        this.getRemoveActive = this.getRemoveActive.bind(this);
+        this.handleRowClick = this.handleRowClick.bind(this);
+        this.handleRowSelection = this.handleRowSelection.bind(this);
+
+        this.handleActive = this.handleActive.bind(this);
 	}
-    handleOpen(e){
+
+    handleInfoOpen(e){
         e.stopPropagation();
-        let target_id = e.currentTarget.parentNode.parentNode.childNodes[2].innerHTML;
+        let target_id = e.currentTarget.parentNode.parentNode.childNodes[3].innerHTML;
         let target_idx = this.props.studentsData.findIndex(x => { return x.username == target_id; });
         let target_obj = this.props.studentsData[target_idx];
-        this.setState({open: true, editidx: target_idx, editstd: target_obj})
+        console.log(target_obj)
+        this.setState({open: true, editidx: target_idx, editstd: target_obj, modal_state: true})
+    }
+    handlePassOpen(e){
+        e.stopPropagation();
+        let target_id = e.currentTarget.parentNode.parentNode.childNodes[3].innerHTML;
+        let target_idx = this.props.studentsData.findIndex(x => { return x.username == target_id; });
+        let target_obj = this.props.studentsData[target_idx];
+        target_obj.password = '';
+        target_obj.check_password = '';
+        this.setState({open: true, editidx: target_idx, editstd: target_obj, modal_state: false})
     }
     handleChange(e) {
         let nextState = {
@@ -61,8 +81,17 @@ class StudentBoard extends React.Component{
         this.props.onStudentEdit(this.state.editstd, this.state.editidx, false);
         this.handleClose();
     }
+    handlePwChange(){
+        this.props.onStudentPwChange(this.state.editstd._id, this.state.editstd.password, this.state.editstd.check_password);
+        this.handleClose();
+    }
     handleClose(){
-        this.setState({open: false, editidx: -1, editstd: {_id: '',username: '',name: '',school: '',level: ''}, clicked: [] })
+        this.setState({
+            open: false, 
+            editidx: -1, 
+            editstd: {_id: '',username: '',name: '',school: '',level: '', password: '', check_password: ''}, 
+            clicked: [] 
+        })
     }
     handleRemove(){
         if(this.state.remove_active){
@@ -99,7 +128,7 @@ class StudentBoard extends React.Component{
             }
         }
     }
-    onRowClick(rowNumber, columnId){
+    handleRowClick(rowNumber, columnId){
         let clicked = [...this.state.clicked];
         let index = clicked.indexOf(rowNumber);
         if(index == -1)
@@ -107,15 +136,13 @@ class StudentBoard extends React.Component{
         else
             clicked.splice(index, 1);
         console.log(clicked)
-        this.state.clicked = clicked;
-        this.state.remove_active = clicked.length == 0 ? false : true;
-        this.getRemoveActive();
+        this.setState({clicked: clicked, remove_active: clicked.length == 0 ? false : true})
     }
-    getRemoveActive(){
-        if(this.state.remove_active)
-            $('#stdBoardRemove').removeClass('inactive');
-        else
-            $('#stdBoardRemove').addClass('inactive');
+    handleRowSelection(rowIds){
+        this.setState({clicked: rowIds})
+    }
+    handleActive(){
+        return this.state.remove_active ? '' : 'inactive';
     }
     render(){
         const boardHeader = (
@@ -123,7 +150,7 @@ class StudentBoard extends React.Component{
                 <div className="col m4"><h4>학생관리</h4></div>
                 <div className="icons col m8">
                     <a onClick={this.handleRemove}>
-                        <FontAwesome id="stdBoardRemove" className={'remove-button right inactive'} name="trash-o" />
+                        <FontAwesome id="stdBoardRemove" className={'remove-button right ' + this.handleActive()} name="trash-o" />
                     </a>
                 </div>
             </div>
@@ -131,8 +158,9 @@ class StudentBoard extends React.Component{
         const mapToComponents = data => {
             return data.map((stdobj, i) => {
                 return(
-                    <TableRow key={stdobj._id}>
-                        <TableRowColumn><FontAwesome onClick={this.handleOpen} className={'edit-button'} name="pencil" style={{fontSize: "18px", cursor: "pointer"}}/></TableRowColumn>
+                    <TableRow selected={this.state.clicked.includes(i)} key={stdobj._id}>
+                        <TableRowColumn style={style.tableButtonCol}><FontAwesome onClick={this.handleInfoOpen} className={'edit-button'} name="pencil" style={{fontSize: "18px", cursor: "pointer"}}/></TableRowColumn>
+                        <TableRowColumn style={style.tableButtonCol}><FontAwesome onClick={this.handlePassOpen} className={'password-button'} name="lock" style={{fontSize: "18px", cursor: "pointer"}}/></TableRowColumn>
                         <TableRowColumn>{stdobj.username}</TableRowColumn>
                         <TableRowColumn>{stdobj.name}</TableRowColumn>
                         <TableRowColumn>{stdobj.class == '' ? '-' : stdobj.class}</TableRowColumn>
@@ -149,21 +177,37 @@ class StudentBoard extends React.Component{
                 onClick={this.handleClose}
             />,
             <FlatButton
-                label="저장"
+                label={this.state.modal_state? '저장' : '변경'}
                 primary={true}
-                keyboardFocused={true}
-                onClick={this.handleEdit}
+                onClick={this.state.modal_state? this.handleEdit : this.handlePwChange}
             />,
         ];
+        const infoDialog = (
+            <div>
+                <TextField floatingLabelText="아이디" name="username" onChange={this.handleChange} value={this.state.editstd.username} fullWidth={true} floatingLabelStyle={style.inputLabel} floatingLabelFocusStyle={style.inputLabelFocus} underlineStyle={style.inputLine} underlineFocusStyle={style.inputLineFocus}/>
+                <TextField floatingLabelText="이름" name="name" onChange={this.handleChange} value={this.state.editstd.name} fullWidth={true} floatingLabelStyle={style.inputLabel} floatingLabelFocusStyle={style.inputLabelFocus} underlineStyle={style.inputLine} underlineFocusStyle={style.inputLineFocus}/>
+                <TextField floatingLabelText="학교" name="school" onChange={this.handleChange} value={this.state.editstd.school} fullWidth={true} floatingLabelStyle={style.inputLabel} floatingLabelFocusStyle={style.inputLabelFocus} underlineStyle={style.inputLine} underlineFocusStyle={style.inputLineFocus}/>
+                <TextField floatingLabelText="학년" name="level" onChange={this.handleChange} value={this.state.editstd.level} fullWidth={true} floatingLabelStyle={style.inputLabel} floatingLabelFocusStyle={style.inputLabelFocus} underlineStyle={style.inputLine} underlineFocusStyle={style.inputLineFocus}/>
+            </div>
+        )
+        const passDialog = (
+            <div>
+                <TextField floatingLabelText="아이디" name="username" disabled value={this.state.editstd.username} fullWidth={true} floatingLabelStyle={style.inputLabel} floatingLabelFocusStyle={style.inputLabelFocus} underlineStyle={style.inputLine} underlineFocusStyle={style.inputLineFocus}/>
+                <TextField floatingLabelText="이름" name="name" disabled value={this.state.editstd.name} fullWidth={true} floatingLabelStyle={style.inputLabel} floatingLabelFocusStyle={style.inputLabelFocus} underlineStyle={style.inputLine} underlineFocusStyle={style.inputLineFocus}/>
+                <TextField floatingLabelText="새 패스워드" name="password" type="password" value={this.state.editstd.password} onChange={this.handleChange} fullWidth={true} floatingLabelStyle={style.inputLabel} floatingLabelFocusStyle={style.inputLabelFocus} underlineStyle={style.inputLine} underlineFocusStyle={style.inputLineFocus}/>
+                <TextField floatingLabelText="패스워드 확인" name="check_password" type="password" value={this.state.editstd.check_password} onChange={this.handleChange} fullWidth={true} floatingLabelStyle={style.inputLabel} floatingLabelFocusStyle={style.inputLabelFocus} underlineStyle={style.inputLine} underlineFocusStyle={style.inputLineFocus}/>
+            </div>
+        )
         return(
             <div className="Boards">
                 { boardHeader }
                 <div className="Board-contents row">
                     <div className="col m12">
-                        <Table style={{border: '1px solid #d3d3d3'}} onCellClick={this.onRowClick} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
+                        <Table style={{border: '1px solid #d3d3d3'}} onRowSelection={this.handleRowSelection} onCellClick={this.handleRowClick} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
                             <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
                                 <TableRow>
-                                    <TableHeaderColumn></TableHeaderColumn>
+                                    <TableHeaderColumn style={style.tableButtonCol}></TableHeaderColumn>
+                                    <TableHeaderColumn style={style.tableButtonCol}></TableHeaderColumn>
                                     <TableHeaderColumn>아이디</TableHeaderColumn>
                                     <TableHeaderColumn>이름</TableHeaderColumn>
                                     <TableHeaderColumn>수업</TableHeaderColumn>
@@ -178,17 +222,15 @@ class StudentBoard extends React.Component{
                     </div>
                 </div>
                 <Dialog
-                    title="학생관리"
+                    title={this.state.modal_state? '학생 정보' : '학생 비밀번호 변경'}
                     modal={false}
                     actions={actions}
                     open={this.state.open}
                     onRequestClose={this.handleClose}
                     autoScrollBodyContent={false}>
-                    <TextField floatingLabelText="아이디" name="username" onChange={this.handleChange} value={this.state.editstd.username} fullWidth={true} floatingLabelStyle={style.inputLabel} floatingLabelFocusStyle={style.inputLabelFocus} underlineStyle={style.inputLine} underlineFocusStyle={style.inputLineFocus}/>
-                    <TextField floatingLabelText="이름" name="name" onChange={this.handleChange} value={this.state.editstd.name} fullWidth={true} floatingLabelStyle={style.inputLabel} floatingLabelFocusStyle={style.inputLabelFocus} underlineStyle={style.inputLine} underlineFocusStyle={style.inputLineFocus}/>
-                    <TextField floatingLabelText="학교" name="school" onChange={this.handleChange} value={this.state.editstd.school} fullWidth={true} floatingLabelStyle={style.inputLabel} floatingLabelFocusStyle={style.inputLabelFocus} underlineStyle={style.inputLine} underlineFocusStyle={style.inputLineFocus}/>
-                    <TextField floatingLabelText="학년" name="level" onChange={this.handleChange} value={this.state.editstd.level} fullWidth={true} floatingLabelStyle={style.inputLabel} floatingLabelFocusStyle={style.inputLabelFocus} underlineStyle={style.inputLine} underlineFocusStyle={style.inputLineFocus}/>
+                    {this.state.modal_state? infoDialog : passDialog}
                 </Dialog>
+                
             </div>
         )
     }
@@ -210,6 +252,9 @@ let style = {
     color: "#00bcd4",
     fontSize: "18px",
     fontWeight: "600"
+  },
+  tableButtonCol: {
+    width: '65px',
   }
 };
 

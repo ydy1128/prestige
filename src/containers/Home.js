@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import FontAwesome from 'react-fontawesome';
 import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest } from 'actions/makeclass';
-import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest } from 'actions/studentinfo';
+import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest, studentsInfoPwChangeRequest } from 'actions/studentinfo';
 
 import { ClassBoard, MakeClass, StudentBoard } from 'components';
 import HWBoard from '../components/HWBoard';
@@ -23,6 +23,7 @@ class Home extends React.Component {
         this.handleClassRemove = this.handleClassRemove.bind(this);
 
         this.handleStudentEdit = this.handleStudentEdit.bind(this);
+        this.handleStudentPwChange = this.handleStudentPwChange.bind(this);
         this.handleStudentRemove = this.handleStudentRemove.bind(this);
 
         this.handleMenuClick = this.handleMenuClick.bind(this);
@@ -82,9 +83,30 @@ class Home extends React.Component {
             }
         })
     }
-    handleStudentRemove(index, id, silent){
-        if(!silent){
-            return this.props.studentsInfoRemoveRequest(id, index).then(() => {
+    handleStudentPwChange(id, pw, check_pw){
+        return this.props.studentsInfoPwChangeRequest(id, pw, check_pw).then(() => {
+            if(this.props.studentPwChangeStatus.status==="SUCCESS") {
+                Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
+            } else {
+                let errorMessage = [
+                    '잘못된 접근입니다.',
+                    '세션이 만료되었습니다. <br /> 다시 로그인 하세요.',
+                    '학생이 존재하지 않습니다.',
+                    '권한이 없습니다.'
+                ];
+                 // NOTIFY ERROR
+                let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.studentPwChangeStatus.error - 1] + '</span>');
+                Materialize.toast($toastContent, 2000);
+                // IF NOT LOGGED IN, REFRESH THE PAGE
+                if(this.props.studentPwChangeStatus.error === 2) {
+                    setTimeout(()=> {location.reload(false)}, 2000);
+                }
+            }
+        });
+    }
+    handleStudentRemove(index, id, silent){        
+        return this.props.studentsInfoRemoveRequest(id, index).then(() => {
+            if(!silent){
                 if(this.props.studentRemoveStatus.status==="SUCCESS") {
                     Materialize.toast('학생 정보가 삭제 되었습니다!', 2000);
                 } else {
@@ -102,8 +124,9 @@ class Home extends React.Component {
                         setTimeout(()=> {location.reload(false)}, 2000);
                     }
                 }
-            });
-        }
+            }
+        });
+        
     }
     handleClassPost(contents){
         return this.props.classPostRequest(contents).then(
@@ -194,6 +217,7 @@ class Home extends React.Component {
                 return (<StudentBoard studentsData={this.props.studentsData}
                                 classData={this.props.classData}
                                 onStudentEdit={this.handleStudentEdit}
+                                onStudentPwChange={this.handleStudentPwChange}
                                 onStudentRemove={this.handleStudentRemove}
                                 onClassEdit={this.handleClassEdit}/>);
             case 'TEACHER_CLASSBOARD':
@@ -307,6 +331,7 @@ const mapStateToProps = (state) => {
 
         studentsData: state.studentinfo.getStudents.data,
         studentEditStatus: state.studentinfo.editStudents,
+        studentPwChangeStatus: state.studentinfo.pwChange,
         studentRemoveStatus: state.studentinfo.removeStudents,
     };
 };
@@ -318,6 +343,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         studentsInfoEditRequest: (id, index, obj) => {
             return dispatch(studentsInfoEditRequest(id, index, obj));
+        },
+        studentsInfoPwChangeRequest: (id, pw, check_pw) => {
+            return dispatch(studentsInfoPwChangeRequest(id, pw, check_pw));
         },
         studentsInfoRemoveRequest: (id, index) => {
             return dispatch(studentsInfoRemoveRequest(id, index));

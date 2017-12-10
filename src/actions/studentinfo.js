@@ -8,6 +8,9 @@ import {
     STUDENT_INFO_REMOVE,
     STUDENT_INFO_REMOVE_SUCCESS,
     STUDENT_INFO_REMOVE_FAILURE,
+    STUDENT_INFO_PW_CHANGE,
+    STUDENT_INFO_PW_CHANGE_SUCCESS,
+    STUDENT_INFO_PW_CHANGE_FAILURE,
 } from './ActionTypes';
 
 import axios from 'axios';
@@ -83,6 +86,40 @@ export function studentsInfoEditFailure(error) {
     };
 }
 
+/* Students EDIT */
+export function studentsInfoPwChangeRequest(id, pw, check_pw) {
+    console.log(pw, check_pw)
+    return (dispatch) => {
+        dispatch(studentsInfoPwChange());
+        return axios.put('/api/student/changepw/' + id, {pw, check_pw})
+        .then((response) => {
+            dispatch(studentsInfoPwChangeSuccess(id));
+        }).catch((error) => {
+            console.log(error)
+            dispatch(studentsInfoPwChangeFailure(error.response.data.code));
+        });
+    };
+}
+
+export function studentsInfoPwChange() {
+    return {
+        type: STUDENT_INFO_PW_CHANGE
+    };
+}
+
+export function studentsInfoPwChangeSuccess(id) {
+    return {
+        type: STUDENT_INFO_PW_CHANGE_SUCCESS,
+        id
+    };
+}
+
+export function studentsInfoPwChangeFailure(error) {
+    return {
+        type: STUDENT_INFO_PW_CHANGE_FAILURE,
+        error
+    };
+}
 /* CLASS REMOVE */
 export function studentsInfoRemoveRequest(id, index) {
     return (dispatch) => {

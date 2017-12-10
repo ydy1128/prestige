@@ -10,6 +10,10 @@ const initialState = {
         status: 'INIT',
         error: -1,
     },
+    pwChange: {
+        status: 'INIT',
+        error: -1,
+    },
     removeStudents: {
         status: 'INIT',
         error: -1,
@@ -64,6 +68,28 @@ export default function studentinfo(state, action) {
         case types.STUDENT_INFO_EDIT_FAILIURE:
             return update(state, {
                 editStudents: {
+                    status: { $set: 'FAILURE' },
+                    error: { $set: action.error }
+                }
+            });
+        case types.STUDENT_INFO_PW_CHANGE: 
+            return update(state, {
+                pwChange: {
+                    status: { $set: 'WAITING' },
+                    error: { $set: -1 }
+                }
+            });
+        case types.STUDENT_INFO_PW_CHANGE_SUCCESS:
+            console.log(action)
+            return update(state, {
+                pwChange: {
+                    status: { $set: 'SUCCESS' },
+                }
+            });
+            
+        case types.STUDENT_INFO_PW_CHANGE_FAILIURE:
+            return update(state, {
+                pwChange: {
                     status: { $set: 'FAILURE' },
                     error: { $set: action.error }
                 }

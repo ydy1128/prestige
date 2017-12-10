@@ -105,7 +105,47 @@ router.get('/getinfo', (req, res) => {
 
     res.json({ info: req.session.loginInfo });
 });
+router.put('/changepw/:id', (req, res)=>{
+    // CHECK PASS LENGTH
+    console.log(req.body)
+    if(req.body.pw.length < 4 || typeof req.body.pw !== "string") {
+        return res.status(400).json({
+            error: "BAD PASSWORD",
+            code: 2
+        });
+    }
+    console.log(req.params.id)
+    Student.findById(req.params.id, (err, std) => {
+        if(err) throw err;
+        // IF MEMO DOES NOT EXIST
+        if(!std) {
+            return res.status(404).json({
+                error: "NO RESOURCE",
+                code: 4
+            });
+        }
+        if(req.body.pw != req.body.check_pw){
+            return res.status(400).json({
+                error: "PASSWORD DOES NOT MATCH",
+                code: 5
+            }); 
+        }
+        console.log(std);
+        console.log(req.body.obj);
+        std.password = req.body.pw;
+        std.password = std.generateHash(std.password);
 
+        console.log(std);
+
+        std.save((err, std) => {
+            if(err) throw err;
+            return res.json({
+                success: true
+            });
+        });
+
+    });
+})
 router.put('/:id', (req, res)=>{
     Student.findById(req.params.id, (err, std) => {
         if(err) throw err;
@@ -137,6 +177,8 @@ router.put('/:id', (req, res)=>{
 
     });
 })
+
+
 
 router.post('/logout', (req, res) => {
     req.session.destroy(err => { if(err) throw err; });
