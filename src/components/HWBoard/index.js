@@ -23,6 +23,32 @@ var Present = ({ props, state, style, functions }) => {
         closeDialog
     } = functions;
     console.log("hwdata", hwData);
+    // const boardHeader = (
+    //     <div className="Board-header col m12">
+    //         <div className="col m4"><h4>숙제관리</h4></div>
+    //         <div className="icons col m8">
+    //             <a>
+    //                 <FontAwesome id="stdBoardRemove" className={'remove-button right '} name="trash-o" />
+    //             </a>
+    //         </div>
+    //     </div>
+    // )
+    // return (
+    //     <div className="Boards">
+    //         { boardHeader }
+    //         <div className="Board-contents row">
+    //             <div className="col m12">
+    //                 <HomeworkTable hwData={hwData}
+    //                     clickedRowIndexes={clickedRowIndexes}
+    //                     handleRowSelection={handleRowSelection}
+    //                     onClickEditHomework={onClickEditHomework}
+    //                 />
+    //             </div>
+    //         </div>
+    //         <HomeworkDialog key={Math.random()*1000000}
+    //             hw={selectedHw} dialogOn={dialogOn} closeDialog={closeDialog} homeworkPostRequest={homeworkPostRequest}/>
+    //     </div>
+    // )
     return (
         <div id='homework-section'  style={styles.main}>
             <div id='homework-header' style={styles.header}>
