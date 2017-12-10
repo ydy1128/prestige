@@ -26,6 +26,7 @@ export function homeworkBoardRequest(isInitial, listType, id, username) {
 
         return axios.get(url)
         .then((response) => {
+            console.log("response",response);
             dispatch(homeworkBoardSuccess(response.data, isInitial, listType));
         }).catch((error) => {
             dispatch(homeworkBoardFailure());
@@ -61,10 +62,10 @@ export function homeworkPostRequest(contents) {
 
         return axios.post('/api/homework', { contents })
         .then((response) => {
-            console.log(response.data.data)
-            dispatch(homeworkPostSuccess(response.data.data));
+            console.log(response.data.homework)
+            dispatch(homeworkPostSuccess(response.data.homework));
         }).catch((error) => {
-            dispatch(homeworkPostFailure(error.response.data.code));
+            dispatch(homeworkPostFailure(error.response.data.homework));
         });
     };
 }
@@ -90,19 +91,19 @@ export function homeworkPostFailure(error) {
 }
 
 /* Homework Edit */
-export function homeworkEditPrep(name, days, starttime, endtime, index, _id, students, flag){
-    return {
-        type: HOMEWORK_EDIT_PREP,
-        name,
-        days,
-        starttime,
-        endtime,
-        index,
-        _id,
-        students,
-        flag
-    };
-}
+// export function homeworkEditPrep(name, days, starttime, endtime, index, _id, students, flag){
+//     return {
+//         type: HOMEWORK_EDIT_PREP,
+//         name,
+//         days,
+//         starttime,
+//         endtime,
+//         index,
+//         _id,
+//         students,
+//         flag
+//     };
+// }
 
 export function homeworkEditRequest(id, index, contents) {
     return (dispatch) => {
@@ -110,9 +111,10 @@ export function homeworkEditRequest(id, index, contents) {
 
         return axios.put('/api/homework/' + id, { contents })
         .then((response) => {
-            dispatch(homeworkEditSuccess(index, response.data.cls));
+            dispatch(homeworkEditSuccess(index, response.data.homework));
         }).catch((error) => {
             dispatch(homeworkEditFailure(error.response.data.code));
+            alert(error.response.data.error);
         });
     };
 }

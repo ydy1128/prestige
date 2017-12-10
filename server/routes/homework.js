@@ -10,14 +10,16 @@ router.put('/:id', (req, res) => { updateHomework(req, res); });
 router.delete('/:id', (req, res) => { deleteHomewerk(req, res); });
 
 const createHomework = (req, res) => {
+    console.log('test1');
     let hwInfo = req.body.contents;
-
     if(not(req.session.loginInfo)) {
-        return throwError(res, 1);
-    }
-
-    if(not(validateData(contents, "all"))) {
         return throwError(res, 2);
+    }
+    console.log(hwInfo);
+    console.log(validateData(hwInfo, "all"));
+
+    if(not(validateData(hwInfo, "all"))) {
+        return throwError(res, 5);
     }
 
     let newhwInfo = Object.assign({}, hwInfo, {
@@ -30,14 +32,16 @@ const createHomework = (req, res) => {
 
     hw.save( err => {
         if( err ) throw err;
-        return res.json({ success: true, data: hw });
+        return res.json({ success: true, homework: hw });
     });
 }
 
 const readHomework = (req, res) => {
-    Homework.find().exec((err, hws) => {
+    let hwId = req.params.id;
+    Homework.find(hwId ? { _id: hwId } : null).exec((err, hws) => {
         if(err) throw err;
-        res.json(hws);
+        if(Array.isArray(hws)) res.json(hws);
+        else res.json([hws]);
     })
 }
 
@@ -56,13 +60,13 @@ const updateHomework = (req, res) => {
 
         hw.save((err, hw) => {
             if(err) throw err;
-            return res.json({ success: true, data: hw });
+            return res.json({ success: true, homework: hw });
         });
     });
 }
 
 const deleteHomewerk = (req, res) => {
-    let hwId = res.params.id;
+    let hwId = req.params.id;
     let valid = mongoose.Types.ObjectId.isValid(hwId);
     let loginInfo = req.session.loginInfo;
 
@@ -88,11 +92,11 @@ var not = (factor) => !factor;
 
 var validateData = (data, checkList) => {
     if (typeof checkList == "string" && checkList == "all") {
-        checkItem = Object.keys(data);
+        checkList = Object.keys(data);
     }
 
     for(let checkItem of checkList) {
-        if(not(checkList[checkItem])) return false
+        if(not(checkList.includes(checkItem))) return false
     }
 
     return true
@@ -103,25 +107,28 @@ var throwError = (res, code) => {
     let errorCode = 0;
     switch (code) {
         case 1:
-            erroCode = 400
-            erroState = { code, error: "INVALID ID" };
-            break;
+        errorCode = 400
+        errorState = { code, error: "INVALID ID" };
+        break;
         case 2:
-            erroCode = 403
-            erroState = { code, error: "NOT LOGGED IN" };
-            break;
+        errorCode = 403
+        errorState = { code, error: "NOT LOGGED IN" };
+        break;
         case 3:
-            erroCode = 404
-            erroState = { code, error: "NO RESOURCE" };
-            break;
+        errorCode = 404
+        errorState = { code, error: "NO RESOURCE" };
+        break;
         case 4:
-            erroCode = 403
-            erroState = { code, error: "PERMISSION FAILURE" };
-            break;
+        errorCode = 403
+        errorState = { code, error: "PERMISSION FAILURE" };
+        break;
+        case 5:
+        errorCode = 400
+        errorState = { code, error: "EMPTY CONTENTS" };
         default:
 
     }
-    return res.status(errorCode).json(erroState)
+    return res.status(errorCode).json(errorState)
 }
 
 export default router;

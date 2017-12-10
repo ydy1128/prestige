@@ -13,5 +13,5 @@ export {
     StudentObj,
     ClassObj,
     ClassBoard,
-    StudentBoard
+    StudentBoard,
 };

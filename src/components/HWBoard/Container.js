@@ -4,12 +4,39 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 // ACTIONS
+import {
+  homeworkBoardRequest,
+  homeworkPostRequest,
+  homeworkEditRequest,
+  homeworkRemoveRequest } from 'actions/homework';
 
 // STORE
-function mapStateToProps ({dataReducer}) {
-    //let  {  } = dataReducer
-    return { }
+function mapStateToProps (state) {
+    let homework  = state.homework;
+    return {
+        hwData: homework.board.data,
+        hwPostStatus: homework.post,
+        hwEditStatus: homework.editClass,
+        hwRemoveStatus: homework.removeClass,
+    }
 }
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        homeworkBoardRequest: (isInitial, listType, id, username) => {
+            return dispatch(homeworkBoardRequest(isInitial, listType, id, username));
+        },
+        homeworkPostRequest: (contents) => {
+            return dispatch(homeworkPostRequest(contents));
+        },
+        homeworkEditRequest: (id, index, contents) => {
+            return dispatch(homeworkEditRequest(id, index, contents));
+        },
+        homeworkRemoveRequest: (id, index) => {
+            return dispatch(homeworkRemoveRequest(id, index));
+        }
+    };
+};
 
 var contain = (Present)  => {
     class Container extends React.Component {
@@ -17,16 +44,33 @@ var contain = (Present)  => {
         // CLASS INNER FUNCTIONS
         constructor(props) {
             super(props);
-            this.state = {url: ""};
-            this._onClick = this._onClick.bind(this);
+            this.state = {
+                dialogOn: false,
+                clickedRowIndexes: [],
+                selectedHw: {},
+            };
+            this._handleRowSelection = this._handleRowSelection.bind(this);
+            this._deleteHomeworks = this._deleteHomeworks.bind(this);
+            this._loadHomeworkData = this._loadHomeworkData.bind(this);
+            this._onClickCreateHomework = this._onClickCreateHomework.bind(this);
+            this._onClickEditHomework = this._onClickEditHomework.bind(this);
+            this._closeDialog = this._closeDialog.bind(this);
         }
 
         render() {
-            let presentState = [];
-            let presentProps = [];
-            let customProps = {customValue: this.value};
+            let presentState = ["dialogOn", "clickedRowIndexes", "selectedHw"];
+            let presentProps = [
+                "hwData"
+            ];
+            let customProps = {
+            };
             let presentFunctions = {
-                onClick: this._onClick
+                homeworkPostRequest: this.props.homeworkPostRequest,
+                deleteHomeworks: this._deleteHomeworks,
+                handleRowSelection: this._handleRowSelection,
+                onClickEditHomework: this._onClickEditHomework,
+                onClickCreateHomework: this._onClickCreateHomework,
+                closeDialog: this._closeDialog,
             }
 
             return (  // Do not modify!!
@@ -39,7 +83,10 @@ var contain = (Present)  => {
         }
 
         // COMPONENT LIFE CYCLE
-        componentWillMount() {}
+        componentWillMount() {
+          console.log("this");
+          this._loadHomeworkData();
+        }
 
         componentWillReceiveProps(nextProps) {}
 
@@ -54,18 +101,52 @@ var contain = (Present)  => {
         componentWillUnmount() {}
 
         // CUSTOM FUNCTIONS
-        _onClick(action){
-            return (e) => {
-                switch (action) {
-                    case 'new':
+        _toggleDialog(open) {
+            this.setState({
+                dialogOn: open
+            })
+        }
 
-                        break;
-                    case 'modify':
+        _closeDialog() {
+          this._toggleDialog(false);
+        }
 
-                        break;
-                    default:
-                }
-            }
+        _onClickCreateHomework(e) {
+
+          this._toggleDialog(true);
+        }
+
+        _onClickEditHomework(index) {
+          return (e) => {
+            e.stopPropagation();
+            this.setState({
+              selectedHw: this.props.hwData[index]
+            })
+            this._toggleDialog(true);
+          }
+        }
+
+        _handleRowSelection(rowIds) {
+          this.setState({
+            clickedRowIndexes: rowIds
+          })
+        }
+
+        _deleteHomeworks() {
+          let targetHomeworkIndexes = this.state.clickedRowIndexes;
+          let desSortedIndexes = targetHomeworkIndexes.sort((a,b)=>{return a<b})
+          for(var targetIndex of desSortedIndexes){
+            let targetId = this.props.hwData[targetIndex]._id;
+            this.props.homeworkRemoveRequest(targetId, targetIndex);
+          }
+
+          this.setState({
+            clickedRowIndexes: []
+          })
+        }
+
+        _loadHomeworkData(){
+          this.props.homeworkBoardRequest().then(() => {});
         }
     }
 
@@ -80,7 +161,7 @@ var contain = (Present)  => {
     }
 
 
-    return connect(mapStateToProps, undefined)(Container);
+    return connect(mapStateToProps, mapDispatchToProps)(Container);
 }
 
 
