@@ -4,7 +4,7 @@ import MakeClass from './MakeClass';
 import ClassObj from './ClassObj';
 import ClassBoard from './ClassBoard';
 import StudentBoard from 'components/StudentBoard';
-
+import HWBoard from 'components/HWBoard';
 export {
     Header,
     Authentication,
@@ -12,4 +12,5 @@ export {
     ClassObj,
     ClassBoard,
     StudentBoard,
+    HWBoard
 };
