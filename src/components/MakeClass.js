@@ -13,8 +13,6 @@ import {
     TableRowColumn,
 } from 'material-ui/Table';
 
-import StudentObj from './StudentObj';
-
 class MakeClass extends React.Component {
     constructor(props){
         super(props);

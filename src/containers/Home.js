@@ -15,7 +15,7 @@ class Home extends React.Component {
         // TEACHER_DASHBOARD, TEACHER_STUDENTBOARD, TEACHER_CLASSBOARD, TEACHER_LECTUREBOARD, TEACHER_HWBOARD
         // STUDENT_DASHBOARD, STUDENT_LECTUREBOARD, STUDENT_HWBOARD
         this.state = {
-            view_type: 'TEACHER_HWBOARD'
+            view_type: 'TEACHER_STUDENTBOARD'
         }
 
         this.handleClassPost = this.handleClassPost.bind(this);
