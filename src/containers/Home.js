@@ -14,10 +14,14 @@ class Home extends React.Component {
 
         // TEACHER_DASHBOARD, TEACHER_STUDENTBOARD, TEACHER_CLASSBOARD, TEACHER_LECTUREBOARD, TEACHER_HWBOARD
         // STUDENT_DASHBOARD, STUDENT_LECTUREBOARD, STUDENT_HWBOARD
-        this.state = {
-            view_type: 'TEACHER_STUDENTBOARD'
-        }
+        // this.state = {
+        //     view_type: 'TEACHER_STUDENTBOARD'
+        // }
 
+        //Commented for dev purposes
+        this.state = {
+            view_type: this.getLoginData == 'teacher' ? 'TEACHER_DASHBOARD' : 'STUDENT_DASHBOARD'
+        }
         this.handleClassPost = this.handleClassPost.bind(this);
         this.handleClassEdit = this.handleClassEdit.bind(this);
         this.handleClassRemove = this.handleClassRemove.bind(this);
@@ -286,15 +290,14 @@ class Home extends React.Component {
     	)
     	const studentMenu = (
 			<ul className="">
-				<li><a className="waves-effect active">대시보드</a></li>
-				<li><a className="waves-effect">강의게시판</a></li>
-				<li><a className="waves-effect">숙제게시판</a></li>
-				<li><a className="waves-effect">질문게시판</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_DASHBOARD')}    name="STUDENT_DASHBOARD"     onClick={this.handleMenuClick}>대시보드</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_LECTUREBOARD')} name="STUDENT_LECTUREBOARD"  onClick={this.handleMenuClick}>강의게시판</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_HWBOARD')}      name="STUDENT_HWBOARD"       onClick={this.handleMenuClick}>숙제게시판</a></li>
 			</ul>
     	)
     	const sideMenu = (
 			<div className="Side-menu">
-				{this.getLoginData().role == 'student' ? studentMenu : teacherMenu}
+				{this.getLoginData().role == 'teacher' ? teacherMenu : studentMenu}
 			</div>
     	)
     	const afterLoginView = (
