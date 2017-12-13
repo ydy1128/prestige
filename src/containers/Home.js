@@ -5,8 +5,12 @@ import FontAwesome from 'react-fontawesome';
 import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest } from 'actions/makeclass';
 import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest, studentsInfoPwChangeRequest } from 'actions/studentinfo';
 
-import { ClassBoard, MakeClass, StudentBoard } from 'components';
-import HWBoard from '../components/HWBoard';
+import { ClassBoard, 
+          MakeClass, 
+          StudentBoard, 
+          HWBoard, 
+          LectureBoard 
+} from 'components';
 
 class Home extends React.Component {
     constructor(props) {
@@ -21,7 +25,7 @@ class Home extends React.Component {
         //Commented for dev purposes
         console.log(this.getLogin)
         this.state = {
-            view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_DASHBOARD' : 'STUDENT_DASHBOARD'
+            view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_LECTUREBOARD' : 'STUDENT_DASHBOARD'
         }
         this.handleClassPost = this.handleClassPost.bind(this);
         this.handleClassEdit = this.handleClassEdit.bind(this);
@@ -232,7 +236,7 @@ class Home extends React.Component {
                                 onStudentEdit={this.handleStudentEdit}
                                 />);
             case 'TEACHER_LECTUREBOARD':
-                return (<div>LectureBoard</div>);
+                return (<LectureBoard />);
             case 'TEACHER_HWBOARD':
                 return (<HWBoard />);
             case 'STUDENT_DASHBOARD':

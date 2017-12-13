@@ -5,6 +5,7 @@ import ClassObj from './ClassObj';
 import ClassBoard from './ClassBoard';
 import StudentBoard from 'components/StudentBoard';
 import HWBoard from 'components/HWBoard';
+import LectureBoard from 'components/LectureBoard';
 export {
     Header,
     Authentication,
@@ -12,5 +13,6 @@ export {
     ClassObj,
     ClassBoard,
     StudentBoard,
-    HWBoard
+    HWBoard,
+    LectureBoard
 };
