@@ -6,14 +6,23 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import DatePicker from 'material-ui/DatePicker';
+import {Editor, EditorState, ContentState, RichUtils, Modifier} from 'draft-js';
+
+let style = {
+  editorStyle: {
+    width: '100%',
+    height: '300px'
+  }
+};
 
 class HomeworkDialog extends React.Component {
   constructor(props) {
     super(props);
     let {hw, closeDialog, dialogOn} = props;
+    let content = Object.keys(hw).length ? hw.content : '';
     this.state = {
       status: hw.id ? "modify" : "create",
-      contents : hw || {// initial contents
+      contents: hw || {// initial contents
       	title: "String",
       	content: "String",
       	downloads: ["String"],
@@ -22,14 +31,17 @@ class HomeworkDialog extends React.Component {
       	dueDate: "String",
       	writtenDate: "String",
       	modifiedDate: "String",
-
       	teacherId: "String",
-      }
+      },
+      editorState: EditorState.createWithContent(ContentState.createFromText(content)),
     };
 
     this._updateOnClick = this._updateOnClick.bind(this);
     this._cancleOnClick = this._cancleOnClick.bind(this);
     this._handleHomeworkPost = this._handleHomeworkPost.bind(this);
+    this._dateOnChange = this._dateOnChange.bind(this);
+    this._onChangeTextArea = this._onChangeTextArea.bind(this);
+    this._handleTab = this._handleTab.bind(this);
   }
 
   render() {
@@ -49,6 +61,7 @@ class HomeworkDialog extends React.Component {
       />,
     ];
 
+    let date = contents.dueDate ? new Date(contents.dueDate) : new Date();
     return (
       <div>
         <Dialog
@@ -71,17 +84,26 @@ class HomeworkDialog extends React.Component {
               }
             }
           /><br />
-
-          <TextField id="content"
-            hintText="Content"
-            floatingLabelText="Content"
-            value={contents.content}
-          /><br />
+          <div
+            style={style.editorStyle}
+            onClick= {(e) => {
+                this.domEditor.focus()
+            }}
+          >
+            <Editor
+                editorState={this.state.editorState}
+                onChange={this._onChangeTextArea}
+                placeholder="Put your content..."
+                onTab={this._handleTab}
+                ref={ref => this.domEditor = ref}
+            />
+          </div>
 
           <DatePicker id="due-date"
             hintText="Landscape Dialog"
             mode="landscape"
-            defaultDate={Date.parse(contents.dueDate) ? contents.dueDate : new Date()}
+            defaultDate={date}
+            onChange={this._dateOnChange}
           />
 
           <div id="accomplishments" > </div>
@@ -92,9 +114,35 @@ class HomeworkDialog extends React.Component {
       </div>
     );
   }
+  _onChangeTextArea(editorState) {
+      this.setState({editorState})
+  };
+
+  _handleTab(e) {
+      e.preventDefault();
+      const tabCharacter = "    ";
+      let currentState = this.state.editorState;
+      let newContentState = Modifier.replaceText(
+          currentState.getCurrentContent(),
+          currentState.getSelection(),
+          tabCharacter
+      );
+
+      this.setState({
+          editorState: EditorState.push(currentState, newContentState, 'insert-characters')
+      });
+  }
+
+  _dateOnChange(e, date){
+    let digitDate = Date.parse(date);
+    this.setState({
+      contents: Object.assign({}, this.state.contents, {dueDate: digitDate})
+    });
+  }
 
   _updateOnClick(e) {
     if(this.state.status == "modify") {
+      //let content = editorState.getCurrentContent().getPlainText()
 
     } else {
       this._handleHomeworkPost(this.state.contents);

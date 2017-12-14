@@ -82,9 +82,9 @@ export default class TableExampleComplex extends Component {
               enableSelectAll={this.state.enableSelectAll}
             >
               <TableRow>
-                <TableHeaderColumn tooltip=""></TableHeaderColumn>
-                <TableHeaderColumn tooltip="Title" style={styles.row.title}>제목</TableHeaderColumn>
-                <TableHeaderColumn tooltip="Due Date">제출기한</TableHeaderColumn>
+                <TableHeaderColumn ></TableHeaderColumn>
+                <TableHeaderColumn style={styles.row.title}>제목</TableHeaderColumn>
+                <TableHeaderColumn >제출기한</TableHeaderColumn>
               </TableRow>
             </TableHeader>
             <TableBody
@@ -118,7 +118,7 @@ export default class TableExampleComplex extends Component {
               style={styles.button} onClick={this.props.onClickEditHomework(index)} name="pencil" />
           </TableRowColumn>
           <TableRowColumn>{title}</TableRowColumn>
-          <TableRowColumn>{dueDate}</TableRowColumn>
+          <TableRowColumn>{Date(dueDate)}</TableRowColumn>
         </TableRow>
       );
     });
