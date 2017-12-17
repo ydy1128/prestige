@@ -10,7 +10,6 @@ router.put('/:id', (req, res) => { updateHomework(req, res); });
 router.delete('/:id', (req, res) => { deleteHomewerk(req, res); });
 
 const createHomework = (req, res) => {
-    console.log('test1');
     let hwInfo = req.body.contents;
     if(not(req.session.loginInfo)) {
         return throwError(res, 2);
@@ -49,6 +48,7 @@ const updateHomework = (req, res) => {
     let modifiedHwInfo = req.body.contents;
     let hwId = req.params.id;
     let userId = req.session.loginInfo._id;
+    delete modifiedHwInfo._id
 
     // Find Class
     Homework.findById( hwId, (err, hw) => {
@@ -56,7 +56,8 @@ const updateHomework = (req, res) => {
         if(not(hw)) return throwError(res, 3)
         if(hw.teacherId != userId) return throwError(res, 4);
 
-        hw = Object.assign({}, hw, modifiedHwInfo);
+
+        Object.assign(hw, modifiedHwInfo)
 
         hw.save((err, hw) => {
             if(err) throw err;
@@ -111,22 +112,23 @@ var throwError = (res, code) => {
         errorState = { code, error: "INVALID ID" };
         break;
         case 2:
-        errorCode = 403
-        errorState = { code, error: "NOT LOGGED IN" };
+            errorCode = 403
+            errorState = { code, error: "NOT LOGGED IN" };
         break;
         case 3:
-        errorCode = 404
-        errorState = { code, error: "NO RESOURCE" };
+            errorCode = 404
+            errorState = { code, error: "NO RESOURCE" };
         break;
         case 4:
-        errorCode = 403
-        errorState = { code, error: "PERMISSION FAILURE" };
+            errorCode = 403
+            errorState = { code, error: "PERMISSION FAILURE" };
         break;
         case 5:
-        errorCode = 400
-        errorState = { code, error: "EMPTY CONTENTS" };
+            errorCode = 400
+            errorState = { code, error: "EMPTY CONTENTS" };
         default:
-
+            errorCode = 500;
+            errorState = {code, error: "INTERNAL SERVER ERROR"};
     }
     return res.status(errorCode).json(errorState)
 }

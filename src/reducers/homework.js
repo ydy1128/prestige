@@ -11,7 +11,7 @@ const initialState = {
         status: 'INIT',
         error: -1
     },
-    // editClassPrep: {
+    // editPrep: {
     //     name: '',
     //     days: '',
     //     starttime: '',
@@ -21,11 +21,11 @@ const initialState = {
     //     _id: '',
     //     flag: true
     // },
-    editClass: {
+    edit: {
         status: 'INIT',
         error: -1,
     },
-    removeClass: {
+    remove: {
         status: 'INIT',
         error: -1
     }
@@ -83,7 +83,7 @@ export default function makeclass(state, action) {
             });
         // case types.HOMEWORK_EDIT_PREP:
         //     return update(state, {
-        //         editClassPrep: {
+        //         editPrep: {
         //             name: { $set: action.name },
         //             days: { $set: action.days },
         //             starttime: { $set: action.starttime },
@@ -96,7 +96,7 @@ export default function makeclass(state, action) {
         //     });
         case types.HOMEWORK_EDIT:
             return update(state, {
-                editClass: {
+                edit: {
                     status: { $set: 'WAITING' },
                     error: { $set: -1 },
                     cls: { $set: undefined }
@@ -104,7 +104,7 @@ export default function makeclass(state, action) {
             });
         case types.HOMEWORK_EDIT_SUCCESS:
             return update(state, {
-                editClass: {
+                edit: {
                     status: { $set: 'SUCCESS' },
                 },
                 board: {
@@ -115,21 +115,21 @@ export default function makeclass(state, action) {
             });
         case types.HOMEWORK_EDIT_FAILURE:
             return update(state, {
-                editClass: {
+                edit: {
                     status: { $set: 'FAILURE' },
                     error: { $set: action.error }
                 }
             });
         case types.HOMEWORK_REMOVE:
             return update(state, {
-                removeClass: {
+                remove: {
                     status: { $set: 'WAITING' },
                     error: { $set: -1 }
                 }
             });
         case types.HOMEWORK_REMOVE_SUCCESS:
             return update(state, {
-                removeClass:{
+                remove:{
                     status: { $set: 'SUCCESS' }
                 },
                 board: {
@@ -138,7 +138,7 @@ export default function makeclass(state, action) {
             });
         case types.HOMEWORK_REMOVE_FAILURE:
             return update(state, {
-                removeClass: {
+                remove: {
                     status: { $set: 'FAILURE' },
                     error: { $set: action.error }
                 }

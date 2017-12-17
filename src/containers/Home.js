@@ -5,11 +5,11 @@ import FontAwesome from 'react-fontawesome';
 import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest } from 'actions/makeclass';
 import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest, studentsInfoPwChangeRequest } from 'actions/studentinfo';
 
-import { ClassBoard, 
-          MakeClass, 
-          StudentBoard, 
-          HWBoard, 
-          LectureBoard 
+import { ClassBoard,
+          MakeClass,
+          StudentBoard,
+          HWBoard,
+          LectureBoard
 } from 'components';
 
 class Home extends React.Component {
@@ -25,7 +25,7 @@ class Home extends React.Component {
         //Commented for dev purposes
         console.log(this.getLogin)
         this.state = {
-            view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_CLASSBOARD' : 'STUDENT_DASHBOARD'
+            view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_DASHBOARD' : 'STUDENT_DASHBOARD'
         }
         this.handleClassPost = this.handleClassPost.bind(this);
         this.handleClassEdit = this.handleClassEdit.bind(this);
@@ -113,7 +113,7 @@ class Home extends React.Component {
             }
         });
     }
-    handleStudentRemove(index, id, silent){        
+    handleStudentRemove(index, id, silent){
         return this.props.studentsInfoRemoveRequest(id, index).then(() => {
             if(!silent){
                 if(this.props.studentRemoveStatus.status==="SUCCESS") {
@@ -135,7 +135,7 @@ class Home extends React.Component {
                 }
             }
         });
-        
+
     }
     handleClassPost(contents){
         return this.props.classPostRequest(contents).then(
@@ -237,7 +237,7 @@ class Home extends React.Component {
                                 onStudentEdit={this.handleStudentEdit}
                                 />);
             case 'TEACHER_LECTUREBOARD':
-                return (<LectureBoard />);
+                return (<LectureBoard classData={this.props.classData}/>);
             case 'TEACHER_HWBOARD':
                 return (<HWBoard />);
             case 'STUDENT_DASHBOARD':

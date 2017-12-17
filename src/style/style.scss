@@ -163,7 +163,7 @@ a{
 				&:hover{
 					img{
 						-webkit-filter: grayscale(0%) brightness(55%);
-					    filter: grayscale(0%) brightness(55%);	
+					    filter: grayscale(0%) brightness(55%);
 					}
 				}
 			}
@@ -357,4 +357,10 @@ a{
 
 input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):focus:not([readonly]), input[type=password]:not(.browser-default):focus:not([readonly]), input[type=email]:not(.browser-default):focus:not([readonly]), input[type=url]:not(.browser-default):focus:not([readonly]), input[type=time]:not(.browser-default):focus:not([readonly]), input[type=date]:not(.browser-default):focus:not([readonly]), input[type=datetime]:not(.browser-default):focus:not([readonly]), input[type=datetime-local]:not(.browser-default):focus:not([readonly]), input[type=tel]:not(.browser-default):focus:not([readonly]), input[type=number]:not(.browser-default):focus:not([readonly]), input[type=search]:not(.browser-default):focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]){
 	box-shadow: none ;
+}
+
+//////////////////////draft-js////////////////////////
+.public-DraftEditorPlaceholder-root {
+    position: absolute;
+    color: #cccccc;
 }

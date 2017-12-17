@@ -5,13 +5,10 @@ const Schema = mongoose.Schema;
 const Homework = new Schema({
 	title: String,
 	content: String,
-	downloads: [String],
-	// uploads: ,
+	files: [String],
 	accomplishments: [String],
 	dueDate: String,
 	writtenDate: String,
-	modifiedDate: String,
-
 	teacherId: String,
 });
 

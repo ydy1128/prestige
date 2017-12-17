@@ -16,7 +16,7 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 
 app.use('/', express.static(path.join(__dirname, './../public')));
-
+app.use('/uploads', express.static('uploads'));
 app.get('/hello', (req, res) => {
     return res.send('Hello CodeLab');
 });
