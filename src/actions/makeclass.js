@@ -58,7 +58,7 @@ export function classBoardFailure() {
 export function classPostRequest(contents) {
     return (dispatch) => {
         dispatch(classPost());
-
+        console.log(contents)
         return axios.post('/api/class', { contents })
         .then((response) => {
             console.log(response.data.data)

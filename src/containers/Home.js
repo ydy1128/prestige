@@ -25,7 +25,7 @@ class Home extends React.Component {
         //Commented for dev purposes
         console.log(this.getLogin)
         this.state = {
-            view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_LECTUREBOARD' : 'STUDENT_DASHBOARD'
+            view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_CLASSBOARD' : 'STUDENT_DASHBOARD'
         }
         this.handleClassPost = this.handleClassPost.bind(this);
         this.handleClassEdit = this.handleClassEdit.bind(this);
@@ -231,6 +231,7 @@ class Home extends React.Component {
                                 onClassEdit={this.handleClassEdit}/>);
             case 'TEACHER_CLASSBOARD':
                 return (<ClassBoard data={this.props.classData}
+                                onClassPost={this.handleClassPost}
                                 studentsData={this.props.studentsData}
                                 onRemove={this.handleClassRemove}
                                 onStudentEdit={this.handleStudentEdit}
