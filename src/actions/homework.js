@@ -114,7 +114,6 @@ export function homeworkEditRequest(id, index, contents) {
             dispatch(homeworkEditSuccess(index, response.data.homework));
         }).catch((error) => {
             dispatch(homeworkEditFailure(error.response.data.code));
-            alert(error.response.data.error);
         });
     };
 }

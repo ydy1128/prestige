@@ -10,7 +10,6 @@ router.put('/:id', (req, res) => { updateHomework(req, res); });
 router.delete('/:id', (req, res) => { deleteHomewerk(req, res); });
 
 const createHomework = (req, res) => {
-    console.log('test1');
     let hwInfo = req.body.contents;
     if(not(req.session.loginInfo)) {
         return throwError(res, 2);
@@ -49,6 +48,7 @@ const updateHomework = (req, res) => {
     let modifiedHwInfo = req.body.contents;
     let hwId = req.params.id;
     let userId = req.session.loginInfo._id;
+    delete modifiedHwInfo._id
 
     // Find Class
     Homework.findById( hwId, (err, hw) => {
@@ -56,7 +56,8 @@ const updateHomework = (req, res) => {
         if(not(hw)) return throwError(res, 3)
         if(hw.teacherId != userId) return throwError(res, 4);
 
-        hw = Object.assign({}, hw, modifiedHwInfo);
+
+        Object.assign(hw, modifiedHwInfo)
 
         hw.save((err, hw) => {
             if(err) throw err;

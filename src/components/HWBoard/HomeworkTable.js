@@ -15,7 +15,7 @@ import Toggle from 'material-ui/Toggle';
 
 import FontAwesome from 'react-fontawesome';
 
-const styles = {
+const style = {
   propContainer: {
     width: 200,
     overflow: 'hidden',
@@ -29,12 +29,12 @@ const styles = {
   },
   row: {
     title: {
-      width: "60%",
+      width: "50%",
     },
-    dueDate: {
+    date: {
+      width: "124px",
 
-    }
-
+    },
   }
 };
 
@@ -83,8 +83,9 @@ export default class TableExampleComplex extends Component {
             >
               <TableRow>
                 <TableHeaderColumn ></TableHeaderColumn>
-                <TableHeaderColumn style={styles.row.title}>제목</TableHeaderColumn>
-                <TableHeaderColumn >제출기한</TableHeaderColumn>
+                <TableHeaderColumn style={style.row.title}>제목</TableHeaderColumn>
+                <TableHeaderColumn style={style.row.date}>제출기한</TableHeaderColumn>
+                <TableHeaderColumn style={style.row.date}>작성일자</TableHeaderColumn>
               </TableRow>
             </TableHeader>
             <TableBody
@@ -108,17 +109,20 @@ export default class TableExampleComplex extends Component {
     hwData.map((rowData, index) => {
       console.log(rowData);
       let {
-        _id, title, content, dueDate, writtenData, modifiedDate, teacherId
+        _id, title, content, dueDate, writtenDate, modifiedDate, teacherId
       } = rowData;
+      let readableDate = new Date(parseInt(dueDate));
+      let readableWrittenDate = new Date(parseInt(writtenDate));
 
       tableRows.push(
         <TableRow selected={this.props.clickedRowIndexes.includes(index)} key={index}>
           <TableRowColumn>
             <FontAwesome
-              style={styles.button} onClick={this.props.onClickEditHomework(index)} name="pencil" />
+              style={style.button} onClick={this.props.onClickEditHomework(index)} name="pencil" />
           </TableRowColumn>
           <TableRowColumn>{title}</TableRowColumn>
-          <TableRowColumn>{Date(dueDate)}</TableRowColumn>
+          <TableRowColumn>{readableDate.toLocaleDateString()}</TableRowColumn>
+          <TableRowColumn>{readableWrittenDate.toLocaleDateString()}</TableRowColumn>
         </TableRow>
       );
     });
