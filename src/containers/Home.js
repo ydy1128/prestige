@@ -236,7 +236,7 @@ class Home extends React.Component {
                                 onStudentEdit={this.handleStudentEdit}
                                 />);
             case 'TEACHER_LECTUREBOARD':
-                return (<LectureBoard />);
+                return (<LectureBoard classData={this.props.classData}/>);
             case 'TEACHER_HWBOARD':
                 return (<HWBoard />);
             case 'STUDENT_DASHBOARD':
