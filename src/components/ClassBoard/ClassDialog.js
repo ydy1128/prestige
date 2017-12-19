@@ -8,7 +8,7 @@ import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import TimePicker from 'material-ui/TimePicker';
-import CustomTimePicker from './commons/CustomTimePicker'
+import CustomTimePicker from 'components/commons/CustomTimePicker'
 
 import {
     Table,
@@ -135,7 +135,7 @@ class ClassDialog extends React.Component{
             <FlatButton
                 label="저장"
                 primary={true}
-                onClick={this.props.newClass? this.props.handlePost : null}
+                onClick={this.props.newClass? this.props.handlePost : this.props.handleEdit}
             />,
         ];
 		return(

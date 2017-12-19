@@ -16,6 +16,7 @@ class ClassBoard extends React.Component{
             dialogOpen: false,
             dialogMode: true,
             editClass: {
+                _id: '',
                 name: '',
                 days: {
                     '월': false,
@@ -54,6 +55,7 @@ class ClassBoard extends React.Component{
         this.getPlusActive = this.getPlusActive.bind(this);
         this.activateModal = this.activateModal.bind(this);
         this.handlePost = this.handlePost.bind(this);
+        this.handleEdit = this.handleEdit.bind(this);
         this.handleRemove = this.handleRemove.bind(this);
 	}
     //Dialog Mode and Open state
@@ -74,7 +76,7 @@ class ClassBoard extends React.Component{
     closeDialog(){
         this.toggleDialog(false);
         this.setState({ allStudents: [], selectedStudents: [], clickedInAllStudents: [], clickedInSelectedStudents: [], newClass: true,
-                        editClass: {name: '',days: {'월': false,'화': false,'수': false,'목': false,'금': false,'토': false,'일': false  },
+                        editClass: {_id: '',name: '',days: {'월': false,'화': false,'수': false,'목': false,'금': false,'토': false,'일': false  },
                         startTime: '00:00 AM',endTime: '00:00 PM',teacher: '',students: []}})
     }
     //Handling Dialog Data
@@ -91,14 +93,14 @@ class ClassBoard extends React.Component{
             } 
             classobj.days = daysobj
             this.processStudentData(classobj);
-            this.setState({editClass: classobj})
+            this.setState({editClass: classobj, newClass: false})
     }
     processStudentData(classobj){
         let studentsIds = classobj.students;
         let allStudents = this.state.allStudents, selectedStudents = this.state.selectedStudents;
         this.props.studentsData.map((obj, i) =>{
             if(studentsIds.includes(obj._id)){
-                selectedStudents.push(obj);
+                selectedStudents.push(Object.assign({}, obj));
             }
             else{
                 let push = true;
@@ -108,7 +110,7 @@ class ClassBoard extends React.Component{
                     }
                 })
                 if(push){
-                    allStudents.push(obj);
+                    allStudents.push(Object.assign({}, obj));
                 }
 
             }
@@ -123,6 +125,9 @@ class ClassBoard extends React.Component{
         nextState.editClass = this.state.editClass;
         if (typeof secondData == 'string'){
             nextState.editClass[e.target.name] = secondData;
+            if(e.target.name == 'name'){
+                this.changeClassNameInStudents(e, nextState);
+            }
         }
         else if(typeof secondData == 'boolean'){
             nextState.editClass.days[e.target.name] = secondData;
@@ -131,6 +136,13 @@ class ClassBoard extends React.Component{
             nextState.editClass[e] = this.convertToTimeString(secondData);
         }
         this.setState(nextState);
+    }
+    changeClassNameInStudents(e, nextState){
+        let selectedStudents = [...this.state.selectedStudents];
+        selectedStudents.map(function(std, i){
+            std.class = e.target.value;
+        })
+        nextState.selectedStudents = selectedStudents;
     }
     convertToTimeString(date){
         let dateString = date.toLocaleTimeString();
@@ -148,45 +160,42 @@ class ClassBoard extends React.Component{
             clicked.push(rowNumber);
         else
             clicked.splice(index, 1);
+        console.log(clicked);
         nextState[type] = clicked;
         nextState.newClass = false;
         this.setState(nextState);
     }    
     addToClass(){
         let students = [...this.state.allStudents], selectedStudents = [...this.state.selectedStudents];
+        let removingIds = [];
         for(let i = 0; i < this.state.clickedInAllStudents.length; i++){
             let index = this.state.clickedInAllStudents[i];
             let newObj = students[index];
-            newObj.class = this.state.classname;
+            newObj.class = this.state.editClass.name;
             selectedStudents.push(newObj);
+            removingIds.push(newObj._id);
         }
-        for(let i = 0; i < this.state.clickedInAllStudents.length; i++){
-            let index = this.state.clickedInAllStudents[i];
-            students.splice(index, 1);
+        for(let i = 0; i < removingIds.length; i++){
+            let removingindex = students.findIndex(x=>x._id == removingIds[i]);
+            students.splice(removingindex, 1);
         }
-        this.setState({
-            selectedStudents: selectedStudents,
-            allStudents: students,
-            clickedInAllStudents: []
-        })
+        this.setState({selectedStudents: selectedStudents,allStudents: students,clickedInAllStudents: []})
     }
     removeFromClass(){
         let students = [...this.state.allStudents], selectedStudents = [...this.state.selectedStudents];
+        let removingIds = [];
         for(let i = 0; i < this.state.clickedInSelectedStudents.length; i++){
             let index = this.state.clickedInSelectedStudents[i];
             let newObj = selectedStudents[index];
-            newObj.class = this.state.classname;
+            newObj.class = '';
             students.push(newObj);
+            removingIds.push(newObj._id);
         }
-        for(let i = 0; i < this.state.clickedInSelectedStudents.length; i++){
-            let index = this.state.clickedInSelectedStudents[i];
-            selectedStudents.splice(index, 1);
+        for(let i = 0; i < removingIds.length; i++){
+            let removingindex = selectedStudents.findIndex(x=>x._id == removingIds[i]);
+            selectedStudents.splice(removingindex, 1);
         }
-        this.setState({
-            selectedStudents: selectedStudents,
-            allStudents: students,
-            clickedInSelectedStudents: []
-        })
+        this.setState({selectedStudents: selectedStudents,allStudents: students,clickedInSelectedStudents: []})
     }
 
 
@@ -251,14 +260,42 @@ class ClassBoard extends React.Component{
             this.closeDialog();
         })
     }
+    handleEdit() {
+        let contents = Object.assign({}, this.state.editClass);
+        contents.days = this.processDays(this.state.editClass.days);
+        let classindex = this.props.data.findIndex(x => x._id == contents._id);
+        let props = this.props;
+        this.state.selectedStudents.map(function(obj, i){
+            let index = props.studentsData.findIndex(x => x._id==obj._id);
+            console.log(obj);
+            console.log(contents.name, props.studentsData[index].class, obj.class)
+            if(props.studentsData[index].class != obj.class){
+                props.onStudentEdit(obj, index, true);
+                contents.students.push(obj._id);
+            }
+        });
+        this.state.allStudents.map(function(obj, i){
+            let index = props.studentsData.findIndex(x => x._id==obj._id);
+            let indexInClass = contents.students.findIndex(x => x == obj._id);
+            if(props.studentsData[index].class != obj.class){
+                console.log(contents.students);
+                props.onStudentEdit(obj, index, true);
+                contents.students.splice(indexInClass, 1);
+            }
+            
+        });
+        this.props.onClassEdit(contents._id, classindex, contents).then(() => {
+            this.closeDialog();
+        })
+    }
     handleRemove(){
         let props = this.props;
         let selected = [...this.state.selected];
         let student_ids = [];
-
-        this.state.selected.map(function(obj, i){
-            student_ids = [...student_ids, ...obj.data.students];
-            props.onRemove(obj.data._id, obj.index);
+        // console.log(selected)
+        this.state.selected.map(function(index, i){
+            student_ids = [...student_ids, ...props.data[index].students];
+            props.onRemove(props.data[index]._id, index);
         });
         for (let i = 0; i < student_ids.length; i++){
             let std_idx = this.props.studentsData.findIndex(x => x._id == student_ids[i]);
@@ -299,7 +336,7 @@ class ClassBoard extends React.Component{
                 <ClassDialog mode={this.state.dialogMode} newClass={this.state.newClass} open={this.state.dialogOpen} data={this.state.editClass}
                              allStudents={this.state.allStudents} selectedStudents={this.state.selectedStudents} clickedInSelectedStudents={this.state.clickedInSelectedStudents} clickedInAllStudents={this.state.clickedInAllStudents}
                              handleDataChange={this.handleDialogDataChange} handleCheck={this.handleDialogDayCheck} onCellClick={this.onCellClick}
-                             handlePost={this.handlePost}
+                             handlePost={this.handlePost} handleEdit={this.handleEdit}
                              addToClass={this.addToClass} removeFromClass={this.removeFromClass} handleClose={this.closeDialog} />
             </div>
 		)
