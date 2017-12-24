@@ -1,37 +1,24 @@
 import express from 'express';
 import Student from '../models/Student';
+import throwError from './throwerror';
 
 const router = express.Router();
 
 router.post('/signup', (req, res) => {
     // CHECK USERNAME FORMAT
     let usernameRegex = /^[a-z0-9]+$/;
-
-    if(!usernameRegex.test(req.body.username)) {
-        return res.status(400).json({
-            error: "BAD USERNAME",
-            code: 1
-        });
-    }
+    if(!usernameRegex.test(req.body.username))
+        return throwerror(res, 400, 'Bad username.');
 
     // CHECK PASS LENGTH
-    if(req.body.password.length < 4 || typeof req.body.password !== "string") {
-        return res.status(400).json({
-            error: "BAD PASSWORD",
-            code: 2
-        });
-    }
+    if(req.body.password.length < 4 || typeof req.body.password !== "string")
+        return throwerror(res, 400, 'Bad password.');
 
     // CHECK USER EXISTANCE
     Student.findOne({ username: req.body.username }, (err, exists) => {
-        if (err) throw err;
-        if(exists){
-            return res.status(409).json({
-                error: "USERNAME EXISTS",
-                code: 3
-            });
-        }
-
+        if (err) return throwerror(res, 409, 'DB error.');
+        if(exists)
+            return throwerror(res, 409, 'Username already exists.');
         // CREATE ACCOUNT
         let account = new Student({
             username: req.body.username,
@@ -41,46 +28,31 @@ router.post('/signup', (req, res) => {
             level: req.body.level,
             class: ''
         });
-
         account.password = account.generateHash(account.password);
 
         // SAVE IN THE DATABASE
         account.save( err => {
-            if(err) throw err;
+            if(err) return throwerror(res, 409, 'DB error.');
             return res.json({ success: true });
         });
-
     });
 });
 
 router.post('/signin', (req, res) => {
-
-    if(typeof req.body.password !== "string") {
-        return res.status(401).json({
-            error: "LOGIN FAILED",
-            code: 1
-        });
-    }
+    if(typeof req.body.password !== "string")
+        return throwerror(res, 401, 'Login failed: password format not valid.');
 
     // FIND THE USER BY USERNAME
     Student.findOne({ username: req.body.username}, (err, account) => {
-        if(err) throw err;
+        if(err) return throwerror(res, 409, 'DB error.');
 
         // CHECK ACCOUNT EXISTANCY
-        if(!account) {
-            return res.status(401).json({
-                error: "LOGIN FAILED",
-                code: 1
-            });
-        }
+        if(!account)
+            return throwerror(res, 401, 'Login failed: account does not exist.');
 
         // CHECK WHETHER THE PASSWORD IS VALID
-        if(!account.validateHash(req.body.password)) {
-            return res.status(401).json({
-                error: "LOGIN FAILED",
-                code: 1
-            });
-        }
+        if(!account.validateHash(req.body.password))
+            return throwerror(res, 401, 'Login failed: wrong password.');
 
         // ALTER SESSION
         let session = req.session;
@@ -97,48 +69,30 @@ router.post('/signin', (req, res) => {
 });
 
 router.get('/getinfo', (req, res) => {
-    if(typeof req.session.loginInfo === "undefined") {
-        return res.status(401).json({
-            error: 1
-        });
-    }
+    if(typeof req.session.loginInfo === "undefined")
+        return throwerror(res, 401, 'User not logged in.');
 
     res.json({ info: req.session.loginInfo });
 });
+
 router.put('/changepw/:id', (req, res)=>{
     // CHECK PASS LENGTH
-    console.log(req.body)
-    if(req.body.pw.length < 4 || typeof req.body.pw !== "string") {
-        return res.status(400).json({
-            error: "BAD PASSWORD",
-            code: 2
-        });
-    }
-    console.log(req.params.id)
+    if(req.body.pw.length < 4 || typeof req.body.pw !== "string")
+        return throwerror(res, 401, 'Login failed: password format not valid.');
+
     Student.findById(req.params.id, (err, std) => {
-        if(err) throw err;
+        if(err) return throwerror(res, 409, 'DB error.');
         // IF MEMO DOES NOT EXIST
-        if(!std) {
-            return res.status(404).json({
-                error: "NO RESOURCE",
-                code: 4
-            });
-        }
-        if(req.body.pw != req.body.check_pw){
-            return res.status(400).json({
-                error: "PASSWORD DOES NOT MATCH",
-                code: 5
-            }); 
-        }
-        console.log(std);
-        console.log(req.body.obj);
+        if(!std) return throwerror(res, 409);
+
+        if(req.body.pw != req.body.check_pw)
+            return throwerror(res, 401, 'Login failed: wrong password.');
+
         std.password = req.body.pw;
         std.password = std.generateHash(std.password);
 
-        console.log(std);
-
         std.save((err, std) => {
-            if(err) throw err;
+            if(err) return throwerror(res, 409, 'DB error.');
             return res.json({
                 success: true
             });
@@ -146,20 +100,13 @@ router.put('/changepw/:id', (req, res)=>{
 
     });
 })
+
 router.put('/:id', (req, res)=>{
     Student.findById(req.params.id, (err, std) => {
-        if(err) throw err;
-
+        if(err) return throwerror(res, 409, 'DB error.');
         // IF MEMO DOES NOT EXIST
-        if(!std) {
-            return res.status(404).json({
-                error: "NO RESOURCE",
-                code: 4
-            });
-        }
+        if(!std) return throwerror(res, 409);
 
-        console.log(std);
-        console.log(req.body.obj);
         std.class = req.body.obj.class;
         std.name = req.body.obj.name;
         std.school = req.body.obj.school;
@@ -168,7 +115,7 @@ router.put('/:id', (req, res)=>{
         console.log(std);
 
         std.save((err, std) => {
-            if(err) throw err;
+            if(err) return throwerror(res, 409, 'DB error.');
             return res.json({
                 success: true,
                 std
@@ -181,31 +128,22 @@ router.put('/:id', (req, res)=>{
 
 
 router.post('/logout', (req, res) => {
-    req.session.destroy(err => { if(err) throw err; });
+    req.session.destroy(err => { if(err) return throwerror(res, 409, 'DB error.'); });
     return res.json({ sucess: true });
 });
 
 router.delete('/:id', (req, res) => {
     // Check login status
-    if(typeof req.session.loginInfo === 'undefined') {
-        return res.status(403).json({
-            error: "NOT LOGGED IN",
-            code: 2
-        });
-    }
+    if(typeof req.session.loginInfo === 'undefined')
+        return throwerror(res, 401, 'User not logged in.');
     // Find student by id
     Student.findById(req.params.id, (err, std) => {
-        if(err) throw err;
-        if(!std) {
-            return res.status(404).json({
-                error: "NO RESOURCE",
-                code: 3
-            });
-        }
+        if(err) return throwerror(res, 409, 'DB error.');
+        if(!std) return throwerror(res, 409);
 
         // Remove student
         Student.remove({ _id: req.params.id }, err => {
-            if(err) throw err;
+            if(err) return throwerror(res, 409, 'DB error.');
             res.json({ success: true });
         });
     });
