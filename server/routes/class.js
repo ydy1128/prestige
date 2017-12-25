@@ -2,7 +2,7 @@ import express from 'express';
 import Class from '../models/Class';
 import mongoose from 'mongoose';
 
-import throwError from './throwerror';
+import throwerror from './throwerror';
 
 const router = express.Router();
 

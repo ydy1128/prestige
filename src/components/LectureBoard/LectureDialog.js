@@ -10,6 +10,13 @@ import CircularProgress from 'material-ui/CircularProgress';
 import AutoComplete from 'material-ui/AutoComplete';
 
 class LectureDialog extends React.Component{
+    constructor(props){
+        super(props);
+        this.handlePost = this.handlePost.bind(this);
+    }
+    handlePost(){
+        this.props.handlePost(this.props.currObj);
+    }
 	render(){
         const actions = [
             <FlatButton
@@ -20,15 +27,22 @@ class LectureDialog extends React.Component{
             <FlatButton
                 label={this.props.editMode? '저장' : '수정'}
                 primary={true}
-                onClick={this.props.editMode? this.props.closeEditMode : this.props.openEditMode}
+                onClick={this.props.editMode? this.handlePost : this.props.openEditMode}
             />,
         ];
         const editDiv = (
             <div>
                 <TextField 
+                    floatingLabelText="제목" fullWidth={true} 
+                    name="name" value={this.props.currObj.name}
+                    onChange={this.props.handleChange} 
+                    floatingLabelStyle={styles.inputLabel} floatingLabelFocusStyle={styles.inputLabelFocus} 
+                    underlineStyle={styles.inputLine} underlineFocusStyle={styles.inputLineFocus}
+                />
+                <TextField 
                     floatingLabelText="링크" fullWidth={true} 
-                    name="link"
-                    // onChange={this.props.handleChange} 
+                    name="link" value={this.props.currObj.link}
+                    onChange={this.props.handleChange} 
                     floatingLabelStyle={styles.inputLabel} floatingLabelFocusStyle={styles.inputLabelFocus} 
                     underlineStyle={styles.inputLine} underlineFocusStyle={styles.inputLineFocus}
                 />
@@ -65,7 +79,7 @@ class LectureDialog extends React.Component{
 
 		return (
             <Dialog
-                title={'강의제목'}
+                title={'강의생성'}
                 modal={false}
                 actions={actions}
                 open={this.props.open}

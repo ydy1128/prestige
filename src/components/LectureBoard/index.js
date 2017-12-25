@@ -9,12 +9,14 @@ import LectureDialog from './LectureDialog';
 
 let Present = ({ props, state, style, functions }) => {
 	let { classData } = props;
-	let { dialogOpen, dialogEditMode, clicked } = state;
+	let { dialogOpen, dialogEditMode, clicked, currObj } = state;
 	let {openDialog,
 		 closeDialog,
 		 openEditMode,
 		 closeEditMode,
 		 onClassChange,
+         handleDialogDataChange,
+         handlePost,
 
 	} = functions;
     const boardHeader = (
@@ -38,10 +40,11 @@ let Present = ({ props, state, style, functions }) => {
                 	<LectureTable />
                 </div>
             </div>
-            <LectureDialog open={dialogOpen} editMode={dialogEditMode} classData={classData}
+            <LectureDialog currObj={currObj} open={dialogOpen} editMode={dialogEditMode} classData={classData}
             			   handleOpen={openDialog} handleClose={closeDialog} 
             			   openEditMode={openEditMode} closeEditMode={closeEditMode}
-            			   onClassChange={onClassChange}/>
+            			   onClassChange={onClassChange} handleChange={handleDialogDataChange}
+                           handlePost={handlePost}/>
         </div>
     )
 	

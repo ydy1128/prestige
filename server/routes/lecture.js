@@ -3,36 +3,46 @@ import mongoose from 'mongoose';
 
 import Lecture from '../models/Lecture';
 
-import throwError from './throwerror';
+import throwerror from './throwerror';
 
 const router = express.Router();
 
 router.post('/', (req, res) => { createLecture(req, res); });
-
+router.get('/', (req, res) => { readLecture(req, res) });
 const createLecture = (req, res) => {
     let lecture_obj = req.body.contents;
-    if(!validateId(req.params.id))
-    	return throwError(res, 400, "Data format not valid.");
 
     if(req.session.loginInfo == undefined)
         return throwerror(res, 401, 'User not logged in.');
 
-    let lecture = new Lecture(Object.assign({}, lecture_obj, {
+    let lecture = new Lecture({
+        name: lecture_obj.name,
+        link: lecture_obj.link,
         teacher: req.session.loginInfo._id,
-    }));
+        class: lecture_obj.class,
+        accomplishments: [],
+        date: new Date()
+    });
 
     lecture.save( err => {
         if( err ) return throwerror(res, 409, 'DB error.');
-        return res.json({ success: true, homework: lecture });
+        return res.json({ success: true, lecture: lecture });
     });
 }
 
-// const readLecture = (req, res) =>{
-// 	let teacher_id = 
-// }
+const readLecture = (req, res) =>{
+    if(req.session.loginInfo == undefined)
+        return throwerror(res, 401, 'User not logged in.');
+
+    Lecture.find({teacher: req.session.loginInfo._id})
+    .exec((err, lectures) => {
+        if(err) return throwerror(res, 409, 'DB error.');
+        res.json({success: true, lectures: lectures});
+    });
+}
 
 let validateId = (id) =>{
-	return mongoose.Types.ObjectId.isValid(req.params.id) ? true : false;
+	return mongoose.Types.ObjectId.isValid(id) ? true : false;
 }
 
 

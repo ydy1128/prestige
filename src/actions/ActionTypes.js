@@ -51,6 +51,15 @@ export const CLASS_REMOVE = "CLASS_REMOVE";
 export const CLASS_REMOVE_SUCCESS = "CLASS_REMOVE_SUCCESS";
 export const CLASS_REMOVE_FAILURE = "CLASS_REMOVE_FAILURE";
 
+//===============LECTURE===============
+/* Lecture Post */
+export const LECTURE_POST = "LECTURE_POST";
+export const LECTURE_POST_SUCCESS = "LECTURE_POST_SUCCESS";
+export const LECTURE_POST_FAILURE = "LECTURE_POST_FAILURE";
+/* Lecture Get */
+export const LECTURE_BOARD = "LECTURE_BOARD";
+export const LECTURE_BOARD_SUCCESS = "LECTURE_BOARD_SUCCESS";
+export const LECTURE_BOARD_FAILURE = "LECTURE_BOARD_FAILURE";
 //===============HOMEWORKINFO===============
 /* Homework Board*/
 export const HOMEWORK_BOARD = "HOMEWORK_BOARD";

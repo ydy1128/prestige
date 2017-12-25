@@ -1,5 +1,6 @@
 import React from "react";
 import { connect } from 'react-redux';
+import { lecturePostRequest, } from 'actions/lecture';
 
 var container = (Present) =>{
 	class Container extends React.Component {
@@ -16,7 +17,6 @@ var container = (Present) =>{
                 	link: '',
                 	class: '',
                 	accomplishments: [],
-                	date: ''
                 }
             };
 
@@ -28,6 +28,8 @@ var container = (Present) =>{
             this.closeEditMode = this.closeEditMode.bind(this);
 
             this.onClassChange = this.onClassChange.bind(this);
+            this.handleDialogDataChange = this.handleDialogDataChange.bind(this);
+            this.handlePost = this.handlePost.bind(this);
         }
 	    render() {
 	        let presentState = ['dialogOpen', 'dialogEditMode', 'clicked', 'currObj'];
@@ -41,9 +43,10 @@ var container = (Present) =>{
 	        	openEditMode: this.openEditMode, 
 	        	closeEditMode: this.closeEditMode,
 	        	onClassChange: this.onClassChange,
-
+	        	handleDialogDataChange: this.handleDialogDataChange,
+	        	handlePost: this.handlePost,
 	        }
-
+	        
 	        return (
 	            <Present  
 		            props={{...(_.pick(this.props, presentProps)), ...customProps}}
@@ -81,15 +84,28 @@ var container = (Present) =>{
 
 	    onClassChange(chosenRequest, index){
 	    	console.log(chosenRequest)
-	    	this.setState({
-	    		currObj:{
-	            	_id: this.state.currObj._id,
-	            	name: this.state.currObj.name,
-	            	link: this.state.currObj.link,
-	            	class: chosenRequest.text,
-	            	accomplishments: this.state.currObj.accomplishments,
-	            	date: this.state.currObj.date
-	            }
+	    	let nextState = {
+	    		currObj: this.state.currObj
+	    	};
+	    	nextState.currObj.class = chosenRequest.value;
+	    	this.setState(nextState);
+	    }
+	    handleDialogDataChange(e){
+	        let nextState = {
+	            currObj: this.state.currObj
+	        };
+	        // let value = e.target.value;
+	        if(e.target.name == 'link')
+	        	e.target.value = e.target.value.replace('watch?v=', 'embed/');
+	        nextState.currObj[e.target.name] = e.target.value;
+	        console.log(nextState.currObj)
+	        this.setState(nextState);
+	    }
+
+	    handlePost(contents){
+	    	return this.props.lecturePostRequest(contents).then(() =>{
+	    		console.log('lecture status: ' + this.props.lecturePostStatus.status);
+	    		this.closeEditMode();
 	    	});
 	    }
 	}
@@ -99,8 +115,22 @@ var container = (Present) =>{
 	Container.defaultProps = {
 	    lectureData: [],
 	}
-	// return connect(mapStateToProps, mapDispatchToProps)(Container);
-	return Container;
+	return connect(mapStateToProps, mapDispatchToProps)(Container);
+	// return Container;
+}
+const mapDispatchToProps = (dispatch) => {
+    return {
+        lecturePostRequest: (contents) => {
+            return dispatch(lecturePostRequest(contents));
+        },
+    }
 }
 
+const mapStateToProps = (state) => {
+	console.log(state);
+    return {
+    	lecturePostStatus: state.lecture.post,
+
+    }
+}
 export default container;

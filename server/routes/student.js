@@ -1,6 +1,6 @@
 import express from 'express';
 import Student from '../models/Student';
-import throwError from './throwerror';
+import throwerror from './throwerror';
 
 const router = express.Router();
 

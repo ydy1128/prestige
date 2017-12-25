@@ -24,7 +24,7 @@ class Home extends React.Component {
         //Commented for dev purposes
         console.log(this.getLogin)
         this.state = {
-            view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_CLASSBOARD' : 'STUDENT_DASHBOARD'
+            view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_DASHBOARD' : 'STUDENT_DASHBOARD'
         }
         this.handleClassPost = this.handleClassPost.bind(this);
         this.handleClassEdit = this.handleClassEdit.bind(this);

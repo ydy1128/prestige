@@ -5,7 +5,6 @@ const initialState = {
     board: {
         status: 'INIT',
         data: [],
-        isLast: false
     },
     post: {
         status: 'INIT',
