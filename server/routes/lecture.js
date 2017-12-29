@@ -9,6 +9,9 @@ const router = express.Router();
 
 router.post('/', (req, res) => { createLecture(req, res); });
 router.get('/', (req, res) => { readLecture(req, res) });
+router.put('/:id', (req, res) => { updateLecture(req.params.id, req, res) });
+router.delete('/:id', (req, res) => { deleteLecture(req.params.id, req, res) });
+
 const createLecture = (req, res) => {
     let lecture_obj = req.body.contents;
 
@@ -38,6 +41,58 @@ const readLecture = (req, res) =>{
     .exec((err, lectures) => {
         if(err) return throwerror(res, 409, 'DB error.');
         res.json({success: true, lectures: lectures});
+    });
+}
+
+const updateLecture = (id, req, res) =>{
+    if(req.session.loginInfo == undefined)
+        return throwerror(res, 401, 'User not logged in.');
+
+    Lecture.findById(id, (err, lecture) => {
+        if(err) return throwerror(res, 409, 'DB error.');
+        // IF Class does not exist
+        if(lecture == undefined) return throwerror(res, 409);
+        // If exists, check teacher
+        if(lecture.teacher != req.session.loginInfo._id)
+            return throwerror(res, 401, 'Unauthorized user.');
+
+        // Modify class contents
+        lecture.name = req.body.contents.name;
+        lecture.link = req.body.contents.link;
+        lecture.class = req.body.contents.class;
+        lecture.accomplishments = req.body.contents.accomplishments;
+
+        lecture.save((err, lecture) => {
+            if(err) return throwerror(res, 409, 'DB error.');
+            return res.json({
+                success: true,
+                lecture
+            });
+        });
+
+    });
+
+}
+
+const deleteLecture = (id, req, res) =>{
+    // Check class Validity
+    if(!validateId(id))
+        return throwError(res, 400, "Data format not valid.");
+    // Check login status
+    if(req.session.loginInfo == undefined)
+        return throwerror(res, 401, 'User not logged in.');
+    // Find memo by id
+    Lecture.findById(id, (err, lecture) => {
+        if(err) return throwerror(res, 409, 'DB error.');
+        if(!lecture) return throwerror(res, 409);
+        //check if teacher is valid
+        if(lecture.teacher != req.session.loginInfo._id)
+            return throwerror(res, 401, 'Unauthorized user.');
+        // Remove class
+        Lecture.remove({ _id: id }, err => {
+            if(err) return throwerror(res, 409, 'DB error.');
+            res.json({ success: true });
+        });
     });
 }
 

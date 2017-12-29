@@ -1,4 +1,7 @@
 import React from "react";
+import FontAwesome from 'react-fontawesome';
+
+import DatePicker from 'material-ui/DatePicker';
 
 import {
     Table,
@@ -11,9 +14,13 @@ import {
 } from 'material-ui/Table';
 
 class LectureTable extends React.Component{
+    constructor(props){
+        super(props);
+    }
 	render(){
         const tableHeader = (
             <TableRow>
+                <TableHeaderColumn style={styles.tableButtonCol}></TableHeaderColumn>
                 <TableHeaderColumn>제목</TableHeaderColumn>
                 <TableHeaderColumn>수업</TableHeaderColumn>
                 <TableHeaderColumn>학습률</TableHeaderColumn>
@@ -21,21 +28,22 @@ class LectureTable extends React.Component{
             </TableRow>
         )
         const tableBody = data => {
-            return data.map((stdobj, i) => {
+            return data.map((lecture, i) => {
                 return(
-                    <TableRow selected={this.props.clicked.includes(i)} key={stdobj._id}>
-                        <TableRowColumn>제목</TableRowColumn>
-                        <TableRowColumn>수업</TableRowColumn>
-                        <TableRowColumn>학습률</TableRowColumn>
-                        <TableRowColumn>날짜</TableRowColumn>
+                    <TableRow selected={this.props.clicked.includes(i)} key={lecture._id}>
+                        <TableRowColumn style={styles.tableButtonCol}><FontAwesome onClick={this.props.handleDialogOpen.bind(undefined, false, false, i)} className={'edit-button'} name="pencil" /></TableRowColumn>
+                        <TableRowColumn>{lecture.name}</TableRowColumn>
+                        <TableRowColumn>{this.props.searchClassNameById(lecture.class)}</TableRowColumn>
+                        <TableRowColumn></TableRowColumn>
+                        <TableRowColumn><DatePicker id={'tp'+lecture._id} value={new Date(lecture.date)} textFieldStyle={{cursor: 'default', width: '120px', height: '20px', fontSize: '13px'}} disabled={true} /></TableRowColumn>
                     </TableRow>
                 );
             });
         };
 
 		return (
-            <Table  
-                    onRowSelection={null} onCellClick={null} 
+            <Table  style={styles.table} 
+                    onCellClick={this.props.handleRowClick} 
                     fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
                 <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
                     { tableHeader }
@@ -56,5 +64,14 @@ LectureTable.propTypes = {
 LectureTable.defaultProps = {
     lectureData: [],
 }
-
+let styles = {
+    tableButtonCol: {
+        width: '65px',
+        fontSize: "18px", 
+        cursor: "pointer"
+    },
+    table: {
+        border: '1px solid #d3d3d3'
+    }
+};
 export default LectureTable;

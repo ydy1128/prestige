@@ -44,7 +44,7 @@ class StudentTable extends React.Component{
 
 		return (
             <Table style={styles.table} 
-                    onRowSelection={this.props.handleRowSelection} onCellClick={this.props.handleRowClick} 
+                    onCellClick={this.props.handleRowClick} 
                     fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
                 <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
                     { tableHeader }

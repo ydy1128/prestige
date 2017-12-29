@@ -35,7 +35,6 @@ class StudentBoard extends React.Component{
         this.handleRemove = this.handleRemove.bind(this);
         //handle table rows
         this.handleRowClick = this.handleRowClick.bind(this);
-        this.handleRowSelection = this.handleRowSelection.bind(this);
         //handle button active
         this.handleActive = this.handleActive.bind(this);
 	}
@@ -123,11 +122,7 @@ class StudentBoard extends React.Component{
             clicked.push(rowNumber);
         else
             clicked.splice(index, 1);
-        console.log(clicked)
         this.setState({clicked: clicked, remove_active: clicked.length == 0 ? false : true})
-    }
-    handleRowSelection(rowIds){
-        this.setState({clicked: rowIds})
     }
     handleActive(){
         return this.state.remove_active ? '' : 'inactive';

@@ -359,6 +359,11 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
 	box-shadow: none ;
 }
 
+// overrides timepicker in table
+td div hr{
+	display: none;
+}
+
 //////////////////////draft-js////////////////////////
 .public-DraftEditorPlaceholder-root {
     position: absolute;

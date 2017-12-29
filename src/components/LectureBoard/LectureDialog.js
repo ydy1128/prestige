@@ -13,21 +13,28 @@ class LectureDialog extends React.Component{
     constructor(props){
         super(props);
         this.handlePost = this.handlePost.bind(this);
+        this.handleEdit = this.handleEdit.bind(this);
     }
     handlePost(){
+        console.log(this.props.newOne)
+        console.log('post')
         this.props.handlePost(this.props.currObj);
+    }
+    handleEdit(){
+        console.log('edit')
+        this.props.handleEdit(this.props.editlec, this.props.currObj);
     }
 	render(){
         const actions = [
             <FlatButton
-                label="취소"
+                label={this.props.editMode? '취소' : '닫기'}
                 primary={true}
-                onClick={this.props.handleClose}
+                onClick={this.props.editMode? (this.props.newOne? this.props.handleClose: this.props.closeEditMode) : this.props.handleClose}
             />,
             <FlatButton
                 label={this.props.editMode? '저장' : '수정'}
                 primary={true}
-                onClick={this.props.editMode? this.handlePost : this.props.openEditMode}
+                onClick={this.props.editMode? (this.props.newOne? this.handlePost: this.handleEdit) : this.props.openEditMode}
             />,
         ];
         const editDiv = (
@@ -51,7 +58,8 @@ class LectureDialog extends React.Component{
                     filter={AutoComplete.noFilter}
                     fullWidth={true}
                     dataSource={this.props.classData}
-                    onNewRequest={this.props.onClassChange}
+                    searchText={this.props.searchClassNameById(this.props.currObj.class)}
+                    onNewRequest={this.props.onClassChange} openOnFocus={true}
                     floatingLabelStyle={styles.inputLabel} floatingLabelFocusStyle={styles.inputLabelFocus} 
                     underlineStyle={styles.inputLine} underlineFocusStyle={styles.inputLineFocus}
                 /><br />
@@ -61,7 +69,7 @@ class LectureDialog extends React.Component{
         const videoDiv = (
                 <div className="row">
                     <div className="col m7">
-                        <iframe style={{minWidth: '400px', minHeight: '250px'}} src='https://www.youtube.com/embed/rRzxEiBLQCA' 
+                        <iframe style={{minWidth: '400px', minHeight: '250px'}} src={this.props.currObj.link}
                         target="_top" frameBorder="0" allowFullScreen></iframe>
                     </div>
                     <div className="col m5" style={{textAlign: 'center'}}>
@@ -79,7 +87,7 @@ class LectureDialog extends React.Component{
 
 		return (
             <Dialog
-                title={'강의생성'}
+                title={this.props.editMode? '강의생성' : '('+this.props.searchClassNameById(this.props.currObj.class)+') '+this.props.currObj.name}
                 modal={false}
                 actions={actions}
                 open={this.props.open}

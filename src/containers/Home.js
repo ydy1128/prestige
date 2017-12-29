@@ -2,14 +2,18 @@ import React from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import FontAwesome from 'react-fontawesome';
+
 import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest } from 'actions/makeclass';
 import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest, studentsInfoPwChangeRequest } from 'actions/studentinfo';
+import { lectureBoardRequest } from 'actions/lecture';
 
 import { ClassBoard,
           StudentBoard,
           HWBoard,
           LectureBoard
 } from 'components';
+
+import axios from 'axios';
 
 class Home extends React.Component {
     constructor(props) {
@@ -38,11 +42,18 @@ class Home extends React.Component {
         this.setMenuActive = this.setMenuActive.bind(this);
     }
     componentWillMount(){
-        this.props.getStudentsInfoRequest().then(() =>{})
+        this.props.getStudentsInfoRequest().then(() =>{
+            console.log('studentsData', this.props.studentsData)
+        });
+        this.props.lectureBoardRequest().then(() =>{
+            console.log('lectureData', this.props.lectureData)
+        });
+        this.props.classBoardRequest().then(() => {
+            console.log('classData', this.props.classData)
+        });
     }
     componentDidMount(){
-        $('.modal').modal({dismissible: false});
-        this.props.classBoardRequest().then(() => {});
+
     }
     getCookie(name) {
         var value = "; " + document.cookie;
@@ -217,10 +228,17 @@ class Home extends React.Component {
             view_type: e.target.name
         })
     }
+    loadCsvClassData(){
+        axios.post('/api/class/test', undefined);
+    }
     getView(){
         switch(this.state.view_type){
             case 'TEACHER_DASHBOARD':
-                return (<div>DashBoard</div>);
+                return (<div>
+                            DashBoard
+                            <button onClick={this.loadCsvClassData}>load classes</button>
+                            <button>load students</button>
+                        </div>);
             case 'TEACHER_STUDENTBOARD':
                 return (<StudentBoard studentsData={this.props.studentsData}
                                 classData={this.props.classData}
@@ -237,7 +255,8 @@ class Home extends React.Component {
                                 onStudentEdit={this.handleStudentEdit}
                                 />);
             case 'TEACHER_LECTUREBOARD':
-                return (<LectureBoard classData={this.props.classData}/>);
+                return (<LectureBoard classData={this.props.classData}
+                                lectureData={this.props.lectureData} />);
             case 'TEACHER_HWBOARD':
                 return (<HWBoard />);
             case 'STUDENT_DASHBOARD':
@@ -337,6 +356,8 @@ const mapStateToProps = (state) => {
         studentEditStatus: state.studentinfo.editStudents,
         studentPwChangeStatus: state.studentinfo.pwChange,
         studentRemoveStatus: state.studentinfo.removeStudents,
+
+        lectureData: state.lecture.board.data,
     };
 };
 
@@ -365,6 +386,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         classRemoveRequest: (id, index) => {
             return dispatch(classRemoveRequest(id, index));
+        },
+        lectureBoardRequest: () => {
+            return dispatch(lectureBoardRequest());
         }
     };
 };

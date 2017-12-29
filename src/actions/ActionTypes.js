@@ -52,7 +52,7 @@ export const CLASS_REMOVE_SUCCESS = "CLASS_REMOVE_SUCCESS";
 export const CLASS_REMOVE_FAILURE = "CLASS_REMOVE_FAILURE";
 
 //===============LECTURE===============
-/* Lecture Post */
+/* Lecture Board */
 export const LECTURE_POST = "LECTURE_POST";
 export const LECTURE_POST_SUCCESS = "LECTURE_POST_SUCCESS";
 export const LECTURE_POST_FAILURE = "LECTURE_POST_FAILURE";
@@ -60,6 +60,14 @@ export const LECTURE_POST_FAILURE = "LECTURE_POST_FAILURE";
 export const LECTURE_BOARD = "LECTURE_BOARD";
 export const LECTURE_BOARD_SUCCESS = "LECTURE_BOARD_SUCCESS";
 export const LECTURE_BOARD_FAILURE = "LECTURE_BOARD_FAILURE";
+/* Lecture Edit */
+export const LECTURE_EDIT = "LECTURE_EDIT";
+export const LECTURE_EDIT_SUCCESS = "LECTURE_EDIT_SUCCESS";
+export const LECTURE_EDIT_FAILURE = "LECTURE_EDIT_FAILURE";
+/* Lecture Remove */
+export const LECTURE_REMOVE = "LECTURE_REMOVE";
+export const LECTURE_REMOVE_SUCCESS = "LECTURE_REMOVE_SUCCESS";
+export const LECTURE_REMOVE_FAILURE = "LECTURE_REMOVE_FAILURE";
 //===============HOMEWORKINFO===============
 /* Homework Board*/
 export const HOMEWORK_BOARD = "HOMEWORK_BOARD";

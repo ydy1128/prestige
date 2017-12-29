@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from 'react-redux';
-import { lecturePostRequest, } from 'actions/lecture';
+import { lecturePostRequest, lectureEditRequest, lectureRemoveRequest } from 'actions/lecture';
 
 var container = (Present) =>{
 	class Container extends React.Component {
@@ -9,15 +9,18 @@ var container = (Present) =>{
             this.state = {
                 dialogOpen: false,
                 dialogEditMode: true,
+                newOne: true,
                 clicked: [],
                 classData: [],
+                editlec: -1,
                 currObj: {
                 	_id: '',
                 	name: '',
                 	link: '',
                 	class: '',
                 	accomplishments: [],
-                }
+                },
+                remove_active: false,
             };
 
             this.toggleDialog = this.toggleDialog.bind(this);
@@ -26,27 +29,39 @@ var container = (Present) =>{
             this.toggleEditMode = this.toggleEditMode.bind(this);
             this.openEditMode = this.openEditMode.bind(this);
             this.closeEditMode = this.closeEditMode.bind(this);
+            this.setNew = this.setNew.bind(this);
 
+	        this.searchClassNameById = this.searchClassNameById.bind(this);
             this.onClassChange = this.onClassChange.bind(this);
             this.handleDialogDataChange = this.handleDialogDataChange.bind(this);
             this.handlePost = this.handlePost.bind(this);
+            this.handleEdit = this.handleEdit.bind(this);
+            this.handleRemove = this.handleRemove.bind(this);
+
+            this.handleRowClick = this.handleRowClick.bind(this);
+
         }
 	    render() {
-	        let presentState = ['dialogOpen', 'dialogEditMode', 'clicked', 'currObj'];
+	        let presentState = ['dialogOpen', 'dialogEditMode', 'clicked', 'currObj', 'newOne', 'editlec', 'remove_active'];
 	        let presentProps = [];
 	        let customProps = {
-	        	classData: this.state.classData
+	        	classData: this.state.classData,
+	        	lectureData: this.props.lectureData,
 	        };
 	        let presentFunctions = {
 	        	openDialog: this.openDialog, 
 	        	closeDialog: this.closeDialog,
 	        	openEditMode: this.openEditMode, 
 	        	closeEditMode: this.closeEditMode,
+	        	searchClassNameById: this.searchClassNameById,
 	        	onClassChange: this.onClassChange,
 	        	handleDialogDataChange: this.handleDialogDataChange,
 	        	handlePost: this.handlePost,
+	        	handleEdit: this.handleEdit,
+	        	handleRowClick: this.handleRowClick,
+	        	handleRemove: this.handleRemove,
 	        }
-	        
+
 	        return (
 	            <Present  
 		            props={{...(_.pick(this.props, presentProps)), ...customProps}}
@@ -58,17 +73,29 @@ var container = (Present) =>{
 	    componentDidMount(){
 	    	this.filterAutocompleteData();
 	    }
-	    openDialog(){
+	    openDialog(newOne, editMode, index, event){
+	    	console.log(newOne, editMode, index)
 	    	this.toggleDialog(true);
+	    	this.setNew(newOne);
+	    	console.log(editMode);
+	    	if(editMode){
+	    		this.setNew(newOne);
+	    		this.openEditMode();
+	    	}
+	    	else{
+	    		this.setState({currObj: this.props.lectureData[index], editlec: index});
+	    		this.closeEditMode();
+	    	}
 	    }
 	    closeDialog(){
+	    	this.setState({currObj:{ _id: '',name: '',link: '',class: '',accomplishments: []}, editlec: -1, clicked: [], remove_active: false})
 	    	this.toggleDialog(false);
-	    	console.log(this.state.currObj)
 	    }
 	    toggleDialog(openState){
 	    	this.setState({dialogOpen: openState});
 	    }
 	    openEditMode(){
+	    	console.log(this.state.currObj)
 	    	this.toggleEditMode(true);
 	    }
 	    closeEditMode(){
@@ -77,11 +104,22 @@ var container = (Present) =>{
 	    toggleEditMode(editState){
 	    	this.setState({dialogEditMode: editState})
 	    }
+	    setNew(newOne){
+	    	console.log('setNew: ', newOne)
+	    	this.setState({newOne: newOne});
+	    }
 	    filterAutocompleteData(){
-	    	let acData = this.props.classData.map(obj => {return {text: obj.name, value: obj._id}; });
+	    	let acData = [...this.props.classData].map(obj => {return {text: obj.name, value: obj._id}; });
 	    	this.setState({classData: acData});
 	    }
-
+	    searchClassNameById(id){
+	        let classData = this.state.classData;
+	        for(let i = 0; i < classData.length; i++){
+	            if(classData[i].value == id){
+	                return classData[i].text;
+	            }
+	        }
+	    }
 	    onClassChange(chosenRequest, index){
 	    	console.log(chosenRequest)
 	    	let nextState = {
@@ -98,7 +136,6 @@ var container = (Present) =>{
 	        if(e.target.name == 'link')
 	        	e.target.value = e.target.value.replace('watch?v=', 'embed/');
 	        nextState.currObj[e.target.name] = e.target.value;
-	        console.log(nextState.currObj)
 	        this.setState(nextState);
 	    }
 
@@ -107,6 +144,26 @@ var container = (Present) =>{
 	    		console.log('lecture status: ' + this.props.lecturePostStatus.status);
 	    		this.closeEditMode();
 	    	});
+	    }
+	    handleEdit(index, contents){
+	    	return this.props.lectureEditRequest(index, contents).then(()=>{
+	    		console.log('lecture edit status: ' + this.props.lectureEditStatus.status);
+	    		this.closeEditMode();
+	    	})
+	    }
+	    handleRemove(id, index){
+	    	return this.props.lectureRemoveRequest(id, index).then(()=>{
+	    		console.log('lecture remove status: ' + this.props.lectureRemoveStatus.status);
+	    	})
+	    }
+		handleRowClick(rowNumber, columnId){
+	        let clicked = [...this.state.clicked];
+	        let index = clicked.indexOf(rowNumber);
+	        if(index == -1)
+	            clicked.push(rowNumber);
+	        else
+	            clicked.splice(index, 1);
+	        this.setState({clicked: clicked, remove_active: clicked.length == 0 ? false : true})
 	    }
 	}
 	Container.propTypes = {
@@ -123,14 +180,20 @@ const mapDispatchToProps = (dispatch) => {
         lecturePostRequest: (contents) => {
             return dispatch(lecturePostRequest(contents));
         },
+        lectureEditRequest: (index, contents) => {
+            return dispatch(lectureEditRequest(index, contents));
+        },
+        lectureRemoveRequest: (id, index) => {
+            return dispatch(lectureRemoveRequest(id, index));
+        },
     }
 }
 
 const mapStateToProps = (state) => {
-	console.log(state);
     return {
     	lecturePostStatus: state.lecture.post,
-
+    	lectureEditStatus: state.lecture.edit,
+    	lectureRemoveStatus: state.lecture.remove,
     }
 }
 export default container;

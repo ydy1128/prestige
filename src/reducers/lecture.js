@@ -10,6 +10,14 @@ const initialState = {
         status: 'INIT',
         error: -1
     },
+    edit:{
+        status: 'INIT',
+        error: -1,
+    },
+    remove: {
+        status: 'INIT',
+        error: -1
+    }
 }
 
 export default function lecture(state, action) {
@@ -24,6 +32,7 @@ export default function lecture(state, action) {
                 }
             });
         case types.LECTURE_POST_SUCCESS:
+        	console.log('actions: '+action.data)
             return update(state, {
                 post: {
                     status: { $set: 'SUCCESS' }
@@ -48,7 +57,7 @@ export default function lecture(state, action) {
                 }
             });
         case types.LECTURE_BOARD_SUCCESS: 
-
+        	console.log('SUCCESS');
             return update(state, {
                 board: {
                     status: { $set: 'SUCCESS' },
@@ -61,6 +70,51 @@ export default function lecture(state, action) {
                     status: { $set: 'FAILURE' }
                 }
             })
+        case types.LECTURE_EDIT: 
+            return update(state, {
+                edit: {
+                    status: { $set: 'WAITING' },
+                    error: { $set: -1 },
+                }
+            });
+        case types.LECTURE_EDIT_SUCCESS:
+            return update(state, {
+                edit: {
+                    status: { $set: 'SUCCESS' },
+                },
+                board: {
+                    data: {
+                        [action.index]: { $set: action.lecture }
+                    }
+                }
+            });
+        case types.LECTURE_EDIT_FAILURE:
+            return update(state, {
+                edit: {
+                    status: { $set: 'FAILURE' },
+                    error: { $set: action.error }
+                }
+            });
+        case types.LECTURE_REMOVE:
+            return update(state, {
+                remove: {
+                    status: { $set: 'WAITING' },
+                    error: { $set: -1 }
+                }
+            });
+        case types.LECTURE_REMOVE_SUCCESS:
+            return update(state, {
+                remove:{
+                    status: { $set: 'SUCCESS' }
+                }
+            });
+        case types.LECTURE_REMOVE_FAILURE:
+            return update(state, {
+                remove: {
+                    status: { $set: 'FAILURE' },
+                    error: { $set: action.error }
+                }
+            });
         default:
             return state;
     }

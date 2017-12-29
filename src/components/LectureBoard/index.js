@@ -8,26 +8,48 @@ import LectureDialog from './LectureDialog';
 
 
 let Present = ({ props, state, style, functions }) => {
-	let { classData } = props;
-	let { dialogOpen, dialogEditMode, clicked, currObj } = state;
+	let { classData, lectureData } = props;
+	let { dialogOpen, dialogEditMode, clicked, currObj, newOne, editlec, remove_active } = state;
 	let {openDialog,
 		 closeDialog,
 		 openEditMode,
 		 closeEditMode,
+         searchClassNameById,
 		 onClassChange,
          handleDialogDataChange,
          handlePost,
-
+         handleEdit,
+         handleRemove,
+         handleRowClick,
 	} = functions;
+    let getRemoveActive = (plus)=>{
+        if(plus)
+            return remove_active? 'inactive' : '';
+        else
+            return remove_active ? '' : 'inactive';
+    }
+    let removeLectures = ()=>{
+
+        for(let i = 0; i < clicked.length; i++){
+            console.log(i, ' : ', lectureData[clicked[i]].name, clicked[i])
+            handleRemove(lectureData[clicked[i]]._id, clicked[i]);
+            lectureData.splice(clicked[i], 1);
+            for(let j = i; j < clicked.length; j++){
+                if(clicked[j] > clicked[i])
+                    clicked[j]--;
+            }
+        }
+        closeDialog();
+    }
     const boardHeader = (
         <div className="Board-header col m12">
             <div className="col m4"><h4>강의관리</h4></div>
             <div className="icons col m8">
-                <a>
-                    <FontAwesome className={'remove-button right '} name="trash-o" />
+                <a onClick={remove_active ? removeLectures : null}>
+                    <FontAwesome className={'remove-button right '+ getRemoveActive(false)} name="trash-o" />
                 </a>
-                <a onClick={openDialog}>
-                    <FontAwesome className={'plus-button right '} name="plus" />
+                <a onClick={openDialog.bind(undefined, true, true)}>
+                    <FontAwesome className={'plus-button right '+ getRemoveActive(true)} name="plus" />
                 </a>
             </div>
         </div>
@@ -37,14 +59,18 @@ let Present = ({ props, state, style, functions }) => {
             { boardHeader }
             <div className="Board-contents row">
                 <div className="col m12">
-                	<LectureTable />
+                	<LectureTable lectureData={lectureData} classData={classData} clicked={clicked}
+                                  handleDialogOpen={openDialog} searchClassNameById={searchClassNameById}
+                                  handleRowClick={handleRowClick} handleRemove={handleRemove}/>
                 </div>
             </div>
-            <LectureDialog currObj={currObj} open={dialogOpen} editMode={dialogEditMode} classData={classData}
+            <LectureDialog open={dialogOpen} editMode={dialogEditMode} newOne={newOne} 
+                           currObj={currObj} classData={classData} editlec={editlec}
             			   handleOpen={openDialog} handleClose={closeDialog} 
-            			   openEditMode={openEditMode} closeEditMode={closeEditMode}
+            			   openEditMode={openEditMode} closeEditMode={closeEditMode} 
+                           searchClassNameById={searchClassNameById}
             			   onClassChange={onClassChange} handleChange={handleDialogDataChange}
-                           handlePost={handlePost}/>
+                           handlePost={handlePost} handleEdit={handleEdit}/>
         </div>
     )
 	
