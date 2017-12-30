@@ -99,13 +99,14 @@ class ClassBoard extends React.Component{
         let studentsIds = classobj.students;
         let allStudents = this.state.allStudents, selectedStudents = this.state.selectedStudents;
         this.props.studentsData.map((obj, i) =>{
-            if(studentsIds.includes(obj._id)){
+            if(studentsIds.includes(obj._id) && obj.class == classobj._id){
                 selectedStudents.push(Object.assign({}, obj));
             }
+            //check if other class has student
             else{
                 let push = true;
                 this.props.data.map((cls, j) =>{
-                    if(cls.students.includes(obj._id)){
+                    if(cls.students.includes(obj._id) && obj.class == cls._id){
                         push = false;
                     }
                 })
@@ -171,7 +172,7 @@ class ClassBoard extends React.Component{
         for(let i = 0; i < this.state.clickedInAllStudents.length; i++){
             let index = this.state.clickedInAllStudents[i];
             let newObj = students[index];
-            newObj.class = this.state.editClass.name;
+            newObj.class = this.state.editClass._id;
             selectedStudents.push(newObj);
             removingIds.push(newObj._id);
         }
@@ -329,7 +330,7 @@ class ClassBoard extends React.Component{
 	            <div className="Board-contents row">
                     <div className="col m12">
                         <ClassList classData={this.props.data} selected={this.state.selected}
-                                    processData={this.processData} handleClick={this.handleListClick}
+                                    processData={this.processData} handleClick={this.handleListClick} 
                                    openClassMode={this.openDialogClassMode} openStudentMode={this.openDialogStudentMode} />
                     </div>
 	            </div>

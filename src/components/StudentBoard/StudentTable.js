@@ -34,7 +34,7 @@ class StudentTable extends React.Component{
                         <TableRowColumn style={styles.tableButtonCol}><FontAwesome onClick={this.props.handlePassOpen} className={'password-button'} name="lock" /></TableRowColumn>
                         <TableRowColumn>{stdobj.username}</TableRowColumn>
                         <TableRowColumn>{stdobj.name}</TableRowColumn>
-                        <TableRowColumn>{stdobj.class == '' ? '-' : stdobj.class}</TableRowColumn>
+                        <TableRowColumn>{stdobj.class == '' ? '-' : this.props.searchClassNameById(stdobj.class)}</TableRowColumn>
                         <TableRowColumn>{stdobj.school}</TableRowColumn>
                         <TableRowColumn>{stdobj.level}학년</TableRowColumn>
                     </TableRow>

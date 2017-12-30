@@ -229,7 +229,10 @@ class Home extends React.Component {
         })
     }
     loadCsvClassData(){
-        axios.post('/api/class/test', undefined);
+        axios.post('/api/class/test');
+    }
+    loadCsvStudentsData(){
+        axios.post('/api/student/test');
     }
     getView(){
         switch(this.state.view_type){
@@ -237,7 +240,7 @@ class Home extends React.Component {
                 return (<div>
                             DashBoard
                             <button onClick={this.loadCsvClassData}>load classes</button>
-                            <button>load students</button>
+                            <button onClick={this.loadCsvStudentsData}>load students</button>
                         </div>);
             case 'TEACHER_STUDENTBOARD':
                 return (<StudentBoard studentsData={this.props.studentsData}

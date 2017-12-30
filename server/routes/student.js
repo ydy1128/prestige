@@ -1,8 +1,50 @@
 import express from 'express';
 import Student from '../models/Student';
+import Class from '../models/Class';
 import throwerror from './throwerror';
 
+import iconv from 'iconv-lite';
+import fs from 'fs';
+
 const router = express.Router();
+
+router.post('/test', (req, res)=>{
+    console.log('test uri called');
+    let data = fs.readFileSync('server/data/students.csv');
+    data = iconv.decode(data, 'EUC-KR').split('\n');
+    data.splice(data.length-1, 1);
+    for(let i = 0; i < data.length; i++){
+        let row = data[i].split(',');
+        let proceed = false;
+        Student.find({username: row[0]}, (err, std) =>{
+            Class.find({name: row[4]}, (err, cls) =>{
+                if(JSON.stringify(std) == JSON.stringify([]) && JSON.stringify(cls) != JSON.stringify([])){
+                    console.log(cls._id);
+                    let account = new Student({
+                        username: row[0],
+                        password: row[1],
+                        name: row[2],
+                        school: row[3],
+                        level: row[5],
+                        class: '',
+                    });
+                    account.class = cls[0]._id;
+                    account.password = account.generateHash(row[1]);
+                    account.save( err => {
+                        if(err) throw err;
+                    });
+                    console.log(cls[0].students);
+                    cls[0].students.push(account._id);
+                    cls[0].save( err=>{
+                        if(err) throw err;
+                    })
+                }            
+            })
+
+        })
+    }
+})
+
 
 router.post('/signup', (req, res) => {
     // CHECK USERNAME FORMAT

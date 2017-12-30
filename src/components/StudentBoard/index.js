@@ -37,6 +37,8 @@ class StudentBoard extends React.Component{
         this.handleRowClick = this.handleRowClick.bind(this);
         //handle button active
         this.handleActive = this.handleActive.bind(this);
+        this.searchClassNameById = this.searchClassNameById.bind(this);
+
 	}
 
     handleInfoOpen(e){
@@ -127,6 +129,14 @@ class StudentBoard extends React.Component{
     handleActive(){
         return this.state.remove_active ? '' : 'inactive';
     }
+    searchClassNameById(id){
+        let classData = this.props.classData;
+        for(let i = 0; i < classData.length; i++){
+            if(classData[i]._id == id){
+                return classData[i].name;
+            }
+        }
+    }
     render(){
         const boardHeader = (
             <div className="Board-header col m12">
@@ -144,7 +154,7 @@ class StudentBoard extends React.Component{
                 <div className="Board-contents row">
                     <div className="col m12">
                     	<StudentTable studentsData={this.props.studentsData} 
-                    					clicked={this.state.clicked}
+                    					clicked={this.state.clicked} searchClassNameById={this.searchClassNameById}
                     					handleInfoOpen={this.handleInfoOpen} handlePassOpen={this.handlePassOpen}
                     					handleRowSelection={this.handleRowSelection} handleRowClick={this.handleRowClick}/>
                     </div>

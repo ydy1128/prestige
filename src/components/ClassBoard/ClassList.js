@@ -51,7 +51,7 @@ class ClassList extends React.Component{
                     >
                         <div style={{padding: '20px', paddingTop: '15px', borderTop: '10px solid ' + color_stock[i % color_stock.length]}}>
                             <div>
-                                <h5>
+                                <h5 style={{overflowX: 'hidden', overflowY: 'hidden', whiteSpace: 'nowrap'}}>
                                     <Checkbox 
                                     	name={cls._id + '-' + i}
                                         label={<h5 style={{margin: '0'}}>{cls.name}</h5>} checked={this.props.selected.includes(i)} onCheck={this.props.handleClick}

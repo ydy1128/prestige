@@ -2,9 +2,39 @@ import express from 'express';
 import Class from '../models/Class';
 import mongoose from 'mongoose';
 
+import iconv from 'iconv-lite';
+import fs from 'fs';
+
 import throwerror from './throwerror';
 
 const router = express.Router();
+
+router.post('/test', (req, res)=>{
+    console.log('test uri called');
+    let data = fs.readFileSync('server/data/class.csv');
+    data = iconv.decode(data, 'EUC-KR').split('\n');
+    data.splice(data.length-1, 1);
+    for(let i = 0; i < data.length; i++){
+        let row = data[i].split(',');
+        let proceed = false;
+        Class.find({name: row[0]}, (err, checkcls) =>{
+            // console.log(JSON.stringify(checkcls), JSON.stringify([]),JSON.stringify(checkcls) == JSON.stringify([]))
+            if(JSON.stringify(checkcls) == JSON.stringify([])){
+                let cls = new Class({
+                    name: row[0],
+                    teacher: row[1],
+                    students: [],
+                    startTime: row[2].replace(' ', ''),
+                    endTime: row[3].replace(' ', ''),
+                    days: row[4]
+                })
+                cls.save( err =>{
+                    if(err) throw err;
+                })
+            }
+        })
+    }
+})
 
 // Create class
 router.post('/', (req, res) => {
