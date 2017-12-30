@@ -2,10 +2,18 @@ import React from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import FontAwesome from 'react-fontawesome';
-import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest,
-         getStudentsInfoRequest, studentsInfoEditRequest } from 'actions/makeclass';
 
-import { ClassBoard, MakeClass, StudentBoard, HWBoard } from 'components';
+import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest } from 'actions/makeclass';
+import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest, studentsInfoPwChangeRequest } from 'actions/studentinfo';
+import { lectureBoardRequest } from 'actions/lecture';
+
+import { ClassBoard,
+          StudentBoard,
+          HWBoard,
+          LectureBoard
+} from 'components';
+
+import axios from 'axios';
 
 class Home extends React.Component {
     constructor(props) {
@@ -13,23 +21,39 @@ class Home extends React.Component {
 
         // TEACHER_DASHBOARD, TEACHER_STUDENTBOARD, TEACHER_CLASSBOARD, TEACHER_LECTUREBOARD, TEACHER_HWBOARD
         // STUDENT_DASHBOARD, STUDENT_LECTUREBOARD, STUDENT_HWBOARD
-        this.state = {
-            view_type: 'TEACHER_DASHBOARD'
-        }
+        // this.state = {
+        //     view_type: 'TEACHER_STUDENTBOARD'
+        // }
 
+        //Commented for dev purposes
+        console.log(this.getLogin)
+        this.state = {
+            view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_DASHBOARD' : 'STUDENT_DASHBOARD'
+        }
         this.handleClassPost = this.handleClassPost.bind(this);
         this.handleClassEdit = this.handleClassEdit.bind(this);
         this.handleClassRemove = this.handleClassRemove.bind(this);
+
+        this.handleStudentEdit = this.handleStudentEdit.bind(this);
+        this.handleStudentPwChange = this.handleStudentPwChange.bind(this);
+        this.handleStudentRemove = this.handleStudentRemove.bind(this);
 
         this.handleMenuClick = this.handleMenuClick.bind(this);
         this.setMenuActive = this.setMenuActive.bind(this);
     }
     componentWillMount(){
-        this.props.getStudentsInfoRequest().then(() =>{})
+        this.props.getStudentsInfoRequest().then(() =>{
+            console.log('studentsData', this.props.studentsData)
+        });
+        this.props.lectureBoardRequest().then(() =>{
+            console.log('lectureData', this.props.lectureData)
+        });
+        this.props.classBoardRequest().then(() => {
+            console.log('classData', this.props.classData)
+        });
     }
     componentDidMount(){
-        $('.modal').modal({dismissible: false});
-        this.props.classBoardRequest().then(() => {});
+
     }
     getCookie(name) {
         var value = "; " + document.cookie;
@@ -49,7 +73,80 @@ class Home extends React.Component {
     	loginData.role = ref;
     	document.cookie='key=' + btoa(JSON.stringify(loginData));
     }
+    handleStudentEdit(stdobj, index, silent){
+        console.log(stdobj)
+        return this.props.studentsInfoEditRequest(stdobj._id, index, stdobj).then(() =>{
+            console.log(this.props.studentEditStatus)
+            if(!silent){
+                if(this.props.studentEditStatus.status === "SUCCESS") {
+                    Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
+                }
+                else {
+                    let $toastContent;
+                    switch(this.props.studentEditStatus.error) {
+                        case 1:
+                            $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
+                            Materialize.toast($toastContent, 2000);
+                            setTimeout(()=> {location.reload(false);}, 2000);
+                            break;
+                        case 2:
+                            $toastContent = $('<span style="color: #FFB4BA">모든 정보를 채워주세요.</span>');
+                            Materialize.toast($toastContent, 2000);
+                            break;
+                        default:
+                            $toastContent = $('<span style="color: #FFB4BA">서버 에러 발생. <br /> 관리자에게 문의하세요.</span>');
+                            Materialize.toast($toastContent, 2000);
+                            break;
+                    }
+                }
+            }
+        })
+    }
+    handleStudentPwChange(id, pw, check_pw){
+        return this.props.studentsInfoPwChangeRequest(id, pw, check_pw).then(() => {
+            if(this.props.studentPwChangeStatus.status==="SUCCESS") {
+                Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
+            } else {
+                let errorMessage = [
+                    '잘못된 접근입니다.',
+                    '세션이 만료되었습니다. <br /> 다시 로그인 하세요.',
+                    '학생이 존재하지 않습니다.',
+                    '권한이 없습니다.'
+                ];
+                 // NOTIFY ERROR
+                let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.studentPwChangeStatus.error - 1] + '</span>');
+                Materialize.toast($toastContent, 2000);
+                // IF NOT LOGGED IN, REFRESH THE PAGE
+                if(this.props.studentPwChangeStatus.error === 2) {
+                    setTimeout(()=> {location.reload(false)}, 2000);
+                }
+            }
+        });
+    }
+    handleStudentRemove(index, id, silent){
+        return this.props.studentsInfoRemoveRequest(id, index).then(() => {
+            if(!silent){
+                if(this.props.studentRemoveStatus.status==="SUCCESS") {
+                    Materialize.toast('학생 정보가 삭제 되었습니다!', 2000);
+                } else {
+                    let errorMessage = [
+                        '잘못된 접근입니다.',
+                        '세션이 만료되었습니다. <br /> 다시 로그인 하세요.',
+                        '학생이 존재하지 않습니다.',
+                        '권한이 없습니다.'
+                    ];
+                     // NOTIFY ERROR
+                    let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.studentRemoveStatus.error - 1] + '</span>');
+                    Materialize.toast($toastContent, 2000);
+                    // IF NOT LOGGED IN, REFRESH THE PAGE
+                    if(this.props.studentRemoveStatus.error === 2) {
+                        setTimeout(()=> {location.reload(false)}, 2000);
+                    }
+                }
+            }
+        });
 
+    }
     handleClassPost(contents){
         return this.props.classPostRequest(contents).then(
             () => {
@@ -131,20 +228,38 @@ class Home extends React.Component {
             view_type: e.target.name
         })
     }
+    loadCsvClassData(){
+        axios.post('/api/class/test');
+    }
+    loadCsvStudentsData(){
+        axios.post('/api/student/test');
+    }
     getView(){
         switch(this.state.view_type){
             case 'TEACHER_DASHBOARD':
-                return (<div>DashBoard</div>);
+                return (<div>
+                            DashBoard
+                            <button onClick={this.loadCsvClassData}>load classes</button>
+                            <button onClick={this.loadCsvStudentsData}>load students</button>
+                        </div>);
             case 'TEACHER_STUDENTBOARD':
-                return (<StudentBoard studentsData={this.props.studentsData} />);
+                return (<StudentBoard studentsData={this.props.studentsData}
+                                classData={this.props.classData}
+                                onStudentEdit={this.handleStudentEdit}
+                                onStudentPwChange={this.handleStudentPwChange}
+                                onStudentRemove={this.handleStudentRemove}
+                                onClassEdit={this.handleClassEdit}/>);
             case 'TEACHER_CLASSBOARD':
                 return (<ClassBoard data={this.props.classData}
+                                onClassPost={this.handleClassPost}
+                                onClassEdit={this.handleClassEdit}
                                 studentsData={this.props.studentsData}
                                 onRemove={this.handleClassRemove}
-                                onStudentEdit={this.props.studentsInfoEditRequest}
+                                onStudentEdit={this.handleStudentEdit}
                                 />);
             case 'TEACHER_LECTUREBOARD':
-                return (<div>LectureBoard</div>);
+                return (<LectureBoard classData={this.props.classData}
+                                lectureData={this.props.lectureData} />);
             case 'TEACHER_HWBOARD':
                 return (<HWBoard />);
             case 'STUDENT_DASHBOARD':
@@ -203,15 +318,14 @@ class Home extends React.Component {
     	)
     	const studentMenu = (
 			<ul className="">
-				<li><a className="waves-effect active">대시보드</a></li>
-				<li><a className="waves-effect">강의게시판</a></li>
-				<li><a className="waves-effect">숙제게시판</a></li>
-				<li><a className="waves-effect">질문게시판</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_DASHBOARD')}    name="STUDENT_DASHBOARD"     onClick={this.handleMenuClick}>대시보드</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_LECTUREBOARD')} name="STUDENT_LECTUREBOARD"  onClick={this.handleMenuClick}>강의게시판</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_HWBOARD')}      name="STUDENT_HWBOARD"       onClick={this.handleMenuClick}>숙제게시판</a></li>
 			</ul>
     	)
     	const sideMenu = (
 			<div className="Side-menu">
-				{this.getLoginData().role == 'student' ? studentMenu : teacherMenu}
+				{this.getLoginData().role == 'teacher' ? teacherMenu : studentMenu}
 			</div>
     	)
     	const afterLoginView = (
@@ -226,11 +340,6 @@ class Home extends React.Component {
 
         return (
         	<div className="row Main">
-                <MakeClass onClassPost={this.handleClassPost}
-                            onClassEdit={this.handleClassEdit}
-                            studentsData={this.props.studentsData}
-                            onStudentEdit={this.props.studentsInfoEditRequest}
-                            />
 	        	{ this.props.isLoggedIn ? afterLoginView : beforeLoginView }
         	</div>
         );
@@ -242,11 +351,16 @@ const mapStateToProps = (state) => {
         isLoggedIn: state.authentication.status.isLoggedIn,
 
         classData: state.makeclass.board.data,
-        studentsData: state.makeclass.getStudents.data,
-
         classPostStatus: state.makeclass.post,
         classEditStatus: state.makeclass.editClass,
         classRemoveStatus: state.makeclass.removeClass,
+
+        studentsData: state.studentinfo.getStudents.data,
+        studentEditStatus: state.studentinfo.editStudents,
+        studentPwChangeStatus: state.studentinfo.pwChange,
+        studentRemoveStatus: state.studentinfo.removeStudents,
+
+        lectureData: state.lecture.board.data,
     };
 };
 
@@ -258,7 +372,12 @@ const mapDispatchToProps = (dispatch) => {
         studentsInfoEditRequest: (id, index, obj) => {
             return dispatch(studentsInfoEditRequest(id, index, obj));
         },
-
+        studentsInfoPwChangeRequest: (id, pw, check_pw) => {
+            return dispatch(studentsInfoPwChangeRequest(id, pw, check_pw));
+        },
+        studentsInfoRemoveRequest: (id, index) => {
+            return dispatch(studentsInfoRemoveRequest(id, index));
+        },
         classBoardRequest: (isInitial, listType, id, username) => {
             return dispatch(classBoardRequest(isInitial, listType, id, username));
         },
@@ -270,6 +389,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         classRemoveRequest: (id, index) => {
             return dispatch(classRemoveRequest(id, index));
+        },
+        lectureBoardRequest: () => {
+            return dispatch(lectureBoardRequest());
         }
     };
 };

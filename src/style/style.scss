@@ -163,7 +163,7 @@ a{
 				&:hover{
 					img{
 						-webkit-filter: grayscale(0%) brightness(55%);
-					    filter: grayscale(0%) brightness(55%);	
+					    filter: grayscale(0%) brightness(55%);
 					}
 				}
 			}
@@ -292,11 +292,21 @@ a{
 .modal-content{
 	padding-bottom: 0 !important;
 	.Edit-students{
-		height: calc(100% - 160px);
+		height: calc(100% - 60px);
 		margin: 0;
 		.Students-list{
-			height: calc(100% - 50px);
+			height: 100%;
 			margin: 0;
+			&>.col.s6{
+				height: calc(100%) !important;
+
+				&>div{
+					height: calc(100%) !important;
+					&>div:nth-child(2){
+						height: calc(100% - 182px) !important;
+					}
+				}
+			}
 			ul{
 				height: 100%;
 				padding: 0;
@@ -343,4 +353,19 @@ a{
 			text-align: center;
 		}
 	}
+}
+
+input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):focus:not([readonly]), input[type=password]:not(.browser-default):focus:not([readonly]), input[type=email]:not(.browser-default):focus:not([readonly]), input[type=url]:not(.browser-default):focus:not([readonly]), input[type=time]:not(.browser-default):focus:not([readonly]), input[type=date]:not(.browser-default):focus:not([readonly]), input[type=datetime]:not(.browser-default):focus:not([readonly]), input[type=datetime-local]:not(.browser-default):focus:not([readonly]), input[type=tel]:not(.browser-default):focus:not([readonly]), input[type=number]:not(.browser-default):focus:not([readonly]), input[type=search]:not(.browser-default):focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]){
+	box-shadow: none ;
+}
+
+// overrides timepicker in table
+td div hr{
+	display: none;
+}
+
+//////////////////////draft-js////////////////////////
+.public-DraftEditorPlaceholder-root {
+    position: absolute;
+    color: #cccccc;
 }

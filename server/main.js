@@ -10,13 +10,13 @@ import api from './routes';
 
 //===============EXPRESS SERVER SETUP===============
 const app = express();
-const port = 3000;
+const port = 2929;
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 
 app.use('/', express.static(path.join(__dirname, './../public')));
-
+app.use('/uploads', express.static('uploads'));
 app.get('/hello', (req, res) => {
     return res.send('Hello CodeLab');
 });
@@ -26,7 +26,7 @@ app.listen(port, () => {
 });
 
 //===============DEV SERVER SETUP===============
-const devPort = 4000;
+const devPort = 2828;
 
 if(process.env.NODE_ENV == 'development') {
     console.log('Server is running on development mode');

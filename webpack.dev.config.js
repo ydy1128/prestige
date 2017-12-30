@@ -2,24 +2,27 @@ var webpack = require('webpack');
 var path = require('path');
 
 module.exports = {
+    devtool: 'cheap-module-eval-source-map',
     entry: [
+        'react-hot-loader/patch',
         './src/index.js',
-        'webpack-dev-server/client?http://0.0.0.0:4000',
+        'webpack-dev-server/client?http://0.0.0.0:2828',
         'webpack/hot/only-dev-server',
         './src/style/style.scss'
     ],
     output: {
         path: '/',
-        filename: 'bundle.js'
+        filename: 'bundle.js',
     },
     devServer: {
+        inline: true,
         hot: true,
         filename: 'bundle.js',
         publicPath: '/',
         historyApiFallback: true,
         contentBase: './public',
         proxy: {
-            "**": "http://localhost:3000"
+            "**": "http://localhost:2929"
         },
         stats: {
           assets: false,
@@ -32,6 +35,7 @@ module.exports = {
         }
     },
     plugins: [
+        new webpack.NamedModulesPlugin(),
         new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoEmitOnErrorsPlugin()
@@ -40,7 +44,7 @@ module.exports = {
         loaders: [
             {
                 test: /\.js$/,
-                loaders: ['react-hot-loader', 'babel-loader?' + JSON.stringify({
+                loaders: ['babel-loader?' + JSON.stringify({
                     cacheDirectory: true,
                     presets: ['es2015', 'react']
                 })],
@@ -48,7 +52,8 @@ module.exports = {
             },
             {
                 test: /\.scss$/,
-                loader: 'style-loader!css-loader?sourceMap!sass-loader?sourceMap'
+                loader: 'style-loader!css-loader?sourceMap!sass-loader?sourceMap',
+                exclude: /node_modules/
             }
         ]
     },

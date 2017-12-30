@@ -14,7 +14,7 @@ module.exports = {
         loaders: [
             {
                 test: /\.js$/,
-                loaders: ['babel?' + JSON.stringify({
+                loaders: ['react-hot-loader', 'babel-loader?' + JSON.stringify({
                     cacheDirectory: true,
                     presets: ['es2015', 'react']
                 })],
@@ -22,11 +22,12 @@ module.exports = {
             },
             {
                 test: /\.scss$/,
-                loader: 'style-loader!css-loader?sourceMap!sass-loader?sourceMap'
+                loader: 'style-loader!css-loader?sourceMap!sass-loader?sourceMap',
+                exclude: /node_modules/
             }
         ]
     },
     resolve: {
-        root: path.resolve('./src')
+        modules: [path.join(__dirname, 'src'), 'node_modules']
     }
 };

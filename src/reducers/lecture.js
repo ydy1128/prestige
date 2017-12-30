@@ -4,65 +4,35 @@ import update from 'react-addons-update';
 const initialState = {
     board: {
         status: 'INIT',
-        data: [],
+        data: []
     },
     post: {
         status: 'INIT',
         error: -1
     },
-    editClassPrep: {
-        name: '',
-        days: '',
-        starttime: '',
-        endtime: '',
-        students: '',
-        index: '',
-        _id: '',
-        flag: true
-    },
-    editClass: {
+    edit:{
         status: 'INIT',
         error: -1,
     },
-    removeClass: {
+    remove: {
         status: 'INIT',
         error: -1
     }
-};
+}
 
-export default function makeclass(state, action) {
-    
+export default function lecture(state, action) {
     if(typeof state === "undefined")
         state = initialState;
     switch(action.type) {
-        case types.CLASS_BOARD:
-            return update(state, {
-                board: {
-                    status: { $set: 'WAITING' },
-                }
-            });
-        case types.CLASS_BOARD_SUCCESS: 
-            return update(state, {
-                board: {
-                    status: { $set: 'SUCCESS' },
-                    data: { $set: action.data },
-                }
-            })
-            return state;
-        case types.CLASS_BOARD_FAILURE:
-            return update(state, {
-                board: {
-                    status: { $set: 'FAILURE' }
-                }
-            })
-        case types.CLASS_POST:
+        case types.LECTURE_POST:
             return update(state, {
                 post: {
                     status: { $set: 'WAITING' },
                     error: { $set: -1 }
                 }
             });
-        case types.CLASS_POST_SUCCESS:
+        case types.LECTURE_POST_SUCCESS:
+        	console.log('actions: '+action.data)
             return update(state, {
                 post: {
                     status: { $set: 'SUCCESS' }
@@ -73,71 +43,74 @@ export default function makeclass(state, action) {
                     }
                 }
             });
-        case types.CLASS_POST_FAILURE:
+        case types.LECTURE_POST_FAILURE:
             return update(state, {
                 post: {
                     status: { $set: 'FAILURE' },
                     error: { $set: action.error }
                 }
             });
-        case types.CLASS_EDIT_PREP:
+        case types.LECTURE_BOARD:
             return update(state, {
-                editClassPrep: {
-                    name: { $set: action.name },
-                    days: { $set: action.days },
-                    starttime: { $set: action.starttime },
-                    endtime: { $set: action.endtime },
-                    students: { $set: action.students },
-                    index: { $set: action.index },
-                    _id: { $set: action._id },
-                    flag: { $set: action.flag }
+                board: {
+                    status: { $set: 'WAITING' },
                 }
             });
-        case types.CLASS_EDIT: 
+        case types.LECTURE_BOARD_SUCCESS: 
+        	console.log('SUCCESS');
             return update(state, {
-                editClass: {
+                board: {
+                    status: { $set: 'SUCCESS' },
+                    data: { $set: action.data }
+                }
+            })
+        case types.LECTURE_BOARD_FAILURE:
+            return update(state, {
+                board: {
+                    status: { $set: 'FAILURE' }
+                }
+            })
+        case types.LECTURE_EDIT: 
+            return update(state, {
+                edit: {
                     status: { $set: 'WAITING' },
                     error: { $set: -1 },
-                    cls: { $set: undefined }
                 }
             });
-        case types.CLASS_EDIT_SUCCESS:
+        case types.LECTURE_EDIT_SUCCESS:
             return update(state, {
-                editClass: {
+                edit: {
                     status: { $set: 'SUCCESS' },
                 },
                 board: {
                     data: {
-                        [action.index]: { $set: action.cls }
+                        [action.index]: { $set: action.lecture }
                     }
                 }
             });
-        case types.CLASS_EDIT_FAILURE:
+        case types.LECTURE_EDIT_FAILURE:
             return update(state, {
-                editClass: {
+                edit: {
                     status: { $set: 'FAILURE' },
                     error: { $set: action.error }
                 }
             });
-        case types.CLASS_REMOVE:
+        case types.LECTURE_REMOVE:
             return update(state, {
-                removeClass: {
+                remove: {
                     status: { $set: 'WAITING' },
                     error: { $set: -1 }
                 }
             });
-        case types.CLASS_REMOVE_SUCCESS:
+        case types.LECTURE_REMOVE_SUCCESS:
             return update(state, {
-                removeClass:{
+                remove:{
                     status: { $set: 'SUCCESS' }
-                },
-                board: {
-                    data: { $splice: [[action.index, 1]] }
                 }
             });
-        case types.CLASS_REMOVE_FAILURE:
+        case types.LECTURE_REMOVE_FAILURE:
             return update(state, {
-                removeClass: {
+                remove: {
                     status: { $set: 'FAILURE' },
                     error: { $set: action.error }
                 }

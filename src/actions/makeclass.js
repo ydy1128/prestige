@@ -1,10 +1,4 @@
 import {
-    GET_STUDENTS_INFO,
-    GET_STUDENTS_INFO_SUCCESS,
-    GET_STUDENTS_INFO_FAILURE,
-    STUDENT_INFO_EDIT,
-    STUDENT_INFO_EDIT_SUCCESS,
-    STUDENT_INFO_EDIT_FAILURE,
     CLASS_BOARD,
     CLASS_BOARD_SUCCESS,
     CLASS_BOARD_FAILURE,
@@ -22,76 +16,6 @@ import {
 
 import axios from 'axios';
 
-/* GET Student Info */
-export function getStudentsInfoRequest(classname) {
-    return (dispatch) => {
-        // inform Get Status API is starting
-        dispatch(getStudentsInfo());
-
-        let url = '/api/teacher/getStudentsInfo';
-        return axios.get(url)
-        .then((response) => {
-            dispatch(getStudentsInfoSuccess(response.data.info));
-        })
-        .catch((error) => {
-            dispatch(getStudentsInfoFailure());
-        });
-    };
-}
-
-export function getStudentsInfo() {
-    return {
-        type: GET_STUDENTS_INFO
-    };
-}
-
-export function getStudentsInfoSuccess(data) {
-    return {
-        type: GET_STUDENTS_INFO_SUCCESS,
-        data
-    };
-}
-
-export function getStudentsInfoFailure(error) {
-    return {
-        type: GET_STUDENTS_INFO_FAILURE,
-        error
-    };
-}
-
-/* Students EDIT */
-export function studentsInfoEditRequest(id, index, obj) {
-    return (dispatch) => {
-        dispatch(studentsInfoEdit());
-        return axios.put('/api/student/' + id, {obj})
-        .then((response) => {
-            dispatch(studentsInfoEditSuccess(id, index, response.data.std));
-        }).catch((error) => {
-            dispatch(studentsInfoEditFailure(error.response.data.code));
-        });
-    };
-}
-
-export function studentsInfoEdit() {
-    return {
-        type: STUDENT_INFO_EDIT
-    };
-}
-
-export function studentsInfoEditSuccess(id, index, data) {
-    return {
-        type: STUDENT_INFO_EDIT_SUCCESS,
-        index,
-        data
-    };
-}
-
-export function studentsInfoEditFailure(error) {
-    return {
-        type: STUDENT_INFO_EDIT_FAILURE,
-        error
-    };
-}
 
 /* Class Board */
 export function classBoardRequest(isInitial, listType, id, username) {
@@ -134,7 +58,7 @@ export function classBoardFailure() {
 export function classPostRequest(contents) {
     return (dispatch) => {
         dispatch(classPost());
-
+        console.log(contents)
         return axios.post('/api/class', { contents })
         .then((response) => {
             console.log(response.data.data)
@@ -214,7 +138,7 @@ export function classEditFailure(error) {
     };
 }
 
-/* MEMO REMOVE */
+/* CLASS REMOVE */
 export function classRemoveRequest(id, index) {
     return (dispatch) => {
         dispatch(classRemove());

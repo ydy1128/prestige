@@ -9,8 +9,7 @@ const Student = new Schema({
     name: String,
     school: String,
     class: String,
-    level: Number,
-    created: { type: Date, default: Date.now }
+    level: Number
 });
 
 // generates hash
