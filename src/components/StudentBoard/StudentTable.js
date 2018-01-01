@@ -17,8 +17,7 @@ class StudentTable extends React.Component{
 	render(){
         const tableHeader = (
             <TableRow>
-                <TableHeaderColumn style={styles.tableButtonCol}></TableHeaderColumn>
-                <TableHeaderColumn style={styles.tableButtonCol}></TableHeaderColumn>
+                <TableHeaderColumn style={styles.selectedCol}>{this.props.clicked.length+' 선택됨'} </TableHeaderColumn>
                 <TableHeaderColumn>아이디</TableHeaderColumn>
                 <TableHeaderColumn>이름</TableHeaderColumn>
                 <TableHeaderColumn>수업</TableHeaderColumn>
@@ -44,19 +43,23 @@ class StudentTable extends React.Component{
 
 		return (
             <Table style={styles.table} 
-                    onCellClick={this.props.handleRowClick} 
+                    onCellClick={this.props.searchOpen ? this.props.handleFilteredRowClick : this.props.handleRowClick} 
                     fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
                 <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
                     { tableHeader }
                 </TableHeader>
                 <TableBody displayRowCheckbox={true} deselectOnClickaway={false} showRowHover={true} stripedRows={false}>
-                   { tableBody(this.props.studentsData) }
+                   { tableBody(this.props.searchOpen ? (this.props.searchText == '' ? this.props.studentsData : this.props.filteredData) : this.props.studentsData) }
                 </TableBody>
             </Table>
 		)
 	}
 }
 let styles = {
+    selectedCol: {
+        fontSize: '12px',
+        width: '130px',
+    },
     tableButtonCol: {
         width: '65px',
         fontSize: "18px", 

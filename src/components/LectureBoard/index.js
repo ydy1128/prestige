@@ -48,9 +48,10 @@ let Present = ({ props, state, style, functions }) => {
                 <a onClick={remove_active ? removeLectures : null}>
                     <FontAwesome className={'remove-button right '+ getRemoveActive(false)} name="trash-o" />
                 </a>
-                <a onClick={openDialog.bind(undefined, true, true)}>
+                <a onClick={remove_active ? null : openDialog.bind(undefined, true, true)}>
                     <FontAwesome className={'plus-button right '+ getRemoveActive(true)} name="plus" />
                 </a>
+
             </div>
         </div>
     )
@@ -61,7 +62,8 @@ let Present = ({ props, state, style, functions }) => {
                 <div className="col m12">
                 	<LectureTable lectureData={lectureData} classData={classData} clicked={clicked}
                                   handleDialogOpen={openDialog} searchClassNameById={searchClassNameById}
-                                  handleRowClick={handleRowClick} handleRemove={handleRemove}/>
+                                  handleRowClick={handleRowClick} handleRemove={handleRemove}
+                                  />
                 </div>
             </div>
             <LectureDialog open={dialogOpen} editMode={dialogEditMode} newOne={newOne} 
