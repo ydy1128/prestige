@@ -26,9 +26,11 @@ class StudentTable extends React.Component{
             </TableRow>
         )
         const tableBody = data => {
+            console.log(this.props.searchOpen)
             return data.map((stdobj, i) => {
+
                 return(
-                    <TableRow selected={this.props.clicked.includes(i)} key={stdobj._id}>
+                    <TableRow selected={this.props.searchOpen ? this.props.filteredClick.includes(i) : this.props.clicked.includes(i)} key={stdobj._id}>
                         <TableRowColumn style={styles.tableButtonCol}><FontAwesome onClick={this.props.handleInfoOpen} className={'edit-button'} name="pencil" /></TableRowColumn>
                         <TableRowColumn style={styles.tableButtonCol}><FontAwesome onClick={this.props.handlePassOpen} className={'password-button'} name="lock" /></TableRowColumn>
                         <TableRowColumn>{stdobj.username}</TableRowColumn>

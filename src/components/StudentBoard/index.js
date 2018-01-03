@@ -5,8 +5,10 @@ import FontAwesome from 'react-fontawesome';
 
 import TextField from 'material-ui/TextField';
 
+import BoardHeader from '../commons/BoardHeader';
 import StudentDialog from './StudentDialog';
 import StudentTable from './StudentTable';
+
 class StudentBoard extends React.Component{
 	constructor(props){
 		super(props);
@@ -41,10 +43,10 @@ class StudentBoard extends React.Component{
         this.handleRemove = this.handleRemove.bind(this);
         //handle table rows
         this.handleRowClick = this.handleRowClick.bind(this);
+        this.handleFilteredRowClick = this.handleFilteredRowClick.bind(this);
         //handle button active
         this.handleActive = this.handleActive.bind(this);
         this.searchClassNameById = this.searchClassNameById.bind(this);
-        this.focusSearchInput = this.focusSearchInput.bind(this);
         this.blurSearchInput = this.blurSearchInput.bind(this);
         this.onSearchEngineChange = this.onSearchEngineChange.bind(this);
 	}
@@ -126,6 +128,7 @@ class StudentBoard extends React.Component{
     handleRowClick(rowNumber, columnId){
         let clicked = [...this.state.clicked];
         let index = clicked.indexOf(rowNumber);
+
         if(index == -1)
             clicked.push(rowNumber);
         else
@@ -133,19 +136,26 @@ class StudentBoard extends React.Component{
         this.setState({clicked: clicked, remove_active: clicked.length == 0 ? false : true})
     }
     handleFilteredRowClick(rowNumber, columnId){
-        let fileteredClick = [...this.state.filteredClick];
-        let clicked = [...this.state.clicked];
+        let filteredClick = [...this.state.filteredClick];
         let index = filteredClick.indexOf(rowNumber);
-        let origIndex = clicked.indexOf(this.state.filteredData[index].index);
-        console.log(this.state.filteredData[index]);
-        console.log(this.state.studentsData[origIndex]);
+        let push = false
         if(index == -1){
+            filteredClick.push(rowNumber);
+            index = rowNumber;
+            push = true;
+        }
+        else
+            filteredClick.splice(index, 1);
+        let clicked = [...this.state.clicked];
+        let origIndex = this.state.searchResult[index].index;
+
+
+        if(push){
             clicked.push(origIndex);
-            filteredClick.push(index);
         }
         else{
+            origIndex = clicked.indexOf(origIndex);
             clicked.splice(origIndex, 1);
-            filteredClick.splice(index, 1);
         }
         this.setState({clicked: clicked, filteredClick: filteredClick, remove_active: (filteredClick == 0 || clicked == 0)? false : true})
     }
@@ -160,18 +170,17 @@ class StudentBoard extends React.Component{
             }
         }
     }
-    focusSearchInput(){
-        this.refs.searchEngine.focus();
-        this.setState({searchOpen: true});
-    }
-    blurSearchInput(){
-        this.setState({searchOpen: false, searchText: ''});
+    blurSearchInput(){ 
+        if(this.state.searchText == '')
+            this.setState({searchOpen: false, searchText: '', filteredClick: []});
     }
     onSearchEngineChange(event, value){
         let data = [];
+        let filteredClick = [];
+        console.log(value, 'clicked: ', this.state.clicked, '')
         this.props.studentsData.map((std, i) =>{
             let push=false;
-            let obj = Object.assign({}, std);
+            let obj = std;
             obj.index = i;
             if(obj.name.includes(value)) push = true;
             if(obj.username.includes(value)) push = true;
@@ -179,35 +188,33 @@ class StudentBoard extends React.Component{
             if(obj.school.includes(value)) push = true;
             if(push) data.push(obj);
         })
-        if(value == '')
-            this.setState({searchOpen: false, searchText: ''});
-        else
-            this.setState({searchResult: data, searchText: value});
+        if(value == ''){
+            this.setState({searchOpen: false, searchResult: [], filteredClick: [], searchText: ''});
+        }
+        else{
+            if(this.state.clicked != []){
+                for(let i = 0; i < this.state.clicked.length; i++){
+                    let filteredIndex = data.indexOf(this.props.studentsData[this.state.clicked[i]]);
+                    if(filteredIndex != -1){
+                        filteredClick.push(filteredIndex);
+                    }
+                }
+            }
+            this.setState({searchOpen: true, searchResult: data, filteredClick: filteredClick, searchText: value});
+        }
     }
     render(){
-        const boardHeader = (
-            <div className="Board-header col m12">
-                <div style={{width: '155px'}} className="col m4"><h4>학생관리</h4></div>
-                <div style={{width: 'calc(100% - 155px)'}}className="icons col m8">
-                    <a onClick={this.state.remove_active? this.handleRemove : null}>
-                        <FontAwesome id="stdBoardRemove" className={'remove-button right ' + this.handleActive()} name="trash-o" />
-                    </a>
-                    <a onClick={this.focusSearchInput}>
-                        <FontAwesome  className={'search-button left '} name="search" />
-                    </a>
-                    <TextField name="searchEngine" onChange={this.onSearchEngineChange} onFocus={this.focusSearchInput} ref="searchEngine" style={{height: '55px', margin: '10px 10px -20px -20px', padding: '0 10px'}}/>
-                </div>
-                
-            </div>
-        )
         return(
             <div className="Boards">
-                { boardHeader }
+                <BoardHeader title='학생관리' remove_active={this.state.remove_active} handleRemove={this.handleRemove}
+                            plus_button={false} remove_button={true} search_engine={true}
+                            handleActive={this.handleActive} focusSearchInput={this.props.focusSearchInput}
+                            onSearchEngineChange={this.onSearchEngineChange} onFocus={this.focusSearchInput} blurSearchInput={this.blurSearchInput} />
                 <div className="Board-contents row">
                     <div className="col m12">
                     	<StudentTable studentsData={this.props.studentsData} filteredData={this.state.searchResult} 
                                         searchOpen={this.state.searchOpen} searchText={this.state.searchText} 
-                    					clicked={this.state.clicked} searchClassNameById={this.searchClassNameById} 
+                    					clicked={this.state.clicked} filteredClick={this.state.filteredClick} searchClassNameById={this.searchClassNameById} 
                     					handleInfoOpen={this.handleInfoOpen} handlePassOpen={this.handlePassOpen}
                     					handleFilteredRowClick={this.handleFilteredRowClick} handleRowClick={this.handleRowClick}/>
                     </div>
