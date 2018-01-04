@@ -27,7 +27,7 @@ class Home extends React.Component {
         // }
 
         //Commented for dev purposes
-        console.log(this.getLogin)
+
         this.state = {
             view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_DASHBOARD' : 'STUDENT_DASHBOARD'
         }
@@ -76,9 +76,7 @@ class Home extends React.Component {
     }
 
     handleStudentEdit(stdobj, index, silent){
-        console.log(stdobj)
         return this.props.studentsInfoEditRequest(stdobj._id, index, stdobj).then(() =>{
-            console.log(this.props.studentEditStatus)
             if(!silent){
                 if(this.props.studentEditStatus.status === "SUCCESS") {
                     Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
@@ -114,7 +112,6 @@ class Home extends React.Component {
     }
     handleClassPost(contents){
         return this.props.classPostRequest(contents).then(() => {
-            console.log(this.props.classPostStatus.status)
             if(this.props.classPostStatus.status === "SUCCESS") {
                 Materialize.toast('수업이 개설 되었습니다!', 2000);
                 return true;
@@ -125,8 +122,7 @@ class Home extends React.Component {
         });
     }
     handleClassEdit(id, index, contents){
-        return this.props.classEditRequest(id, index, contents).then(
-            () => {
+        return this.props.classEditRequest(id, index, contents).then(() => {
                 if(this.props.classEditStatus.status==="SUCCESS") {
                     Materialize.toast('수업 정보가 수정 되었습니다.', 2000);
                     return true;

@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from 'react-redux';
 import { lecturePostRequest, lectureEditRequest, lectureRemoveRequest } from 'actions/lecture';
+import throwError from 'components/commons/throwError';
 
 var container = (Present) =>{
 	class Container extends React.Component {
@@ -141,19 +142,34 @@ var container = (Present) =>{
 
 	    handlePost(contents){
 	    	return this.props.lecturePostRequest(contents).then(() =>{
-	    		console.log('lecture status: ' + this.props.lecturePostStatus.status);
-	    		this.closeEditMode();
+	    		if(this.props.lecturePostStatus.status === 'SUCCESS'){
+                    Materialize.toast('강의가 생성 되었습니다!', 2000);
+	    			this.closeEditMode();
+	    		}
+	    		else{
+                    return throwError(false, '강의', this.props.lecturePostStatus.error, '');
+	    		}	    		
 	    	});
 	    }
 	    handleEdit(index, contents){
 	    	return this.props.lectureEditRequest(index, contents).then(()=>{
-	    		console.log('lecture edit status: ' + this.props.lectureEditStatus.status);
-	    		this.closeEditMode();
+	    		if(this.props.lectureEditStatus.status === 'SUCCESS'){
+                    Materialize.toast('강의가 수정 되었습니다!', 2000);
+	    			this.closeEditMode();
+	    		}
+	    		else{
+                    return throwError(false, '강의', this.props.lectureEditStatus.error, '');
+	    		}	    		
 	    	})
 	    }
 	    handleRemove(id, index){
 	    	return this.props.lectureRemoveRequest(id, index).then(()=>{
-	    		console.log('lecture remove status: ' + this.props.lectureRemoveStatus.status);
+	    		if(this.props.lectureRemoveStatus.status === 'SUCCESS'){
+                    Materialize.toast('강의가 삭제 되었습니다!', 2000);
+	    		}
+	    		else{
+                    return throwError(false, '강의', this.props.lectureRemoveStatus.error, '');
+	    		}
 	    	})
 	    }
 		handleRowClick(rowNumber, columnId){
