@@ -14,10 +14,14 @@ class BoardHeader extends React.Component{
         this.refs.searchEngine.focus();
     }
 	render(){
-		// const
 		const remove_button = (
             <a onClick={this.props.remove_active? this.props.handleRemove : null}>
-                <FontAwesome id="stdBoardRemove" className={'remove-button right ' + this.props.handleActive()} name="trash-o" />
+                <FontAwesome id="stdBoardRemove" className={'remove-button right ' + this.props.handleActive(false)} name="trash-o" />
+            </a>
+		)
+		const plus_button = (
+            <a onClick={this.props.remove_active ? null : this.props.openDialog}>
+                <FontAwesome className={'plus-button right '+ this.props.handleActive(true)} name="plus" />
             </a>
 		)
 		const search_button = (
@@ -35,6 +39,7 @@ class BoardHeader extends React.Component{
 	            <div style={styles.boardTitle} className="col m4"><h4>{this.props.title}</h4></div>
 	            <div style={styles.boardIcons}className="icons col m8">
 	            	{this.props.remove_button ? remove_button : null}
+	            	{this.props.plus_button ? plus_button : null}
 	            	{this.props.search_engine ? search_button : null}
 	            	{this.props.search_engine ? search_engine : null}
 	            </div>

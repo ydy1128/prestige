@@ -208,8 +208,8 @@ class StudentBoard extends React.Component{
             <div className="Boards">
                 <BoardHeader title='학생관리' remove_active={this.state.remove_active} handleRemove={this.handleRemove}
                             plus_button={false} remove_button={true} search_engine={true}
-                            handleActive={this.handleActive} focusSearchInput={this.props.focusSearchInput}
-                            onSearchEngineChange={this.onSearchEngineChange} onFocus={this.focusSearchInput} blurSearchInput={this.blurSearchInput} />
+                            openDialog={null} handleActive={this.handleActive}
+                            onSearchEngineChange={this.onSearchEngineChange} blurSearchInput={this.blurSearchInput} />
                 <div className="Board-contents row">
                     <div className="col m12">
                     	<StudentTable studentsData={this.props.studentsData} filteredData={this.state.searchResult} 
