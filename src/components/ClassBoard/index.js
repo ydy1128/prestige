@@ -257,8 +257,8 @@ class ClassBoard extends React.Component{
         let contents = Object.assign({}, this.state.editClass);
         contents.days = this.processDays(this.state.editClass.days);
         console.log(contents)
-        this.props.onClassPost(contents).then(() =>{
-            this.closeDialog();
+        this.props.onClassPost(contents).then((success) =>{
+            if(success) this.closeDialog();
         })
     }
     handleEdit() {
@@ -283,10 +283,9 @@ class ClassBoard extends React.Component{
                 props.onStudentEdit(obj, index, true);
                 contents.students.splice(indexInClass, 1);
             }
-            
         });
-        this.props.onClassEdit(contents._id, classindex, contents).then(() => {
-            this.closeDialog();
+        this.props.onClassEdit(contents._id, classindex, contents).then((success) => {
+            if(success) this.closeDialog();
         })
     }
     handleRemove(){

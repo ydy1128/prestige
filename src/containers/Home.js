@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import FontAwesome from 'react-fontawesome';
+import axios from 'axios';
 
 import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest } from 'actions/makeclass';
 import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest, studentsInfoPwChangeRequest } from 'actions/studentinfo';
@@ -13,7 +14,7 @@ import { ClassBoard,
           LectureBoard
 } from 'components';
 
-import axios from 'axios';
+import throwError from 'components/commons/throwError';
 
 class Home extends React.Component {
     constructor(props) {
@@ -73,6 +74,7 @@ class Home extends React.Component {
     	loginData.role = ref;
     	document.cookie='key=' + btoa(JSON.stringify(loginData));
     }
+
     handleStudentEdit(stdobj, index, silent){
         console.log(stdobj)
         return this.props.studentsInfoEditRequest(stdobj._id, index, stdobj).then(() =>{
@@ -80,24 +82,10 @@ class Home extends React.Component {
             if(!silent){
                 if(this.props.studentEditStatus.status === "SUCCESS") {
                     Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
+                    return true;
                 }
                 else {
-                    let $toastContent;
-                    switch(this.props.studentEditStatus.error) {
-                        case 1:
-                            $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
-                            Materialize.toast($toastContent, 2000);
-                            setTimeout(()=> {location.reload(false);}, 2000);
-                            break;
-                        case 2:
-                            $toastContent = $('<span style="color: #FFB4BA">모든 정보를 채워주세요.</span>');
-                            Materialize.toast($toastContent, 2000);
-                            break;
-                        default:
-                            $toastContent = $('<span style="color: #FFB4BA">서버 에러 발생. <br /> 관리자에게 문의하세요.</span>');
-                            Materialize.toast($toastContent, 2000);
-                            break;
-                    }
+                    return throwError(silent, '학생', this.props.classEditStatus.error, '');
                 }
             }
         })
@@ -106,20 +94,9 @@ class Home extends React.Component {
         return this.props.studentsInfoPwChangeRequest(id, pw, check_pw).then(() => {
             if(this.props.studentPwChangeStatus.status==="SUCCESS") {
                 Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
+                return true;
             } else {
-                let errorMessage = [
-                    '잘못된 접근입니다.',
-                    '세션이 만료되었습니다. <br /> 다시 로그인 하세요.',
-                    '학생이 존재하지 않습니다.',
-                    '권한이 없습니다.'
-                ];
-                 // NOTIFY ERROR
-                let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.studentPwChangeStatus.error - 1] + '</span>');
-                Materialize.toast($toastContent, 2000);
-                // IF NOT LOGGED IN, REFRESH THE PAGE
-                if(this.props.studentPwChangeStatus.error === 2) {
-                    setTimeout(()=> {location.reload(false)}, 2000);
-                }
+                return throwError(false, '학생', this.props.classEditStatus.error, '');
             }
         });
     }
@@ -128,76 +105,34 @@ class Home extends React.Component {
             if(!silent){
                 if(this.props.studentRemoveStatus.status==="SUCCESS") {
                     Materialize.toast('학생 정보가 삭제 되었습니다!', 2000);
+                    return true;
                 } else {
-                    let errorMessage = [
-                        '잘못된 접근입니다.',
-                        '세션이 만료되었습니다. <br /> 다시 로그인 하세요.',
-                        '학생이 존재하지 않습니다.',
-                        '권한이 없습니다.'
-                    ];
-                     // NOTIFY ERROR
-                    let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.studentRemoveStatus.error - 1] + '</span>');
-                    Materialize.toast($toastContent, 2000);
-                    // IF NOT LOGGED IN, REFRESH THE PAGE
-                    if(this.props.studentRemoveStatus.error === 2) {
-                        setTimeout(()=> {location.reload(false)}, 2000);
-                    }
+                    return throwError(false, '학생', this.props.classRemoveStatus.error, '');
                 }
             }
         });
-
     }
     handleClassPost(contents){
-        return this.props.classPostRequest(contents).then(
-            () => {
-                console.log(this.props.classPostStatus.status)
-                if(this.props.classPostStatus.status === "SUCCESS") {
-                    Materialize.toast('수업이 개설 되었습니다!', 2000);
-                }
-                else {
-                    let $toastContent;
-                    switch(this.props.classPostStatus.error) {
-                        case 1:
-                            $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
-                            Materialize.toast($toastContent, 2000);
-                            setTimeout(()=> {location.reload(false);}, 2000);
-                            break;
-                        case 2:
-                            $toastContent = $('<span style="color: #FFB4BA">모든 정보를 채워주세요.</span>');
-                            Materialize.toast($toastContent, 2000);
-                            break;
-                        default:
-                            $toastContent = $('<span style="color: #FFB4BA">서버 에러 발생. <br /> 관리자에게 문의하세요.</span>');
-                            Materialize.toast($toastContent, 2000);
-                            break;
-                    }
-
-                }
+        return this.props.classPostRequest(contents).then(() => {
+            console.log(this.props.classPostStatus.status)
+            if(this.props.classPostStatus.status === "SUCCESS") {
+                Materialize.toast('수업이 개설 되었습니다!', 2000);
+                return true;
             }
-        );
+            else {
+                return throwError(false, '수업', this.props.classPostStatus.error, '');
+            }
+        });
     }
     handleClassEdit(id, index, contents){
         return this.props.classEditRequest(id, index, contents).then(
             () => {
                 if(this.props.classEditStatus.status==="SUCCESS") {
                     Materialize.toast('수업 정보가 수정 되었습니다.', 2000);
+                    return true;
                 }
                 else {
-                    let errorMessage = [
-                        '',
-                        '모든 정보를 채워주세요.',
-                        '세션이 만료 되었습니다. <br />로그인 하세요.',
-                        '수업이 더이상 존재하지 않습니다.',
-                        '권한이 없습니다.'
-                    ];
-                    let error = this.props.classEditStatus.error;
-                    // NOTIFY ERROR
-                    let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[error - 1] + '</span>');
-                    Materialize.toast($toastContent, 2000);
-                    // IF NOT LOGGED IN, REFRESH THE PAGE AFTER 2 SECONDS
-                    if(error === 3) {
-                        setTimeout(()=> {location.reload(false)}, 2000);
-                    }
+                    return throwError(false, '수업', this.props.classEditStatus.error, '');
                 }
             }
         );
@@ -206,20 +141,9 @@ class Home extends React.Component {
         this.props.classRemoveRequest(id, index).then(() => {
             if(this.props.classRemoveStatus.status==="SUCCESS") {
                 Materialize.toast('수업이 삭제 되었습니다!', 2000);
+                return true;
             } else {
-                let errorMessage = [
-                    '잘못된 접근입니다.',
-                    '세션이 만료되었습니다. <br /> 다시 로그인 하세요.',
-                    '수업이 존재하지 않습니다.',
-                    '권한이 없습니다.'
-                ];
-                 // NOTIFY ERROR
-                let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.classRemoveStatus.error - 1] + '</span>');
-                Materialize.toast($toastContent, 2000);
-                // IF NOT LOGGED IN, REFRESH THE PAGE
-                if(this.props.classRemoveStatus.error === 2) {
-                    setTimeout(()=> {location.reload(false)}, 2000);
-                }
+                return throwError(false, '수업', this.props.classRemoveStatus.error, '');
             }
         });
     }
