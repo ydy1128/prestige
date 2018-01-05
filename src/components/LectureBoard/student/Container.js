@@ -10,6 +10,13 @@ var container = (Present) =>{
             this.state = {
                 classData: [],
                 dialogOpen: false,
+                currObj: {
+                	_id: '',
+                	name: '',
+                	link: '',
+                	class: '',
+                	accomplishments: [],
+                },
             };
             this.filterAutocompleteData = this.filterAutocompleteData.bind(this);
 	        this.searchClassNameById = this.searchClassNameById.bind(this);
@@ -19,7 +26,7 @@ var container = (Present) =>{
 
         }
         render(){
-	        let presentState = ['dialogOpen'];
+	        let presentState = ['dialogOpen', 'currObj'];
 	        let presentProps = [];
 	        let customProps = {
 	        	classData: this.state.classData,
@@ -54,11 +61,11 @@ var container = (Present) =>{
 	        }
 	    }
 
-	    openDialog(){
-	    	this.setState({dialogOpen: true});
+	    openDialog(rowNumber){
+	    	this.setState({dialogOpen: true, currObj: this.props.lectureData[rowNumber]});
 	    }
 	    closeDialog(){
-	    	this.setState({dialogOpen: false});
+	    	this.setState({dialogOpen: false, currObj: {_id: '',name: '',link: '',class: '',accomplishments: []}});
 	    }
     }
     return Container;

@@ -8,7 +8,7 @@ import LectureDialog from './LectureDialog';
 
 let Present = ({ props, state, style, functions }) => {
 	let { classData, lectureData } = props;
-	let { dialogOpen } = state;
+	let { dialogOpen, currObj } = state;
 	let {
 		searchClassNameById,
 		openDialog,
@@ -35,7 +35,7 @@ let Present = ({ props, state, style, functions }) => {
                 </div>
             </div>
             <LectureDialog handleOpen={openDialog} handleClose={closeDialog}
-			            open={dialogOpen}/>
+			            open={dialogOpen} currObj={currObj}/>
         </div>
     	)
 }

@@ -22,14 +22,15 @@ class LectureDialog extends React.Component{
 
 		return (
             <Dialog
-                title={"dialog"}
+                title={this.props.currObj.name}
                 modal={false}
                 actions={actions}
                 open={this.props.open}
                 onRequestClose={this.props.handleClose}
                 // autoScrollBodyContent={this.props.editMode? false : true}>
                 >
-                Dialog
+                <iframe style={{minWidth: '400px', minHeight: '250px'}} src={this.props.currObj.link}
+	                target="_top" frameBorder="0" allowFullScreen></iframe>
             </Dialog>
 		)
 	}
