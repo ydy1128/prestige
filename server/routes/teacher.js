@@ -61,7 +61,8 @@ router.post('/signin', (req, res) => {
         let session = req.session;
         session.loginInfo = {
             _id: account._id,
-            username: account.username
+            username: account.username,
+            role: 'teacher'
         };
 
         // RETURN SUCCESS

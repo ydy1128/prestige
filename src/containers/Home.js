@@ -11,7 +11,9 @@ import { lectureBoardRequest } from 'actions/lecture';
 import { ClassBoard,
           StudentBoard,
           HWBoard,
-          LectureBoard
+          TeacherLectureBoard,
+
+          StudentLectureBoard
 } from 'components';
 
 import throwError from 'components/commons/throwError';
@@ -43,15 +45,18 @@ class Home extends React.Component {
         this.setMenuActive = this.setMenuActive.bind(this);
     }
     componentWillMount(){
-        this.props.getStudentsInfoRequest().then(() =>{
-            console.log('studentsData', this.props.studentsData)
-        });
+        if(this.getLoginData().role == 'teacher'){
+            this.props.getStudentsInfoRequest().then(() =>{
+                console.log('studentsData', this.props.studentsData)
+            });
+        }
+            this.props.classBoardRequest().then(() => {
+                console.log('classData', this.props.classData)
+            });
         this.props.lectureBoardRequest().then(() =>{
             console.log('lectureData', this.props.lectureData)
         });
-        this.props.classBoardRequest().then(() => {
-            console.log('classData', this.props.classData)
-        });
+
     }
     componentDidMount(){
 
@@ -144,8 +149,9 @@ class Home extends React.Component {
         });
     }
     handleMenuClick(e){
+        console.log(e.target.parentNode.name)
         this.setState({
-            view_type: e.target.name
+            view_type: e.target.parentNode.name
         })
     }
     loadCsvClassData(){
@@ -178,14 +184,15 @@ class Home extends React.Component {
                                 onStudentEdit={this.handleStudentEdit}
                                 />);
             case 'TEACHER_LECTUREBOARD':
-                return (<LectureBoard classData={this.props.classData}
+                return (<TeacherLectureBoard classData={this.props.classData}
                                 lectureData={this.props.lectureData} />);
             case 'TEACHER_HWBOARD':
                 return (<HWBoard />);
             case 'STUDENT_DASHBOARD':
                 return (<div>DASHBOARD</div>);
             case 'STUDENT_LECTUREBOARD':
-                return (<div>LECTUREBOARD</div>);
+                return (<StudentLectureBoard classData={this.props.classData}
+                                lectureData={this.props.lectureData} />);
             case 'STUDENT_HWBOARD':
                 return (<div>HWBOARD</div>);
             default:
@@ -229,18 +236,18 @@ class Home extends React.Component {
     	);
     	const teacherMenu = (
 			<ul className="">
-				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_DASHBOARD')}    name="TEACHER_DASHBOARD"    onClick={this.handleMenuClick}>대시보드</a></li>
-                <li><a className={'waves-effect '+this.setMenuActive('TEACHER_STUDENTBOARD')} name="TEACHER_STUDENTBOARD" onClick={this.handleMenuClick}>학생관리</a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_CLASSBOARD')}   name="TEACHER_CLASSBOARD"   onClick={this.handleMenuClick}>수업관리</a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_LECTUREBOARD')} name="TEACHER_LECTUREBOARD" onClick={this.handleMenuClick}>강의관리</a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_HWBOARD')}      name="TEACHER_HWBOARD"      onClick={this.handleMenuClick}>숙제관리</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_DASHBOARD')}    name="TEACHER_DASHBOARD"    ><FontAwesome name="dashboard"  onClick={this.handleMenuClick}/></a></li>
+                <li><a className={'waves-effect '+this.setMenuActive('TEACHER_STUDENTBOARD')} name="TEACHER_STUDENTBOARD" ><FontAwesome name="street-view" onClick={this.handleMenuClick} /></a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_CLASSBOARD')}   name="TEACHER_CLASSBOARD"   ><FontAwesome name="university"  onClick={this.handleMenuClick}/></a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_LECTUREBOARD')} name="TEACHER_LECTUREBOARD" ><FontAwesome name="tv" onClick={this.handleMenuClick} /></a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_HWBOARD')}      name="TEACHER_HWBOARD"      ><FontAwesome name="file-o" onClick={this.handleMenuClick} /></a></li>
 			</ul>
     	)
     	const studentMenu = (
 			<ul className="">
-				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_DASHBOARD')}    name="STUDENT_DASHBOARD"     onClick={this.handleMenuClick}>대시보드</a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_LECTUREBOARD')} name="STUDENT_LECTUREBOARD"  onClick={this.handleMenuClick}>강의게시판</a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_HWBOARD')}      name="STUDENT_HWBOARD"       onClick={this.handleMenuClick}>숙제게시판</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_DASHBOARD')}    name="STUDENT_DASHBOARD"    ><FontAwesome name="dashboard"  onClick={this.handleMenuClick}/></a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_LECTUREBOARD')} name="STUDENT_LECTUREBOARD" ><FontAwesome name="tv" onClick={this.handleMenuClick} /></a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_HWBOARD')}      name="STUDENT_HWBOARD"      ><FontAwesome name="file-o" onClick={this.handleMenuClick} /></a></li>
 			</ul>
     	)
     	const sideMenu = (

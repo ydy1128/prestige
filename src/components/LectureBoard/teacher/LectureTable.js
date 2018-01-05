@@ -30,12 +30,12 @@ class LectureTable extends React.Component{
         const tableBody = data => {
             return data.map((lecture, i) => {
                 return(
-                    <TableRow selected={this.props.clicked.includes(i)} key={lecture._id}>
+                    <TableRow key={lecture._id}>
                         <TableRowColumn style={styles.tableButtonCol}><FontAwesome onClick={this.props.handleDialogOpen.bind(undefined, false, false, i)} className={'edit-button'} name="pencil" /></TableRowColumn>
                         <TableRowColumn>{lecture.name}</TableRowColumn>
                         <TableRowColumn>{this.props.searchClassNameById(lecture.class)}</TableRowColumn>
                         <TableRowColumn></TableRowColumn>
-                        <TableRowColumn><DatePicker id={'tp'+lecture._id} value={new Date(lecture.date)} textFieldStyle={{cursor: 'default', width: '120px', height: '20px', fontSize: '13px'}} disabled={true} /></TableRowColumn>
+                        <TableRowColumn><DatePicker id={'tp'+lecture._id} value={new Date(lecture.date)} textFieldStyle={styles.datePickerStyle} disabled={true} /></TableRowColumn>
                     </TableRow>
                 );
             });
@@ -72,6 +72,12 @@ let styles = {
     },
     table: {
         border: '1px solid #d3d3d3'
+    },
+    datePickerStyle: {
+        cursor: 'default', 
+        width: '120px', 
+        height: '20px', 
+        fontSize: '13px'
     }
 };
 export default LectureTable;

@@ -17,7 +17,7 @@ class Header extends React.Component {
         );
         return (
             <div className="App-Header">
-	            <Link to="/" className="App-logo">PRESTIGE</Link>
+	            <a className="App-logo">PRESTIGE</a>
                 { this.props.isLoggedIn ? logoutButton  : undefined }
                 { this.props.isLoggedIn ? accountButton  : undefined }
             </div>

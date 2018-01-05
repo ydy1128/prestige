@@ -36,8 +36,17 @@ const createLecture = (req, res) => {
 const readLecture = (req, res) =>{
     if(req.session.loginInfo == undefined)
         return throwerror(res, 401, 'User not logged in.');
-
-    Lecture.find({teacher: req.session.loginInfo._id})
+    let condition = {};
+    if(req.session.loginInfo.role == 'teacher'){
+        condition = {teacher: req.session.loginInfo._id};
+    }
+    else{
+        if(req.session.loginInfo.class == undefined)
+            return throwerror(res, 403, 'Student is not assigned to class.');
+        else
+            condition = {class: req.session.loginInfo.class};
+    }
+    Lecture.find(condition)
     .exec((err, lectures) => {
         if(err) return throwerror(res, 409, 'DB error.');
         res.json({success: true, lectures: lectures});

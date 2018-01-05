@@ -195,7 +195,7 @@ a{
 		display: inline-block;
 		vertical-align: top;
 		height: 100%;
-		width: 23%;
+		width: 80px;
 		padding: 0;
 		background-color: #1c240d;
 		ul{
@@ -204,14 +204,18 @@ a{
 			li{
 				margin: 0;
 				height: 80px;
-				font-size: 28px;
+				font-size: 30px;
 				a{
 					margin: 0;
 					color: $back-color;
-					padding: 18px 0;
 					width: 100%;
 					text-align: center;
 					border-bottom: 2px solid $back-color;
+					span{
+						padding-top: 25px;
+						height: 80px;
+						width: 80px;
+					}
 					&:hover{
 						background-color: $back-color;
 						color: black;
@@ -228,7 +232,7 @@ a{
 		display: inline-block;
 		vertical-align: top;
 		height: 100%;
-		width: 77%;
+		width: calc(100% - 80px);
 		overflow-y: auto;
 		.Boards{
 			height: calc(100% - 4.5em);

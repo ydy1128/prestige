@@ -23,6 +23,7 @@ var container = (Present) =>{
                 },
                 remove_active: false,
             };
+            this.filterAutocompleteData = this.filterAutocompleteData.bind(this);
 
             this.toggleDialog = this.toggleDialog.bind(this);
             this.openDialog = this.openDialog.bind(this);

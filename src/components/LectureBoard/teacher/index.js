@@ -60,9 +60,9 @@ let Present = ({ props, state, style, functions }) => {
             { boardHeader }
             <div className="Board-contents row">
                 <div className="col m12">
-                	<LectureTable lectureData={lectureData} classData={classData} clicked={clicked}
+                	<LectureTable lectureData={lectureData} clicked={clicked}
                                   handleDialogOpen={openDialog} searchClassNameById={searchClassNameById}
-                                  handleRowClick={handleRowClick} handleRemove={handleRemove}
+                                  handleRowClick={handleRowClick}
                                   />
                 </div>
             </div>
