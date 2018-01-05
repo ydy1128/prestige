@@ -55,10 +55,10 @@ class LectureDialog extends React.Component{
                 />
                 <AutoComplete
                     floatingLabelText={'수업'}
-                    filter={AutoComplete.noFilter}
                     fullWidth={true}
                     dataSource={this.props.classData}
-                    searchText={this.props.searchClassNameById(this.props.currObj.class)}
+                    searchText={this.props.currObj.className}
+                    onUpdateInput={this.props.onInputChange}
                     onNewRequest={this.props.onClassChange} openOnFocus={true}
                     floatingLabelStyle={styles.inputLabel} floatingLabelFocusStyle={styles.inputLabelFocus} 
                     underlineStyle={styles.inputLine} underlineFocusStyle={styles.inputLineFocus}

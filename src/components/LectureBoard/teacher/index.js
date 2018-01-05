@@ -15,7 +15,8 @@ let Present = ({ props, state, style, functions }) => {
 		 openEditMode,
 		 closeEditMode,
          searchClassNameById,
-		 onClassChange,
+    		 onClassChange,
+         onInputChange,
          handleDialogDataChange,
          handlePost,
          handleEdit,
@@ -71,7 +72,7 @@ let Present = ({ props, state, style, functions }) => {
             			   handleOpen={openDialog} handleClose={closeDialog} 
             			   openEditMode={openEditMode} closeEditMode={closeEditMode} 
                            searchClassNameById={searchClassNameById}
-            			   onClassChange={onClassChange} handleChange={handleDialogDataChange}
+            			   onClassChange={onClassChange} onInputChange={onInputChange} handleChange={handleDialogDataChange}
                            handlePost={handlePost} handleEdit={handleEdit}/>
         </div>
     )

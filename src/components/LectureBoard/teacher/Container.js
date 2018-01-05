@@ -19,6 +19,7 @@ var container = (Present) =>{
                 	name: '',
                 	link: '',
                 	class: '',
+                	className: '',
                 	accomplishments: [],
                 },
                 remove_active: false,
@@ -35,6 +36,7 @@ var container = (Present) =>{
 
 	        this.searchClassNameById = this.searchClassNameById.bind(this);
             this.onClassChange = this.onClassChange.bind(this);
+            this.onInputChange = this.onInputChange.bind(this);
             this.handleDialogDataChange = this.handleDialogDataChange.bind(this);
             this.handlePost = this.handlePost.bind(this);
             this.handleEdit = this.handleEdit.bind(this);
@@ -57,6 +59,7 @@ var container = (Present) =>{
 	        	closeEditMode: this.closeEditMode,
 	        	searchClassNameById: this.searchClassNameById,
 	        	onClassChange: this.onClassChange,
+	        	onInputChange: this.onInputChange,
 	        	handleDialogDataChange: this.handleDialogDataChange,
 	        	handlePost: this.handlePost,
 	        	handleEdit: this.handleEdit,
@@ -85,12 +88,14 @@ var container = (Present) =>{
 	    		this.openEditMode();
 	    	}
 	    	else{
-	    		this.setState({currObj: this.props.lectureData[index], editlec: index});
+	    		let obj = this.props.lectureData[index];
+		    	obj.className = this.searchClassNameById(obj.class);
+	    		this.setState({currObj: obj, editlec: index});
 	    		this.closeEditMode();
 	    	}
 	    }
 	    closeDialog(){
-	    	this.setState({currObj:{ _id: '',name: '',link: '',class: '',accomplishments: []}, editlec: -1, clicked: [], remove_active: false})
+	    	this.setState({currObj:{ _id: '',name: '',link: '', className: '', class: '',accomplishments: []}, editlec: -1, clicked: [], remove_active: false})
 	    	this.toggleDialog(false);
 	    }
 	    toggleDialog(openState){
@@ -112,6 +117,7 @@ var container = (Present) =>{
 	    }
 	    filterAutocompleteData(){
 	    	let acData = [...this.props.classData].map(obj => {return {text: obj.name, value: obj._id}; });
+	    	console.log(acData)
 	    	this.setState({classData: acData});
 	    }
 	    searchClassNameById(id){
@@ -130,6 +136,15 @@ var container = (Present) =>{
 	    	nextState.currObj.class = chosenRequest.value;
 	    	this.setState(nextState);
 	    }
+	    onInputChange(searchText){
+	    	let nextState = {
+	    		currObj: this.state.currObj
+	    	};
+	    	console.log(searchText)
+	    	nextState.currObj.className = searchText;
+	    	this.setState(nextState)
+	    }
+
 	    handleDialogDataChange(e){
 	        let nextState = {
 	            currObj: this.state.currObj

@@ -20,11 +20,35 @@
 
    <body>
       <div id="root"></div>
+      <div id="player"></div>
 
       <!-- js libraries -->
       <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+
       <script src="/bundle.js"></script>
+      <script>
+         var tag = document.createElement('script');
+
+         tag.src = "https://www.youtube.com/iframe_api";
+         var firstScriptTag = document.getElementsByTagName('script')[0];
+         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+         // 3. This function creates an <iframe> (and YouTube player)
+         //    after the API code downloads.
+         var player;
+         function onYouTubeIframeAPIReady(url) {
+            console.log('load')
+            console.log(url)
+           player = new YT.Player('player', {
+             height: '360',
+             width: '640',
+             videoId: '8JOBpb1O5u0',
+
+           });
+           $('#player').hide();
+         }
+      </script>
    </body>
 
 </html>

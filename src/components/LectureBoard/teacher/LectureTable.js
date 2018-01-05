@@ -30,7 +30,7 @@ class LectureTable extends React.Component{
         const tableBody = data => {
             return data.map((lecture, i) => {
                 return(
-                    <TableRow key={lecture._id}>
+                    <TableRow selected={this.props.clicked.includes(i)} key={lecture._id}>
                         <TableRowColumn style={styles.tableButtonCol}><FontAwesome onClick={this.props.handleDialogOpen.bind(undefined, false, false, i)} className={'edit-button'} name="pencil" /></TableRowColumn>
                         <TableRowColumn>{lecture.name}</TableRowColumn>
                         <TableRowColumn>{this.props.searchClassNameById(lecture.class)}</TableRowColumn>
