@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from 'react-redux';
-
+import { lectureEditRequest } from 'actions/lecture';
 import throwError from 'components/commons/throwError';
 
 var container = (Present) =>{
@@ -23,6 +23,8 @@ var container = (Present) =>{
 
 	        this.openDialog = this.openDialog.bind(this);
 	        this.closeDialog = this.closeDialog.bind(this);
+	        this.onAccChange = this.onAccChange.bind(this);
+	        this.handleEdit = this.handleEdit.bind(this);
 
         }
         render(){
@@ -36,6 +38,8 @@ var container = (Present) =>{
 	        	searchClassNameById: this.searchClassNameById,
 	        	openDialog: this.openDialog,
 	        	closeDialog: this.closeDialog,
+	        	handleEdit: this.handleEdit,
+	        	onAccChange: this.onAccChange,
 	        }
 	        return (
 	            <Present  
@@ -67,7 +71,43 @@ var container = (Present) =>{
 	    closeDialog(){
 	    	this.setState({dialogOpen: false, currObj: {_id: '',name: '',link: '',class: '',accomplishments: []}});
 	    }
+	    onAccChange(id, time){
+	    	let nextState = {
+	    		currObj: this.state.currObj
+	    	}
+	    	let acc = nextState.currObj.accomplishments;
+	    	for(let i = 0; i < acc.length; i++){
+	    		if(id == acc[i]._id){
+	    			acc[i].accomplishments = time;
+	    		}
+	    	}
+	    	this.setState(nextState);
+	    }
+	    handleEdit(silent, index, contents){
+	    	return this.props.lectureEditRequest(index, contents).then(()=>{
+	    		if(this.props.lectureEditStatus.status === 'SUCCESS'){
+                    if(!silent) { Materialize.toast('강의가 수정 되었습니다!', 2000); }
+	    		}
+	    		else{
+                    return throwError(silent, '강의', this.props.lectureEditStatus.error, '');
+	    		}	    		
+	    	})
+	    }
     }
-    return Container;
+	return connect(mapStateToProps, mapDispatchToProps)(Container);
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        lectureEditRequest: (index, contents) => {
+            return dispatch(lectureEditRequest(index, contents));
+        },
+    }
+}
+
+const mapStateToProps = (state) => {
+    return {
+    	lectureEditStatus: state.lecture.edit,
+    }
 }
 export default container;

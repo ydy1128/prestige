@@ -12,7 +12,9 @@ let Present = ({ props, state, style, functions }) => {
 	let {
 		searchClassNameById,
 		openDialog,
-		closeDialog
+		closeDialog,
+        handleEdit,
+        onAccChange,
 	} = functions;
 
 
@@ -34,8 +36,8 @@ let Present = ({ props, state, style, functions }) => {
                                   />
                 </div>
             </div>
-            <LectureDialog handleOpen={openDialog} handleClose={closeDialog}
-			            open={dialogOpen} currObj={currObj}/>
+            <LectureDialog handleOpen={openDialog} handleClose={closeDialog} onAccChange={onAccChange} handleEdit={handleEdit}
+			            open={dialogOpen} currObj={currObj} lectureData={lectureData} />
         </div>
     	)
 }

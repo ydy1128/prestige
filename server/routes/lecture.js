@@ -23,7 +23,7 @@ const createLecture = (req, res) => {
         link: lecture_obj.link,
         teacher: req.session.loginInfo._id,
         class: lecture_obj.class,
-        accomplishments: [],
+        accomplishments: lecture_obj.accomplishments,
         date: new Date()
     });
 
@@ -62,8 +62,8 @@ const updateLecture = (id, req, res) =>{
         // IF Class does not exist
         if(lecture == undefined) return throwerror(res, 409);
         // If exists, check teacher
-        if(lecture.teacher != req.session.loginInfo._id)
-            return throwerror(res, 401, 'Unauthorized user.');
+        // if(lecture.teacher != req.session.loginInfo._id)
+        //     return throwerror(res, 401, 'Unauthorized user.');
 
         // Modify class contents
         lecture.name = req.body.contents.name;

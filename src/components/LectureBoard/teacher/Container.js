@@ -35,6 +35,7 @@ var container = (Present) =>{
             this.setNew = this.setNew.bind(this);
 
 	        this.searchClassNameById = this.searchClassNameById.bind(this);
+	        this.getClassById = this.getClassById.bind(this);
             this.onClassChange = this.onClassChange.bind(this);
             this.onInputChange = this.onInputChange.bind(this);
             this.handleDialogDataChange = this.handleDialogDataChange.bind(this);
@@ -128,11 +129,24 @@ var container = (Present) =>{
 	            }
 	        }
 	    }
+	    getClassById(id){
+	        let classData = this.props.classData;
+	        for(let i = 0; i < classData.length; i++){
+	            if(classData[i]._id == id){
+	                return classData[i];
+	            }
+	        }
+	    }
 	    onClassChange(chosenRequest, index){
-	    	console.log(chosenRequest)
 	    	let nextState = {
 	    		currObj: this.state.currObj
 	    	};
+	    	let cls = this.getClassById(chosenRequest.value);
+
+	    	for(let i = 0; i < cls.students.length; i++){
+	    		nextState.currObj.accomplishments.push({_id: cls.students[i], accomplishments: 0});
+	    	}
+	    	console.log(nextState.currObj.accomplishments)
 	    	nextState.currObj.class = chosenRequest.value;
 	    	this.setState(nextState);
 	    }

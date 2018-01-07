@@ -47,10 +47,10 @@ class Authentication extends React.Component {
 
     }
     handleLogin() {
-        let id = this.state.username;
+        let username = this.state.username;
         let pw = this.state.password;
         let url_ref = this.state.ref;
-        this.props.onLogin(id, pw, url_ref).then(
+        this.props.onLogin(username, pw, url_ref).then(
             (success) => {
                 if(!success) {
                     this.setState({

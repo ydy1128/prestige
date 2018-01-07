@@ -82,14 +82,11 @@ class Home extends React.Component {
 
     handleStudentEdit(stdobj, index, silent){
         return this.props.studentsInfoEditRequest(stdobj._id, index, stdobj).then(() =>{
-            if(!silent){
-                if(this.props.studentEditStatus.status === "SUCCESS") {
-                    Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
-                    return true;
-                }
-                else {
-                    return throwError(silent, '학생', this.props.classEditStatus.error, '');
-                }
+            if(this.props.studentEditStatus.status === "SUCCESS") {
+                if(silent) { Materialize.toast('학생 정보가 수정 되었습니다!', 2000); return true; }
+            }
+            else {
+                return throwError(silent, '학생', this.props.classEditStatus.error, '');
             }
         })
     }

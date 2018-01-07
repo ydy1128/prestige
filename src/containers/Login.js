@@ -10,20 +10,22 @@ class Login extends React.Component {
 		super(props);
 		this.handleLogin = this.handleLogin.bind(this);
 	}
-	handleLogin(id, pw, url_ref){
-		return this.props.loginRequest(id, pw, url_ref).then(
+	handleLogin(username, pw, url_ref){
+		return this.props.loginRequest(username, pw, url_ref).then(
 			() => {
 				if(this.props.status === "SUCCESS"){
 					// create session data
+                    console.log(this.props.userid)
 					let loginData = {
                         isLoggedIn: true,
-                        username: id,
+                        id: this.props.userid,
+                        username: username,
                         role: url_ref
                     };
 
                     document.cookie = 'key=' + btoa(JSON.stringify(loginData));
 
-                    Materialize.toast('Welcome, ' + id + '!', 2000);
+                    Materialize.toast('Welcome, ' + username + '!', 2000);
                     browserHistory.push('/');
                     return true;
 				}
@@ -47,7 +49,8 @@ class Login extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        status: state.authentication.login.status
+        status: state.authentication.login.status,
+        userid: state.authentication.status.currentUser
     };
 };
 
