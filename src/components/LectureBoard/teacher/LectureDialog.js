@@ -8,12 +8,37 @@ import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import CircularProgress from 'material-ui/CircularProgress';
 import AutoComplete from 'material-ui/AutoComplete';
+import {List, ListItem} from 'material-ui/List';
+import LinearProgress from 'material-ui/LinearProgress';
+
+import YouTube from 'react-youtube';
 
 class LectureDialog extends React.Component{
     constructor(props){
         super(props);
+        this.state = {
+            videoPlayer: null,
+            zindex: -999,
+        }
+        this.updateVideo = this.updateVideo.bind(this);
         this.handlePost = this.handlePost.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
+    }
+    updateVideo(event){
+        let time = -1;
+        // this.props.currObj.accomplishments.map((acc, i) =>{
+        //     if(acc._id == this.getLoginData().id)
+        //         time = acc.accomplishments;
+        // })
+        // event.target.playVideo();
+        // if(time > 0)
+        //     event.target.seekTo(time, true);
+        this.setState({videoPlayer: event.target, zindex: 1500});
+    }
+    getVideoId(link){
+        let id = link.split('/');
+        id = id[id.length - 1];
+        return id;
     }
     handlePost(){
         console.log(this.props.newOne)
@@ -65,23 +90,43 @@ class LectureDialog extends React.Component{
                 /><br />
             </div>
         );
+        // const div = (
+        //                 <iframe style={{minWidth: '400px', minHeight: '250px'}} src={this.props.currObj.link}
+        //                 target="_top" frameBorder="0" allowFullScreen></iframe>
+        //             <div className="col m5" style={{textAlign: 'center'}}>
+        //                 <h5 style={{fontWeight: '600'}}>학습률</h5>
+        //                 <CircularProgress
+        //                     mode="determinate"
+        //                     value={80}
+        //                     size={130}
+        //                     thickness={15}
+        //                 />
+        //                 <h3 style={{color: '#00bcd4', fontWeight: '600'}}>80%</h3>
+        //             </div>
+        //     )
         // iframe 사라질때 inspector 뜨는 문제
+        const generateList = data => {
+            if(this.state.videoPlayer != null)
+                return data.map((acc, i) => {
+                    let fraction = acc.accomplishments / this.state.videoPlayer.getDuration() * 100;
+                    console.log(acc.accomplishments, this.state.videoPlayer.getDuration(), fraction)
+                    return(
+                        <List>
+                            <ListItem primaryText={acc._id} rightIcon={<LinearProgress mode="determinate" value={fraction} />} />
+                        </List>
+                    );
+                });
+        };
         const videoDiv = (
                 <div className="row">
-                    <div className="col m7">
-                        <iframe style={{minWidth: '400px', minHeight: '250px'}} src={this.props.currObj.link}
-                        target="_top" frameBorder="0" allowFullScreen></iframe>
+                    <div className="col m12">
+                        <YouTube videoId={this.getVideoId(this.props.currObj.link)} 
+                                onReady={this.updateVideo}
+                            />
+                        {generateList(this.props.currObj.accomplishments)}
+
                     </div>
-                    <div className="col m5" style={{textAlign: 'center'}}>
-                        <h5 style={{fontWeight: '600'}}>학습률</h5>
-                        <CircularProgress
-                            mode="determinate"
-                            value={80}
-                            size={130}
-                            thickness={15}
-                        />
-                        <h3 style={{color: '#00bcd4', fontWeight: '600'}}>80%</h3>
-                    </div>
+
                 </div>
         );
 
@@ -92,7 +137,9 @@ class LectureDialog extends React.Component{
                 actions={actions}
                 open={this.props.open}
                 onRequestClose={this.props.handleClose}
+                style={{zIndex: this.state.zindex, textAlign: 'center'}}
                 autoScrollBodyContent={this.props.editMode? false : true}>
+
                 {this.props.editMode? editDiv : videoDiv}
             </Dialog>
 		)
