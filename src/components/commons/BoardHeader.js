@@ -50,10 +50,10 @@ class BoardHeader extends React.Component{
 
 let styles = {
 	boardTitle: {
-		width: '155px'
+		width: '180px'
 	},
 	boardIcons: {
-		width: 'calc(100% - 155px)'
+		width: 'calc(100% - 180px)'
 	},
 	searchEngine: {
 		height: '55px',
