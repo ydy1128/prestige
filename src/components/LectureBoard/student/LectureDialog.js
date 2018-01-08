@@ -62,6 +62,9 @@ class LectureDialog extends React.Component{
     }
     timeChange(){
         let time = this.state.videoPlayer.getCurrentTime();
+        let fulltime = this.state.videoPlayer.getDuration();
+        time = time / fulltime * 100;
+        time = time.toFixed(2);
         let index = -1;
         this.props.onAccChange(this.getLoginData().id, time);
 

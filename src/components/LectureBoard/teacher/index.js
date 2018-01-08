@@ -15,6 +15,7 @@ let Present = ({ props, state, style, functions }) => {
 		 openEditMode,
 		 closeEditMode,
          searchClassNameById,
+         searchStudentNameById,
     		 onClassChange,
          onInputChange,
          handleDialogDataChange,
@@ -71,7 +72,7 @@ let Present = ({ props, state, style, functions }) => {
                            currObj={currObj} classData={classData} editlec={editlec}
             			   handleOpen={openDialog} handleClose={closeDialog} 
             			   openEditMode={openEditMode} closeEditMode={closeEditMode} 
-                           searchClassNameById={searchClassNameById}
+                           searchClassNameById={searchClassNameById} searchStudentNameById={searchStudentNameById}
             			   onClassChange={onClassChange} onInputChange={onInputChange} handleChange={handleDialogDataChange}
                            handlePost={handlePost} handleEdit={handleEdit}/>
         </div>

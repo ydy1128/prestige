@@ -2,6 +2,7 @@ import React from "react";
 import FontAwesome from 'react-fontawesome';
 
 import DatePicker from 'material-ui/DatePicker';
+import CircularProgress from 'material-ui/CircularProgress';
 
 import {
     Table,
@@ -29,12 +30,18 @@ class LectureTable extends React.Component{
         )
         const tableBody = data => {
             return data.map((lecture, i) => {
+                let acc = 0;
+                lecture.accomplishments.map((a, i) =>{
+                    acc += a.accomplishments;
+                })
+                acc /= lecture.accomplishments.length;
+                acc = acc.toFixed(2);
                 return(
                     <TableRow selected={this.props.clicked.includes(i)} key={lecture._id}>
                         <TableRowColumn style={styles.tableButtonCol}><FontAwesome onClick={this.props.handleDialogOpen.bind(undefined, false, false, i)} className={'edit-button'} name="pencil" /></TableRowColumn>
                         <TableRowColumn>{lecture.name}</TableRowColumn>
                         <TableRowColumn>{this.props.searchClassNameById(lecture.class)}</TableRowColumn>
-                        <TableRowColumn></TableRowColumn>
+                        <TableRowColumn><CircularProgress style={{verticalAlign: 'middle', marginRight: '10px'}} mode="determinate" value={parseFloat(acc)} size={20} thickness={4} />{acc + '%'}</TableRowColumn>
                         <TableRowColumn><DatePicker id={'tp'+lecture._id} value={new Date(lecture.date)} textFieldStyle={styles.datePickerStyle} disabled={true} /></TableRowColumn>
                     </TableRow>
                 );

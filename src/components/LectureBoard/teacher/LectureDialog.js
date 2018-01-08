@@ -6,7 +6,6 @@ import FontAwesome from 'react-fontawesome';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import CircularProgress from 'material-ui/CircularProgress';
 import AutoComplete from 'material-ui/AutoComplete';
 import {List, ListItem} from 'material-ui/List';
 import LinearProgress from 'material-ui/LinearProgress';
@@ -90,40 +89,29 @@ class LectureDialog extends React.Component{
                 /><br />
             </div>
         );
-        // const div = (
-        //                 <iframe style={{minWidth: '400px', minHeight: '250px'}} src={this.props.currObj.link}
-        //                 target="_top" frameBorder="0" allowFullScreen></iframe>
-        //             <div className="col m5" style={{textAlign: 'center'}}>
-        //                 <h5 style={{fontWeight: '600'}}>학습률</h5>
-        //                 <CircularProgress
-        //                     mode="determinate"
-        //                     value={80}
-        //                     size={130}
-        //                     thickness={15}
-        //                 />
-        //                 <h3 style={{color: '#00bcd4', fontWeight: '600'}}>80%</h3>
-        //             </div>
-        //     )
-        // iframe 사라질때 inspector 뜨는 문제
-        const generateList = data => {
-            if(this.state.videoPlayer != null)
+        const generate = data =>{
+            if(this.state.videoPlayer != null){
                 return data.map((acc, i) => {
-                    let fraction = acc.accomplishments / this.state.videoPlayer.getDuration() * 100;
-                    console.log(acc.accomplishments, this.state.videoPlayer.getDuration(), fraction)
+                    // let fraction = acc.accomplishments / this.state.videoPlayer.getDuration() * 100;
+                    // console.log(acc.accomplishments, this.state.videoPlayer.getDuration(), fraction)
                     return(
-                        <List>
-                            <ListItem primaryText={acc._id} rightIcon={<LinearProgress mode="determinate" value={fraction} />} />
-                        </List>
+                        <div key={'lec-'+acc._id} style={{padding: '18px'}}>
+                            <div><div style={{float:'left'}}>{this.props.searchStudentNameById(acc._id)}</div><div style={{float:'right'}}>{acc.accomplishments + '%'}</div></div>
+                            <div><LinearProgress mode="determinate" value={acc.accomplishments} /></div>
+                        </div>
                     );
                 });
-        };
+            }
+
+        }
         const videoDiv = (
                 <div className="row">
                     <div className="col m12">
                         <YouTube videoId={this.getVideoId(this.props.currObj.link)} 
                                 onReady={this.updateVideo}
                             />
-                        {generateList(this.props.currObj.accomplishments)}
+                        <h5>학습률</h5>
+                        {generate(this.props.currObj.accomplishments)}
 
                     </div>
 

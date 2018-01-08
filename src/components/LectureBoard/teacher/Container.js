@@ -35,6 +35,7 @@ var container = (Present) =>{
             this.setNew = this.setNew.bind(this);
 
 	        this.searchClassNameById = this.searchClassNameById.bind(this);
+	        this.searchStudentNameById = this.searchStudentNameById.bind(this);
 	        this.getClassById = this.getClassById.bind(this);
             this.onClassChange = this.onClassChange.bind(this);
             this.onInputChange = this.onInputChange.bind(this);
@@ -59,6 +60,7 @@ var container = (Present) =>{
 	        	openEditMode: this.openEditMode, 
 	        	closeEditMode: this.closeEditMode,
 	        	searchClassNameById: this.searchClassNameById,
+	        	searchStudentNameById: this.searchStudentNameById,
 	        	onClassChange: this.onClassChange,
 	        	onInputChange: this.onInputChange,
 	        	handleDialogDataChange: this.handleDialogDataChange,
@@ -124,10 +126,16 @@ var container = (Present) =>{
 	    searchClassNameById(id){
 	        let classData = this.state.classData;
 	        for(let i = 0; i < classData.length; i++){
-	            if(classData[i].value == id){
+	            if(classData[i].value == id)
 	                return classData[i].text;
-	            }
 	        }
+	    }
+	    searchStudentNameById(id){
+	    	let studentsData = this.props.studentsData;
+	    	for(let i = 0; i < studentsData.length; i++){
+	    		if(studentsData[i]._id == id)
+	    			return studentsData[i].name;
+	    	}
 	    }
 	    getClassById(id){
 	        let classData = this.props.classData;

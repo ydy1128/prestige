@@ -182,6 +182,7 @@ class Home extends React.Component {
                                 />);
             case 'TEACHER_LECTUREBOARD':
                 return (<TeacherLectureBoard classData={this.props.classData}
+                                studentsData={this.props.studentsData}
                                 lectureData={this.props.lectureData} />);
             case 'TEACHER_HWBOARD':
                 return (<HWBoard />);
