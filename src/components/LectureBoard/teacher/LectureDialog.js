@@ -9,6 +9,8 @@ import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
 import {List, ListItem} from 'material-ui/List';
 import LinearProgress from 'material-ui/LinearProgress';
+import DatePicker from 'material-ui/DatePicker';
+import TimePicker from 'material-ui/TimePicker';
 
 import YouTube from 'react-youtube';
 
@@ -95,8 +97,21 @@ class LectureDialog extends React.Component{
                     // let fraction = acc.accomplishments / this.state.videoPlayer.getDuration() * 100;
                     // console.log(acc.accomplishments, this.state.videoPlayer.getDuration(), fraction)
                     return(
-                        <div key={'lec-'+acc._id} style={{padding: '18px'}}>
-                            <div><div style={{float:'left'}}>{this.props.searchStudentNameById(acc._id)}</div><div style={{float:'right'}}>{acc.accomplishments + '%'}</div></div>
+                        <div key={'lec-'+acc._id} className="row" style={{padding: '18px'}}>
+                            <div>
+                                <div className="col m3">{this.props.searchStudentNameById(acc._id)}</div>
+                                <div className="col m6">
+                                    {acc.startTime == '' ?
+                                     '-' :
+                                     (<div className="studyTime" style={{color: 'rgba(0,0,0,0.3)'}}>
+                                        <DatePicker id={'dp'+acc._id} value={new Date(acc.startTime)} style={{display: 'inline-block'}} textFieldStyle={styles.datePickerStyle} disabled={true} />
+                                     <TimePicker id={'tp1'+acc._id} value={new Date(acc.startTime)} style={{display: 'inline-block', marginRight: '5px'}} textFieldStyle={styles.timePickerStyle} disabled={true} />
+                                     ~
+                                     <TimePicker id={'tp2'+acc._id} value={new Date(acc.endTime)} style={{display: 'inline-block', marginLeft: '5px'}} textFieldStyle={styles.timePickerStyle} disabled={true} /> </div>)
+                                    }
+                                </div>
+                                <div className="col m3">{acc.accomplishments + '%'}</div>
+                            </div>
                             <div><LinearProgress mode="determinate" value={acc.accomplishments} /></div>
                         </div>
                     );
@@ -110,7 +125,11 @@ class LectureDialog extends React.Component{
                         <YouTube videoId={this.getVideoId(this.props.currObj.link)} 
                                 onReady={this.updateVideo}
                             />
-                        <h5>학습률</h5>
+                            <div className="row">
+                                <h5 className="col m3">이름</h5>
+                                <h5 className="col m6">학습시간</h5>
+                                <h5 className="col m3">학습률</h5>
+                            </div>
                         {generate(this.props.currObj.accomplishments)}
 
                     </div>
@@ -150,6 +169,18 @@ let styles = {
 		fontSize: "18px",
 		fontWeight: "600"
 	},
+    datePickerStyle: {
+        cursor: 'default', 
+        width: '80px', 
+        height: '20px', 
+        fontSize: '14px'
+    },
+    timePickerStyle: {
+        cursor: 'default', 
+        width: '50px', 
+        height: '20px', 
+        fontSize: '14px'
+    }
 }
 
 export default LectureDialog;

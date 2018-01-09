@@ -152,7 +152,7 @@ var container = (Present) =>{
 	    	let cls = this.getClassById(chosenRequest.value);
 
 	    	for(let i = 0; i < cls.students.length; i++){
-	    		nextState.currObj.accomplishments.push({_id: cls.students[i], accomplishments: 0});
+	    		nextState.currObj.accomplishments.push({_id: cls.students[i], accomplishments: 0, startTime: '', endTime: ''});
 	    	}
 	    	console.log(nextState.currObj.accomplishments)
 	    	nextState.currObj.class = chosenRequest.value;

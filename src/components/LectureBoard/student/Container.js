@@ -52,6 +52,19 @@ var container = (Present) =>{
 	    componentDidMount(){
 	    	this.filterAutocompleteData();
 	    }
+	    getCookie(name) {
+	        var value = "; " + document.cookie;
+	        var parts = value.split("; " + name + "=");
+	        if (parts.length == 2) return parts.pop().split(";").shift();
+	    }
+	    getLoginData(){
+	        let loginData = this.getCookie('key');
+	        if(loginData == undefined)
+	            loginData = {};
+	        else
+	            loginData = JSON.parse(atob(loginData));
+	        return loginData;
+	    }
 	    filterAutocompleteData(){
 	    	let acData = [...this.props.classData].map(obj => {return {text: obj.name, value: obj._id}; });
 	    	this.setState({classData: acData});
@@ -66,7 +79,18 @@ var container = (Present) =>{
 	    }
 
 	    openDialog(rowNumber){
-	    	this.setState({dialogOpen: true, currObj: this.props.lectureData[rowNumber]});
+	    	let nextState = {
+	    		currObj: this.props.lectureData[rowNumber],
+	    		dialogOpen: true,
+	    	}
+	    	let acc = nextState.currObj.accomplishments;
+	    	for(let i = 0; i < acc.length; i++){
+	    		if(this.getLoginData().id == acc[i]._id){
+	    			let date = new Date();
+	    			acc[i].startTime = date;
+	    		}
+	    	}
+	    	this.setState(nextState);
 	    }
 	    closeDialog(){
 	    	this.setState({dialogOpen: false, currObj: {_id: '',name: '',link: '',class: '',accomplishments: []}});
@@ -79,6 +103,8 @@ var container = (Present) =>{
 	    	for(let i = 0; i < acc.length; i++){
 	    		if(id == acc[i]._id){
 	    			acc[i].accomplishments = time;
+	    			let date = new Date();
+	    			acc[i].endTime = date;
 	    		}
 	    	}
 	    	this.setState(nextState);

@@ -9,7 +9,9 @@ const Lecture = new Schema({
 	class: String,
 	accomplishments: [{
 		_id: String,
-		accomplishments: Number
+		accomplishments: Number,
+		startTime: String,
+		endTime: String
 	}],
 	date: String
 });
