@@ -100,12 +100,15 @@ router.post('/signin', (req, res) => {
         let session = req.session;
         session.loginInfo = {
             _id: account._id,
-            username: account.username
+            username: account.username,
+            role: 'student',
+            class: account.class
         };
 
         // RETURN SUCCESS
         return res.json({
-            success: true
+            success: true,
+            id: account._id,
         });
     });
 });

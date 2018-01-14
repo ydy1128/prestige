@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from 'react-redux';
 import { lecturePostRequest, lectureEditRequest, lectureRemoveRequest } from 'actions/lecture';
+import throwError from 'components/commons/throwError';
 
 var container = (Present) =>{
 	class Container extends React.Component {
@@ -18,10 +19,12 @@ var container = (Present) =>{
                 	name: '',
                 	link: '',
                 	class: '',
+                	className: '',
                 	accomplishments: [],
                 },
                 remove_active: false,
             };
+            this.filterAutocompleteData = this.filterAutocompleteData.bind(this);
 
             this.toggleDialog = this.toggleDialog.bind(this);
             this.openDialog = this.openDialog.bind(this);
@@ -32,7 +35,10 @@ var container = (Present) =>{
             this.setNew = this.setNew.bind(this);
 
 	        this.searchClassNameById = this.searchClassNameById.bind(this);
+	        this.searchStudentNameById = this.searchStudentNameById.bind(this);
+	        this.getClassById = this.getClassById.bind(this);
             this.onClassChange = this.onClassChange.bind(this);
+            this.onInputChange = this.onInputChange.bind(this);
             this.handleDialogDataChange = this.handleDialogDataChange.bind(this);
             this.handlePost = this.handlePost.bind(this);
             this.handleEdit = this.handleEdit.bind(this);
@@ -54,7 +60,9 @@ var container = (Present) =>{
 	        	openEditMode: this.openEditMode, 
 	        	closeEditMode: this.closeEditMode,
 	        	searchClassNameById: this.searchClassNameById,
+	        	searchStudentNameById: this.searchStudentNameById,
 	        	onClassChange: this.onClassChange,
+	        	onInputChange: this.onInputChange,
 	        	handleDialogDataChange: this.handleDialogDataChange,
 	        	handlePost: this.handlePost,
 	        	handleEdit: this.handleEdit,
@@ -83,12 +91,14 @@ var container = (Present) =>{
 	    		this.openEditMode();
 	    	}
 	    	else{
-	    		this.setState({currObj: this.props.lectureData[index], editlec: index});
+	    		let obj = this.props.lectureData[index];
+		    	obj.className = this.searchClassNameById(obj.class);
+	    		this.setState({currObj: obj, editlec: index});
 	    		this.closeEditMode();
 	    	}
 	    }
 	    closeDialog(){
-	    	this.setState({currObj:{ _id: '',name: '',link: '',class: '',accomplishments: []}, editlec: -1, clicked: [], remove_active: false})
+	    	this.setState({currObj:{ _id: '',name: '',link: '', className: '', class: '',accomplishments: []}, editlec: -1, clicked: [], remove_active: false})
 	    	this.toggleDialog(false);
 	    }
 	    toggleDialog(openState){
@@ -110,24 +120,53 @@ var container = (Present) =>{
 	    }
 	    filterAutocompleteData(){
 	    	let acData = [...this.props.classData].map(obj => {return {text: obj.name, value: obj._id}; });
+	    	console.log(acData)
 	    	this.setState({classData: acData});
 	    }
 	    searchClassNameById(id){
 	        let classData = this.state.classData;
 	        for(let i = 0; i < classData.length; i++){
-	            if(classData[i].value == id){
+	            if(classData[i].value == id)
 	                return classData[i].text;
+	        }
+	    }
+	    searchStudentNameById(id){
+	    	let studentsData = this.props.studentsData;
+	    	for(let i = 0; i < studentsData.length; i++){
+	    		if(studentsData[i]._id == id)
+	    			return studentsData[i].name;
+	    	}
+	    }
+	    getClassById(id){
+	        let classData = this.props.classData;
+	        for(let i = 0; i < classData.length; i++){
+	            if(classData[i]._id == id){
+	                return classData[i];
 	            }
 	        }
 	    }
 	    onClassChange(chosenRequest, index){
-	    	console.log(chosenRequest)
 	    	let nextState = {
 	    		currObj: this.state.currObj
 	    	};
+	    	let cls = this.getClassById(chosenRequest.value);
+
+	    	for(let i = 0; i < cls.students.length; i++){
+	    		nextState.currObj.accomplishments.push({_id: cls.students[i], accomplishments: 0, startTime: '', endTime: ''});
+	    	}
+	    	console.log(nextState.currObj.accomplishments)
 	    	nextState.currObj.class = chosenRequest.value;
 	    	this.setState(nextState);
 	    }
+	    onInputChange(searchText){
+	    	let nextState = {
+	    		currObj: this.state.currObj
+	    	};
+	    	console.log(searchText)
+	    	nextState.currObj.className = searchText;
+	    	this.setState(nextState)
+	    }
+
 	    handleDialogDataChange(e){
 	        let nextState = {
 	            currObj: this.state.currObj
@@ -141,19 +180,34 @@ var container = (Present) =>{
 
 	    handlePost(contents){
 	    	return this.props.lecturePostRequest(contents).then(() =>{
-	    		console.log('lecture status: ' + this.props.lecturePostStatus.status);
-	    		this.closeEditMode();
+	    		if(this.props.lecturePostStatus.status === 'SUCCESS'){
+                    Materialize.toast('강의가 생성 되었습니다!', 2000);
+	    			this.closeEditMode();
+	    		}
+	    		else{
+                    return throwError(false, '강의', this.props.lecturePostStatus.error, '');
+	    		}	    		
 	    	});
 	    }
 	    handleEdit(index, contents){
 	    	return this.props.lectureEditRequest(index, contents).then(()=>{
-	    		console.log('lecture edit status: ' + this.props.lectureEditStatus.status);
-	    		this.closeEditMode();
+	    		if(this.props.lectureEditStatus.status === 'SUCCESS'){
+                    Materialize.toast('강의가 수정 되었습니다!', 2000);
+	    			this.closeEditMode();
+	    		}
+	    		else{
+                    return throwError(false, '강의', this.props.lectureEditStatus.error, '');
+	    		}	    		
 	    	})
 	    }
 	    handleRemove(id, index){
 	    	return this.props.lectureRemoveRequest(id, index).then(()=>{
-	    		console.log('lecture remove status: ' + this.props.lectureRemoveStatus.status);
+	    		if(this.props.lectureRemoveStatus.status === 'SUCCESS'){
+                    Materialize.toast('강의가 삭제 되었습니다!', 2000);
+	    		}
+	    		else{
+                    return throwError(false, '강의', this.props.lectureRemoveStatus.error, '');
+	    		}
 	    	})
 	    }
 		handleRowClick(rowNumber, columnId){

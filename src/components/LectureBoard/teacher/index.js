@@ -15,7 +15,9 @@ let Present = ({ props, state, style, functions }) => {
 		 openEditMode,
 		 closeEditMode,
          searchClassNameById,
-		 onClassChange,
+         searchStudentNameById,
+    		 onClassChange,
+         onInputChange,
          handleDialogDataChange,
          handlePost,
          handleEdit,
@@ -48,9 +50,10 @@ let Present = ({ props, state, style, functions }) => {
                 <a onClick={remove_active ? removeLectures : null}>
                     <FontAwesome className={'remove-button right '+ getRemoveActive(false)} name="trash-o" />
                 </a>
-                <a onClick={openDialog.bind(undefined, true, true)}>
+                <a onClick={remove_active ? null : openDialog.bind(undefined, true, true)}>
                     <FontAwesome className={'plus-button right '+ getRemoveActive(true)} name="plus" />
                 </a>
+
             </div>
         </div>
     )
@@ -59,17 +62,18 @@ let Present = ({ props, state, style, functions }) => {
             { boardHeader }
             <div className="Board-contents row">
                 <div className="col m12">
-                	<LectureTable lectureData={lectureData} classData={classData} clicked={clicked}
+                	<LectureTable lectureData={lectureData} clicked={clicked}
                                   handleDialogOpen={openDialog} searchClassNameById={searchClassNameById}
-                                  handleRowClick={handleRowClick} handleRemove={handleRemove}/>
+                                  handleRowClick={handleRowClick}
+                                  />
                 </div>
             </div>
             <LectureDialog open={dialogOpen} editMode={dialogEditMode} newOne={newOne} 
                            currObj={currObj} classData={classData} editlec={editlec}
             			   handleOpen={openDialog} handleClose={closeDialog} 
             			   openEditMode={openEditMode} closeEditMode={closeEditMode} 
-                           searchClassNameById={searchClassNameById}
-            			   onClassChange={onClassChange} handleChange={handleDialogDataChange}
+                           searchClassNameById={searchClassNameById} searchStudentNameById={searchStudentNameById}
+            			   onClassChange={onClassChange} onInputChange={onInputChange} handleChange={handleDialogDataChange}
                            handlePost={handlePost} handleEdit={handleEdit}/>
         </div>
     )

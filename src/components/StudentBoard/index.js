@@ -3,8 +3,12 @@ import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import FontAwesome from 'react-fontawesome';
 
+import TextField from 'material-ui/TextField';
+
+import BoardHeader from '../commons/BoardHeader';
 import StudentDialog from './StudentDialog';
 import StudentTable from './StudentTable';
+
 class StudentBoard extends React.Component{
 	constructor(props){
 		super(props);
@@ -21,8 +25,12 @@ class StudentBoard extends React.Component{
                 check_password: ''
             },
             clicked: [],
+            filteredClick: [],
             remove_active: false,
-            modal_state: true
+            modal_state: true,
+            searchOpen: false,
+            searchText: '',
+            searchResult: []
         }
         //handle modal open
         this.handleInfoOpen = this.handleInfoOpen.bind(this);
@@ -35,10 +43,12 @@ class StudentBoard extends React.Component{
         this.handleRemove = this.handleRemove.bind(this);
         //handle table rows
         this.handleRowClick = this.handleRowClick.bind(this);
+        this.handleFilteredRowClick = this.handleFilteredRowClick.bind(this);
         //handle button active
         this.handleActive = this.handleActive.bind(this);
         this.searchClassNameById = this.searchClassNameById.bind(this);
-
+        this.blurSearchInput = this.blurSearchInput.bind(this);
+        this.onSearchEngineChange = this.onSearchEngineChange.bind(this);
 	}
 
     handleInfoOpen(e){
@@ -83,48 +93,71 @@ class StudentBoard extends React.Component{
         })
     }
     handleRemove(){
-        if(this.state.remove_active){
-            let clicked = [...this.state.clicked];
-            let deleting_stds = [];
-            let editting_classes = {};
-            for (let i = 0; i < clicked.length; i++){
-                let stdidx = clicked[i];
-                let std_id = this.props.studentsData[stdidx]._id;
-                let std_class = this.props.studentsData[stdidx].class;
-                if(std_class != ''){
-                    if(editting_classes[std_class] == undefined){
-                        editting_classes[std_class] = [];
-                    }
-                    editting_classes[std_class].push(std_id);
+        let clicked = [...this.state.clicked];
+        let deleting_stds = [];
+        let editting_classes = {};
+        for (let i = 0; i < clicked.length; i++){
+            let stdidx = clicked[i];
+            let std_id = this.props.studentsData[stdidx]._id;
+            let std_class = this.props.studentsData[stdidx].class;
+            if(std_class != ''){
+                if(editting_classes[std_class] == undefined){
+                    editting_classes[std_class] = [];
                 }
-                deleting_stds.push({index: stdidx, id: std_id});
+                editting_classes[std_class].push(std_id);
             }
-            for(let i = 0; i < deleting_stds.length; i++){
-                this.props.onStudentRemove(deleting_stds[i].index, deleting_stds[i].id).then(()=>{ console.log(this.props.studentsData)});
-                for(let j = 0; j < deleting_stds.length; j++){
-                    deleting_stds[j].index -= 1;
-                }
+            deleting_stds.push({index: stdidx, id: std_id});
+        }
+        for(let i = 0; i < deleting_stds.length; i++){
+            this.props.onStudentRemove(deleting_stds[i].index, deleting_stds[i].id).then(()=>{ console.log(this.props.studentsData)});
+            for(let j = 0; j < deleting_stds.length; j++){
+                deleting_stds[j].index -= 1;
             }
-            for (let key in editting_classes) {
-                let classidx = this.props.classData.findIndex(x => { return x.name == key; });
-                let class_obj = this.props.classData[classidx];
-                for(let i = 0; i < editting_classes[key].length; i++){
-                    let std_list_in_class = class_obj.students;
-                    let std_class_idx = std_list_in_class.indexOf(editting_classes[key][i]);
-                    std_list_in_class.splice(std_class_idx, 1);
-                }
-                this.props.onClassEdit(class_obj._id, classidx, class_obj).then(()=>{ console.log(this.props.classData)});
+        }
+        for (let key in editting_classes) {
+            let classidx = this.props.classData.findIndex(x => { return x.name == key; });
+            let class_obj = this.props.classData[classidx];
+            for(let i = 0; i < editting_classes[key].length; i++){
+                let std_list_in_class = class_obj.students;
+                let std_class_idx = std_list_in_class.indexOf(editting_classes[key][i]);
+                std_list_in_class.splice(std_class_idx, 1);
             }
+            this.props.onClassEdit(class_obj._id, classidx, class_obj).then(()=>{ console.log(this.props.classData)});
         }
     }
     handleRowClick(rowNumber, columnId){
         let clicked = [...this.state.clicked];
         let index = clicked.indexOf(rowNumber);
+
         if(index == -1)
             clicked.push(rowNumber);
         else
             clicked.splice(index, 1);
         this.setState({clicked: clicked, remove_active: clicked.length == 0 ? false : true})
+    }
+    handleFilteredRowClick(rowNumber, columnId){
+        let filteredClick = [...this.state.filteredClick];
+        let index = filteredClick.indexOf(rowNumber);
+        let push = false
+        if(index == -1){
+            filteredClick.push(rowNumber);
+            index = rowNumber;
+            push = true;
+        }
+        else
+            filteredClick.splice(index, 1);
+        let clicked = [...this.state.clicked];
+        let origIndex = this.state.searchResult[index].index;
+
+
+        if(push){
+            clicked.push(origIndex);
+        }
+        else{
+            origIndex = clicked.indexOf(origIndex);
+            clicked.splice(origIndex, 1);
+        }
+        this.setState({clicked: clicked, filteredClick: filteredClick, remove_active: (filteredClick == 0 || clicked == 0)? false : true})
     }
     handleActive(){
         return this.state.remove_active ? '' : 'inactive';
@@ -137,26 +170,53 @@ class StudentBoard extends React.Component{
             }
         }
     }
+    blurSearchInput(){ 
+        if(this.state.searchText == '')
+            this.setState({searchOpen: false, searchText: '', filteredClick: []});
+    }
+    onSearchEngineChange(event, value){
+        let data = [];
+        let filteredClick = [];
+        console.log(value, 'clicked: ', this.state.clicked, '')
+        this.props.studentsData.map((std, i) =>{
+            let push=false;
+            let obj = std;
+            obj.index = i;
+            if(obj.name.includes(value)) push = true;
+            if(obj.username.includes(value)) push = true;
+            if(obj.class.includes(value)) push = true;
+            if(obj.school.includes(value)) push = true;
+            if(push) data.push(obj);
+        })
+        if(value == ''){
+            this.setState({searchOpen: false, searchResult: [], filteredClick: [], searchText: ''});
+        }
+        else{
+            if(this.state.clicked != []){
+                for(let i = 0; i < this.state.clicked.length; i++){
+                    let filteredIndex = data.indexOf(this.props.studentsData[this.state.clicked[i]]);
+                    if(filteredIndex != -1){
+                        filteredClick.push(filteredIndex);
+                    }
+                }
+            }
+            this.setState({searchOpen: true, searchResult: data, filteredClick: filteredClick, searchText: value});
+        }
+    }
     render(){
-        const boardHeader = (
-            <div className="Board-header col m12">
-                <div className="col m4"><h4>학생관리</h4></div>
-                <div className="icons col m8">
-                    <a onClick={this.handleRemove}>
-                        <FontAwesome id="stdBoardRemove" className={'remove-button right ' + this.handleActive()} name="trash-o" />
-                    </a>
-                </div>
-            </div>
-        )
         return(
             <div className="Boards">
-                { boardHeader }
+                <BoardHeader title='학생관리' remove_active={this.state.remove_active} handleRemove={this.handleRemove}
+                            plus_button={false} remove_button={true} search_engine={true}
+                            openDialog={null} handleActive={this.handleActive}
+                            onSearchEngineChange={this.onSearchEngineChange} blurSearchInput={this.blurSearchInput} />
                 <div className="Board-contents row">
                     <div className="col m12">
-                    	<StudentTable studentsData={this.props.studentsData} 
-                    					clicked={this.state.clicked} searchClassNameById={this.searchClassNameById}
+                    	<StudentTable studentsData={this.props.studentsData} filteredData={this.state.searchResult} 
+                                        searchOpen={this.state.searchOpen} searchText={this.state.searchText} 
+                    					clicked={this.state.clicked} filteredClick={this.state.filteredClick} searchClassNameById={this.searchClassNameById} 
                     					handleInfoOpen={this.handleInfoOpen} handlePassOpen={this.handlePassOpen}
-                    					handleRowSelection={this.handleRowSelection} handleRowClick={this.handleRowClick}/>
+                    					handleFilteredRowClick={this.handleFilteredRowClick} handleRowClick={this.handleRowClick}/>
                     </div>
 
                 </div>

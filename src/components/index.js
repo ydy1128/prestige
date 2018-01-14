@@ -3,12 +3,14 @@ import Authentication from './Authentication';
 import ClassBoard from 'components/ClassBoard';
 import StudentBoard from 'components/StudentBoard';
 import HWBoard from 'components/HWBoard';
-import LectureBoard from 'components/LectureBoard';
+import TeacherLectureBoard from 'components/LectureBoard/teacher';
+import StudentLectureBoard from 'components/LectureBoard/student';
 export {
     Header,
     Authentication,
     ClassBoard,
     StudentBoard,
     HWBoard,
-    LectureBoard
+    TeacherLectureBoard,
+    StudentLectureBoard
 };

@@ -24,7 +24,8 @@ export function loginRequest(username, password, url_ref) {
         return axios.post(post_url, { username, password })
         .then((response) => {
             // Success
-            dispatch(loginSuccess(username));
+            console.log(response.data)
+            dispatch(loginSuccess(response.data.id));
         })
         .catch((error) => {
             // Fail
@@ -39,10 +40,10 @@ export function login() {
     };
 }
 
-export function loginSuccess(username) {
+export function loginSuccess(id) {
     return {
         type: AUTH_LOGIN_SUCCESS,
-        username
+        id
     };
 }
 

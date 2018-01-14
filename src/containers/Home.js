@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import FontAwesome from 'react-fontawesome';
+import axios from 'axios';
 
 import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest } from 'actions/makeclass';
 import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest, studentsInfoPwChangeRequest } from 'actions/studentinfo';
@@ -10,10 +11,12 @@ import { lectureBoardRequest } from 'actions/lecture';
 import { ClassBoard,
           StudentBoard,
           HWBoard,
-          LectureBoard
+          TeacherLectureBoard,
+
+          StudentLectureBoard
 } from 'components';
 
-import axios from 'axios';
+import throwError from 'components/commons/throwError';
 
 class Home extends React.Component {
     constructor(props) {
@@ -26,7 +29,7 @@ class Home extends React.Component {
         // }
 
         //Commented for dev purposes
-        console.log(this.getLogin)
+
         this.state = {
             view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_DASHBOARD' : 'STUDENT_DASHBOARD'
         }
@@ -42,15 +45,18 @@ class Home extends React.Component {
         this.setMenuActive = this.setMenuActive.bind(this);
     }
     componentWillMount(){
-        this.props.getStudentsInfoRequest().then(() =>{
-            console.log('studentsData', this.props.studentsData)
-        });
+        if(this.getLoginData().role == 'teacher'){
+            this.props.getStudentsInfoRequest().then(() =>{
+                console.log('studentsData', this.props.studentsData)
+            });
+        }
+            this.props.classBoardRequest().then(() => {
+                console.log('classData', this.props.classData)
+            });
         this.props.lectureBoardRequest().then(() =>{
             console.log('lectureData', this.props.lectureData)
         });
-        this.props.classBoardRequest().then(() => {
-            console.log('classData', this.props.classData)
-        });
+
     }
     componentDidMount(){
 
@@ -73,32 +79,14 @@ class Home extends React.Component {
     	loginData.role = ref;
     	document.cookie='key=' + btoa(JSON.stringify(loginData));
     }
+
     handleStudentEdit(stdobj, index, silent){
-        console.log(stdobj)
         return this.props.studentsInfoEditRequest(stdobj._id, index, stdobj).then(() =>{
-            console.log(this.props.studentEditStatus)
-            if(!silent){
-                if(this.props.studentEditStatus.status === "SUCCESS") {
-                    Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
-                }
-                else {
-                    let $toastContent;
-                    switch(this.props.studentEditStatus.error) {
-                        case 1:
-                            $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
-                            Materialize.toast($toastContent, 2000);
-                            setTimeout(()=> {location.reload(false);}, 2000);
-                            break;
-                        case 2:
-                            $toastContent = $('<span style="color: #FFB4BA">모든 정보를 채워주세요.</span>');
-                            Materialize.toast($toastContent, 2000);
-                            break;
-                        default:
-                            $toastContent = $('<span style="color: #FFB4BA">서버 에러 발생. <br /> 관리자에게 문의하세요.</span>');
-                            Materialize.toast($toastContent, 2000);
-                            break;
-                    }
-                }
+            if(this.props.studentEditStatus.status === "SUCCESS") {
+                if(silent) { Materialize.toast('학생 정보가 수정 되었습니다!', 2000); return true; }
+            }
+            else {
+                return throwError(silent, '학생', this.props.classEditStatus.error, '');
             }
         })
     }
@@ -106,20 +94,9 @@ class Home extends React.Component {
         return this.props.studentsInfoPwChangeRequest(id, pw, check_pw).then(() => {
             if(this.props.studentPwChangeStatus.status==="SUCCESS") {
                 Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
+                return true;
             } else {
-                let errorMessage = [
-                    '잘못된 접근입니다.',
-                    '세션이 만료되었습니다. <br /> 다시 로그인 하세요.',
-                    '학생이 존재하지 않습니다.',
-                    '권한이 없습니다.'
-                ];
-                 // NOTIFY ERROR
-                let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.studentPwChangeStatus.error - 1] + '</span>');
-                Materialize.toast($toastContent, 2000);
-                // IF NOT LOGGED IN, REFRESH THE PAGE
-                if(this.props.studentPwChangeStatus.error === 2) {
-                    setTimeout(()=> {location.reload(false)}, 2000);
-                }
+                return throwError(false, '학생', this.props.classEditStatus.error, '');
             }
         });
     }
@@ -128,76 +105,32 @@ class Home extends React.Component {
             if(!silent){
                 if(this.props.studentRemoveStatus.status==="SUCCESS") {
                     Materialize.toast('학생 정보가 삭제 되었습니다!', 2000);
+                    return true;
                 } else {
-                    let errorMessage = [
-                        '잘못된 접근입니다.',
-                        '세션이 만료되었습니다. <br /> 다시 로그인 하세요.',
-                        '학생이 존재하지 않습니다.',
-                        '권한이 없습니다.'
-                    ];
-                     // NOTIFY ERROR
-                    let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.studentRemoveStatus.error - 1] + '</span>');
-                    Materialize.toast($toastContent, 2000);
-                    // IF NOT LOGGED IN, REFRESH THE PAGE
-                    if(this.props.studentRemoveStatus.error === 2) {
-                        setTimeout(()=> {location.reload(false)}, 2000);
-                    }
+                    return throwError(false, '학생', this.props.classRemoveStatus.error, '');
                 }
             }
         });
-
     }
     handleClassPost(contents){
-        return this.props.classPostRequest(contents).then(
-            () => {
-                console.log(this.props.classPostStatus.status)
-                if(this.props.classPostStatus.status === "SUCCESS") {
-                    Materialize.toast('수업이 개설 되었습니다!', 2000);
-                }
-                else {
-                    let $toastContent;
-                    switch(this.props.classPostStatus.error) {
-                        case 1:
-                            $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
-                            Materialize.toast($toastContent, 2000);
-                            setTimeout(()=> {location.reload(false);}, 2000);
-                            break;
-                        case 2:
-                            $toastContent = $('<span style="color: #FFB4BA">모든 정보를 채워주세요.</span>');
-                            Materialize.toast($toastContent, 2000);
-                            break;
-                        default:
-                            $toastContent = $('<span style="color: #FFB4BA">서버 에러 발생. <br /> 관리자에게 문의하세요.</span>');
-                            Materialize.toast($toastContent, 2000);
-                            break;
-                    }
-
-                }
+        return this.props.classPostRequest(contents).then(() => {
+            if(this.props.classPostStatus.status === "SUCCESS") {
+                Materialize.toast('수업이 개설 되었습니다!', 2000);
+                return true;
             }
-        );
+            else {
+                return throwError(false, '수업', this.props.classPostStatus.error, '');
+            }
+        });
     }
     handleClassEdit(id, index, contents){
-        return this.props.classEditRequest(id, index, contents).then(
-            () => {
+        return this.props.classEditRequest(id, index, contents).then(() => {
                 if(this.props.classEditStatus.status==="SUCCESS") {
                     Materialize.toast('수업 정보가 수정 되었습니다.', 2000);
+                    return true;
                 }
                 else {
-                    let errorMessage = [
-                        '',
-                        '모든 정보를 채워주세요.',
-                        '세션이 만료 되었습니다. <br />로그인 하세요.',
-                        '수업이 더이상 존재하지 않습니다.',
-                        '권한이 없습니다.'
-                    ];
-                    let error = this.props.classEditStatus.error;
-                    // NOTIFY ERROR
-                    let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[error - 1] + '</span>');
-                    Materialize.toast($toastContent, 2000);
-                    // IF NOT LOGGED IN, REFRESH THE PAGE AFTER 2 SECONDS
-                    if(error === 3) {
-                        setTimeout(()=> {location.reload(false)}, 2000);
-                    }
+                    return throwError(false, '수업', this.props.classEditStatus.error, '');
                 }
             }
         );
@@ -206,26 +139,16 @@ class Home extends React.Component {
         this.props.classRemoveRequest(id, index).then(() => {
             if(this.props.classRemoveStatus.status==="SUCCESS") {
                 Materialize.toast('수업이 삭제 되었습니다!', 2000);
+                return true;
             } else {
-                let errorMessage = [
-                    '잘못된 접근입니다.',
-                    '세션이 만료되었습니다. <br /> 다시 로그인 하세요.',
-                    '수업이 존재하지 않습니다.',
-                    '권한이 없습니다.'
-                ];
-                 // NOTIFY ERROR
-                let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.classRemoveStatus.error - 1] + '</span>');
-                Materialize.toast($toastContent, 2000);
-                // IF NOT LOGGED IN, REFRESH THE PAGE
-                if(this.props.classRemoveStatus.error === 2) {
-                    setTimeout(()=> {location.reload(false)}, 2000);
-                }
+                return throwError(false, '수업', this.props.classRemoveStatus.error, '');
             }
         });
     }
     handleMenuClick(e){
+        console.log(e.target.parentNode.name)
         this.setState({
-            view_type: e.target.name
+            view_type: e.target.parentNode.name
         })
     }
     loadCsvClassData(){
@@ -258,14 +181,16 @@ class Home extends React.Component {
                                 onStudentEdit={this.handleStudentEdit}
                                 />);
             case 'TEACHER_LECTUREBOARD':
-                return (<LectureBoard classData={this.props.classData}
+                return (<TeacherLectureBoard classData={this.props.classData}
+                                studentsData={this.props.studentsData}
                                 lectureData={this.props.lectureData} />);
             case 'TEACHER_HWBOARD':
                 return (<HWBoard />);
             case 'STUDENT_DASHBOARD':
                 return (<div>DASHBOARD</div>);
             case 'STUDENT_LECTUREBOARD':
-                return (<div>LECTUREBOARD</div>);
+                return (<StudentLectureBoard classData={this.props.classData}
+                                lectureData={this.props.lectureData} />);
             case 'STUDENT_HWBOARD':
                 return (<div>HWBOARD</div>);
             default:
@@ -309,18 +234,18 @@ class Home extends React.Component {
     	);
     	const teacherMenu = (
 			<ul className="">
-				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_DASHBOARD')}    name="TEACHER_DASHBOARD"    onClick={this.handleMenuClick}>대시보드</a></li>
-                <li><a className={'waves-effect '+this.setMenuActive('TEACHER_STUDENTBOARD')} name="TEACHER_STUDENTBOARD" onClick={this.handleMenuClick}>학생관리</a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_CLASSBOARD')}   name="TEACHER_CLASSBOARD"   onClick={this.handleMenuClick}>수업관리</a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_LECTUREBOARD')} name="TEACHER_LECTUREBOARD" onClick={this.handleMenuClick}>강의관리</a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_HWBOARD')}      name="TEACHER_HWBOARD"      onClick={this.handleMenuClick}>숙제관리</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_DASHBOARD')}    name="TEACHER_DASHBOARD"    ><FontAwesome name="dashboard"  onClick={this.handleMenuClick}/></a></li>
+                <li><a className={'waves-effect '+this.setMenuActive('TEACHER_STUDENTBOARD')} name="TEACHER_STUDENTBOARD" ><FontAwesome name="street-view" onClick={this.handleMenuClick} /></a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_CLASSBOARD')}   name="TEACHER_CLASSBOARD"   ><FontAwesome name="university"  onClick={this.handleMenuClick}/></a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_LECTUREBOARD')} name="TEACHER_LECTUREBOARD" ><FontAwesome name="tv" onClick={this.handleMenuClick} /></a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_HWBOARD')}      name="TEACHER_HWBOARD"      ><FontAwesome name="file-o" onClick={this.handleMenuClick} /></a></li>
 			</ul>
     	)
     	const studentMenu = (
 			<ul className="">
-				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_DASHBOARD')}    name="STUDENT_DASHBOARD"     onClick={this.handleMenuClick}>대시보드</a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_LECTUREBOARD')} name="STUDENT_LECTUREBOARD"  onClick={this.handleMenuClick}>강의게시판</a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_HWBOARD')}      name="STUDENT_HWBOARD"       onClick={this.handleMenuClick}>숙제게시판</a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_DASHBOARD')}    name="STUDENT_DASHBOARD"    ><FontAwesome name="dashboard"  onClick={this.handleMenuClick}/></a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_LECTUREBOARD')} name="STUDENT_LECTUREBOARD" ><FontAwesome name="tv" onClick={this.handleMenuClick} /></a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_HWBOARD')}      name="STUDENT_HWBOARD"      ><FontAwesome name="file-o" onClick={this.handleMenuClick} /></a></li>
 			</ul>
     	)
     	const sideMenu = (

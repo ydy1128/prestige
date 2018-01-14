@@ -64,7 +64,7 @@ export function classPostRequest(contents) {
             console.log(response.data.data)
             dispatch(classPostSuccess(response.data.data));
         }).catch((error) => {
-            dispatch(classPostFailure(error.response.data.code));
+            dispatch(classPostFailure(error.response.data));
         });
     };
 }
