@@ -1,8 +1,4 @@
-$point-color: #86272d;
-$active-color: #f8c709;
-$button-color: #839b44;
-$back-color: #E6DDDD;
-$deem-color: #939393;
+@import './vars.scss';
 
 *{
 	box-sizing: border-box;

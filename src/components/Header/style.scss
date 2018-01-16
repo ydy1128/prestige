@@ -1,0 +1,33 @@
+@import '../../style/vars.scss';
+
+.App-Header{
+	height: 80px;
+	background-color: $point-color;
+	color: white;
+	box-shadow: 0 0 20px #3f3f3f;
+	.App-logo{
+		display: inline-block;
+		font-size: 28px;
+		margin: 17.5px 25px;
+		padding: 0px;
+		height: 45px;
+		width: 170px;
+		text-align: center;
+		border: 4px solid white;
+		border-radius: 8px;
+		color: white;
+	}
+	.header-buttons{
+		font-size: 40px;
+		height: 40px;
+		margin: 20px 20px;
+		cursor: pointer;
+		color: white;
+		&:hover{
+			color: $active-color;
+		}
+	}
+	.dropdown-button{
+		float: right;
+	}
+}

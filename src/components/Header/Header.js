@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router';
-
 import FontAwesome from 'react-fontawesome';
+
+import './style.scss';
 
 class Header extends React.Component {
     render() {
