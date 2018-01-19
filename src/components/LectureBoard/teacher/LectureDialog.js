@@ -19,7 +19,6 @@ class LectureDialog extends React.Component{
         super(props);
         this.state = {
             videoPlayer: null,
-            zindex: -999,
         }
         this.updateVideo = this.updateVideo.bind(this);
         this.handlePost = this.handlePost.bind(this);
@@ -27,14 +26,10 @@ class LectureDialog extends React.Component{
     }
     updateVideo(event){
         let time = -1;
-        // this.props.currObj.accomplishments.map((acc, i) =>{
-        //     if(acc._id == this.getLoginData().id)
-        //         time = acc.accomplishments;
-        // })
-        // event.target.playVideo();
-        // if(time > 0)
-        //     event.target.seekTo(time, true);
-        this.setState({videoPlayer: event.target, zindex: 1500});
+        if(this.props.newOne){
+            console.log(newOne)
+        }
+        this.setState({videoPlayer: event.target});
     }
     getVideoId(link){
         let id = link.split('/');
@@ -144,7 +139,7 @@ class LectureDialog extends React.Component{
                 actions={actions}
                 open={this.props.open}
                 onRequestClose={this.props.handleClose}
-                style={{zIndex: this.state.zindex, textAlign: 'center'}}
+                style={{textAlign: 'center'}}
                 autoScrollBodyContent={this.props.editMode? false : true}>
 
                 {this.props.editMode? editDiv : videoDiv}
@@ -177,7 +172,7 @@ let styles = {
     },
     timePickerStyle: {
         cursor: 'default', 
-        width: '50px', 
+        width: '65px', 
         height: '20px', 
         fontSize: '14px'
     }

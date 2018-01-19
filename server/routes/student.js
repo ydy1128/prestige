@@ -104,11 +104,11 @@ router.post('/signin', (req, res) => {
             role: 'student',
             class: account.class
         };
-
+        delete account.password;
         // RETURN SUCCESS
         return res.json({
             success: true,
-            id: account._id,
+            id: account,
         });
     });
 });
