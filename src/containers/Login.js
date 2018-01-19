@@ -18,7 +18,7 @@ class Login extends React.Component {
                     console.log(this.props.userid)
 					let loginData = {
                         isLoggedIn: true,
-                        id: this.props.user._id,
+                        id: this.props.userid,
                         username: username,
                         role: url_ref
                     };
