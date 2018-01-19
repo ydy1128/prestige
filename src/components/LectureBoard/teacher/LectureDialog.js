@@ -26,10 +26,7 @@ class LectureDialog extends React.Component{
     }
     updateVideo(event){
         let time = -1;
-        if(this.props.newOne){
-            console.log(newOne)
-        }
-        this.setState({videoPlayer: event.target});
+        this.setState({videoPlayer: event.target, zindex: 1500});
     }
     getVideoId(link){
         let id = link.split('/');
@@ -89,20 +86,18 @@ class LectureDialog extends React.Component{
         const generate = data =>{
             if(this.state.videoPlayer != null){
                 return data.map((acc, i) => {
-                    // let fraction = acc.accomplishments / this.state.videoPlayer.getDuration() * 100;
-                    // console.log(acc.accomplishments, this.state.videoPlayer.getDuration(), fraction)
                     return(
-                        <div key={'lec-'+acc._id} className="row" style={{padding: '18px'}}>
+                        <div key={'lec-'+acc._id} className="row" style={styles.accList.container}>
                             <div>
                                 <div className="col m3">{this.props.searchStudentNameById(acc._id)}</div>
                                 <div className="col m6">
                                     {acc.startTime == '' ?
                                      '-' :
-                                     (<div className="studyTime" style={{color: 'rgba(0,0,0,0.3)'}}>
-                                        <DatePicker id={'dp'+acc._id} value={new Date(acc.startTime)} style={{display: 'inline-block'}} textFieldStyle={styles.datePickerStyle} disabled={true} />
-                                     <TimePicker id={'tp1'+acc._id} value={new Date(acc.startTime)} style={{display: 'inline-block', marginRight: '5px'}} textFieldStyle={styles.timePickerStyle} disabled={true} />
+                                     (<div className="studyTime" style={styles.accList.studyTime}>
+                                        <DatePicker id={'dp'+acc._id} value={new Date(acc.startTime)} style={styles.accList.datePicker} textFieldStyle={styles.accList.dateInput} disabled={true} />
+                                     <TimePicker id={'tp1'+acc._id} value={new Date(acc.startTime)} style={styles.accList.timePicker1} textFieldStyle={styles.accList.timeInput} disabled={true} />
                                      ~
-                                     <TimePicker id={'tp2'+acc._id} value={new Date(acc.endTime)} style={{display: 'inline-block', marginLeft: '5px'}} textFieldStyle={styles.timePickerStyle} disabled={true} /> </div>)
+                                     <TimePicker id={'tp2'+acc._id} value={new Date(acc.endTime)} style={styles.accList.timePicker2} textFieldStyle={styles.accList.timeInput} disabled={true} /> </div>)
                                     }
                                 </div>
                                 <div className="col m3">{acc.accomplishments + '%'}</div>
@@ -164,18 +159,34 @@ let styles = {
 		fontSize: "18px",
 		fontWeight: "600"
 	},
-    datePickerStyle: {
-        cursor: 'default', 
-        width: '80px', 
-        height: '20px', 
-        fontSize: '14px'
-    },
-    timePickerStyle: {
-        cursor: 'default', 
-        width: '65px', 
-        height: '20px', 
-        fontSize: '14px'
+    accList: {
+        container: {padding: '18px'},
+        studyTime: {color: 'rgba(0,0,0,0.3)'},
+        timePicker1: {
+            display: 'inline-block', 
+            marginRight: '5px'
+        },
+        timePicker2: {
+            display: 'inline-block', 
+            marginLeft: '5px'
+        },
+        dateInput: {
+            cursor: 'default', 
+            width: '80px', 
+            height: '20px', 
+            fontSize: '14px'
+        },
+        datePicker: {
+            display: 'inline-block'
+        },
+        timeInput: {
+            cursor: 'default', 
+            width: '50px', 
+            height: '20px', 
+            fontSize: '14px'
+        }
     }
+
 }
 
 export default LectureDialog;

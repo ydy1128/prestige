@@ -1,4 +1,4 @@
-import Header from './Header';
+import Header from 'components/Header';
 import Authentication from './Authentication';
 import ClassBoard from 'components/ClassBoard';
 import StudentBoard from 'components/StudentBoard';
