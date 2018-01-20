@@ -11,6 +11,8 @@ import HomeworkTable from './HomeworkTable';
 import HomeworkDialog from './HomeworkDialog';
 import DeleteDialog from './DeleteDialog';
 
+import CommentBoard from '../CommentBoard';
+
 var Present = ({ props, state, style, functions }) => {
     let styles = getStyleWith(props) // Do not modify!!
     let { hwData } = props;
@@ -42,6 +44,8 @@ var Present = ({ props, state, style, functions }) => {
     return (
         <div className="Boards" id='homework-section'>
             { boardHeader }
+            <CommentBoard />        
+            {/*
              <div className="Board-contents row">
                 <div className="col m12">
                 <HomeworkTable hwData={hwData}
@@ -50,7 +54,7 @@ var Present = ({ props, state, style, functions }) => {
                     onClickEditHomework={onClickEditHomework}
                     />
                 </div>
-            </div>
+            </div> */}
             <HomeworkDialog key={Math.random()*1000000}
                 hw={selectedHw}
                 selectedHwIndex={selectedHwIndex}

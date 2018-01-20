@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 
 import Dialog from 'material-ui/Dialog';
+import Paper from 'material-ui/Paper';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
@@ -25,23 +26,19 @@ let style = {
     fontSize: '16px',
     // marginTop: '24px',
   },
+  contentContainerStyle: {
+    height: "361px",
+  },
   titleStyle: {
     flex: '0 0 300px',
   },
   editorStyle: {
     position: 'relative',
     width: '100%',
-    height: '300px',
-    cursor: 'text'
+    height: '50%',
+    cursor: 'text',
+    backgroundColor: '#fefefe'
 
-  },
-  editorOverlayStyle: {
-    opacity: 0.2,
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    userSelect: 'none',
-    cursor: 'none',
   }
 };
 
@@ -61,6 +58,7 @@ class HomeworkDialog extends React.Component {
         writtenDate: null,
         modifiedDate: null,
         teacherId: "TODO teacherId",
+        dropzoneActive: false
       },
       files:[],
       editorState: EditorState.createWithContent(ContentState.createFromText(content)),
@@ -75,6 +73,7 @@ class HomeworkDialog extends React.Component {
     this._handleTab = this._handleTab.bind(this);
     this._showUpload = this._showUpload.bind(this);
     this._onDrop = this._onDrop.bind(this);
+    this._onDelete = this._onDelete.bind(this);
   }
 
   render() {
@@ -100,7 +99,6 @@ class HomeworkDialog extends React.Component {
 
 
     let dueDate = contents.dueDate ? new Date(parseInt(contents.dueDate)) : new Date();
-    console.log(new Date(contents.dueDate));
 
     return (
       <div>
@@ -110,50 +108,59 @@ class HomeworkDialog extends React.Component {
           open={dialogOn}
           onRequestClose={this._cancleOnClick}
         >
-          <div id="dialog-head" style={style.dialogHeadStyle}>
-            <TextField id="homework-title"
-              style={style.titleStyle}
-              hintText="Title"
-              floatingLabelText="Title"
-              value={contents.title}
-              onChange={
-                (e) => {
-                  this.setState({
-                    contents: Object.assign({}, contents, {title: e.target.value})
-                  });
+          <div style={style.contentContainerStyle}>
+            <div id="dialog-head" style={style.dialogHeadStyle}>
+              <TextField id="homework-title"
+                style={style.titleStyle}
+                hintText="Title"
+                floatingLabelText="Title"
+                value={contents.title}
+                onChange={
+                  (e) => {
+                    this.setState({
+                      contents: Object.assign({}, contents, {title: e.target.value})
+                    });
+                  }
                 }
-              }
-            />
-            <div style={style.datePickerContainerStyle}>
-              <DatePicker id="due-date"
-                floatingLabelText="Due Date"
-                textFieldStyle={style.datePickerStyle}
-                hintText="Landscape Dialog"
-                mode="landscape"
-                defaultDate={dueDate}
-                onChange={this._dateOnChange}
+              />
+              <div style={style.datePickerContainerStyle}>
+                <DatePicker id="due-date"
+                  floatingLabelText="Due Date"
+                  textFieldStyle={style.datePickerStyle}
+                  hintText="Landscape Dialog"
+                  mode="landscape"
+                  defaultDate={dueDate}
+                  onChange={this._dateOnChange}
+                />
+              </div>
+            </div>
+
+            <div
+              style={style.editorStyle}
+              onClick= {(e) => {
+                this.domEditor.focus()
+              }}
+            >
+              <Editor
+                editorState={this.state.editorState}
+                onChange={this._onChangeTextArea}
+                placeholder="Put your content..."
+                onTab={this._handleTab}
+                ref={ref => this.domEditor = ref}
               />
             </div>
-          </div>
-          <div
-            style={style.editorStyle}
-            onClick= {(e) => {
-              this.domEditor.focus()
-            }}
-          >
-            <Editor
-              editorState={this.state.editorState}
-              onChange={this._onChangeTextArea}
-              placeholder="Put your content..."
-              onTab={this._handleTab}
-              ref={ref => this.domEditor = ref}
-            />
-            <div style={style.editorOverlayStyle}> content </div>
-          </div>
 
-          <div id="accomplishments" > </div>
-          <div id="upload" >
-            {this._showUpload()}
+            <div id="accomplishments" > </div>
+            <div id="upload" style={{height: '100px', display: 'flex', flexDirection: "column"}}>
+              <div id="upload-header" style={{display: 'flex', flex:'0 0 36px', justifyContent:'space-between'}}>
+                <div >Upload File </div>
+                <FlatButton
+                  label="select files"
+                  onClick={(e) => {this.dropzoneRef.onClick(e)}}
+                />
+              </div>
+              {this._showUpload()}
+            </div>
           </div>
         </Dialog>
       </div>
@@ -200,7 +207,6 @@ class HomeworkDialog extends React.Component {
 
     // Fileupload
     let data = new FormData();
-    let i = 1;
     for (let file of this.state.files) {
       data.append('file', file, file.name);
     }
@@ -209,7 +215,7 @@ class HomeworkDialog extends React.Component {
         headers: { 'content-type': 'multipart/form-data' }
     }
 
-    return axios.post('/api/upload', data, config);
+    return axios.post('/api/upload?hwId=' + this.props.hw._id , data, config);
   }
 
   _cancleOnClick(e) {
@@ -273,30 +279,63 @@ class HomeworkDialog extends React.Component {
 
   _showUpload(props) {
     return(
-      <section style={{position: 'relative'}}>
-        <div className="dropzone">
-          <Dropzone ref={(node) => { this.dropzoneRef = node; }}
-            style={{width:"100%", height:"100px"}}
-            onDrop={this._onDrop.bind(this)}
-            >
-            <p>Try dropping some files here, or click to select files to upload.</p>
-          </Dropzone>
-        </div>
-        <aside style={{position: 'absolute', left: 0, top:0}}>
-          <ul>
+      <div className="dropzone" style={{position: "relative", flex: '1'}}>
+        <Dropzone ref={(node) => { this.dropzoneRef = node; }}
+          style={{width:"100%", height:"100%"}}
+          onDrop={this._onDrop.bind(this)}
+          onDragEnter={this._onEnter.bind(this)}
+          onDragLeave={this._onDragLeave.bind(this)}
+          >
+          <div style={{position: 'absolute', left: 0, top:0, width:"100%", height:"100%",overflow: "scroll", backgroundColor: this.state.dropzoneActive ? "#aaaaaa" : "#f1f1f1"}}>
             {
-              this.state.files.map(f => <li key={f.name}>{f.name} - {f.size} bytes</li>)
+              this.state.files.map( (f, idx) => <div key={f.name}>{f.name} - {f.size} bytes <span onClick={this._onDelete(idx)}> x </span> </div>)
             }
-          </ul>
-        </aside>
-      </section>
+          </div>
+        </Dropzone>
+      </div>
     )
   }
 
-  _onDrop(files) {
-    this.setState({
-      files
-    });
+  _onDrop(accepted, rejected) {
+    let files = accepted;
+    // In case, new files has same file Name
+    let newFiles = Object.assign(this.state.files);
+    for (let file of files) {
+        let hasSameName = false;
+        this.state.files.map((stateFile, index) => {
+            if(stateFile.name == file.name) {
+                newFiles[index] = file;
+                hasSameName = true;
+            }
+        });
+        if(!hasSameName){
+            newFiles.push(file);
+        }
+    }
+    this.setState({ files: newFiles, dropzoneActive: false });
+  }
+
+  _onEnter(e) {
+    console.log(this.state.dropzoneActive)    
+      this.setState({
+          dropzoneActive: true
+      });
+  }
+
+  _onDragLeave(e) {
+      console.log(this.state.dropzoneActive)        
+      this.setState({
+          dropzoneActive: false
+      });
+  }
+
+  _onDelete(index) {
+    return (e) => {
+      e.stopPropagation()
+      let files = this.state.files;
+      let newFiles = [...files.slice(0,index), ...files.slice(index+1, files.length)]
+      this.setState({files:newFiles}) 
+    }
   }
 
 }

@@ -28,6 +28,9 @@ const style = {
       fontSize: '18px',
   },
   row: {
+    button: {
+      width: "66px",
+    },
     title: {
       width: "50%",
     },
@@ -82,7 +85,7 @@ export default class TableExampleComplex extends Component {
               enableSelectAll={this.state.enableSelectAll}
             >
               <TableRow>
-                <TableHeaderColumn ></TableHeaderColumn>
+                <TableHeaderColumn style={style.row.button}></TableHeaderColumn>
                 <TableHeaderColumn style={style.row.title}>제목</TableHeaderColumn>
                 <TableHeaderColumn style={style.row.date}>제출기한</TableHeaderColumn>
                 <TableHeaderColumn style={style.row.date}>작성일자</TableHeaderColumn>
