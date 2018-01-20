@@ -29,7 +29,7 @@ class LectureTable extends React.Component{
         const tableBody = data => {
             return data.map((lecture, i) => {
                 return(
-                    <TableRow key={lecture._id}>
+                    <TableRow key={lecture._id + i}>
                         <TableRowColumn>{lecture.name}</TableRowColumn>
                         <TableRowColumn>{this.props.searchClassNameById(lecture.class)}</TableRowColumn>
                         <TableRowColumn></TableRowColumn>

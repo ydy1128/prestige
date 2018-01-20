@@ -68,7 +68,7 @@ router.post('/signin', (req, res) => {
         // RETURN SUCCESS
         return res.json({
             success: true,
-            id: account._id,
+            id: account,
         });
     });
 });

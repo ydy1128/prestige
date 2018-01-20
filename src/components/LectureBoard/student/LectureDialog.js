@@ -69,7 +69,7 @@ class LectureDialog extends React.Component{
         this.props.onAccChange(this.getLoginData().id, time);
 
         this.props.lectureData.map((lec, i) =>{
-            if(lec._id = this.props.currObj._id)
+            if(lec._id == this.props.currObj._id)
                 index = i;
         })
         console.log(index, this.props.currObj)
