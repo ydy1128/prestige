@@ -8,8 +8,12 @@ import {
 	Image,
 	TouchableHighlight
 } from 'react-native';
+import navOptions from './navigator';
+
 
 class Register extends Component<{}> {
+  static navigationOptions = navOptions(undefined, (<View></View>));
+
 	render(){
 		const { navigate } = this.props.navigation;
 		return(

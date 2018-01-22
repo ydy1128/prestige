@@ -11,6 +11,7 @@ import {
     LECTURE_REMOVE,
     LECTURE_REMOVE_SUCCESS,
     LECTURE_REMOVE_FAILURE,
+    LECTURE_PASS,
 } from './ActionTypes';
 import Toast from 'react-native-simple-toast';
 
@@ -64,7 +65,6 @@ export function lectureBoardRequest() {
         .then((response) => {
             dispatch(lectureBoardSuccess(response.data.lectures));
         }).catch((error) => {
-            Toast.show(''+error);
             if(error.response == undefined) console.error(error);
             dispatch(lectureBoardFailure());
         });
@@ -88,6 +88,13 @@ export function lectureBoardFailure() {
     return {
         type: LECTURE_BOARD_FAILURE
     };
+}
+
+export function passLecture(lecture){
+    return {
+        type: LECTURE_PASS,
+        lecture
+    }
 }
 
 /* LECTURE EDIT */

@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import Home from './src/components/Home';
 import Register from './src/components/Register';
 import LectureList from './src/components/LectureList';
+import Lecture from './src/components/Lecture';
 
 import reducers from './reducers'
 import thunk from 'redux-thunk';
@@ -15,7 +16,7 @@ const Navigation = StackNavigator({
   Home: { screen: Home },
   Register: { screen: Register },
   LectureList: { screen: LectureList},
-
+  Lecture: { screen: Lecture},
 })
 
 const store = createStore(reducers, applyMiddleware(thunk));

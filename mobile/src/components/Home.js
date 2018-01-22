@@ -6,19 +6,22 @@ import {
 	TextInput,
 	View,
 	Image,
-	TouchableHighlight
+	TouchableHighlight,
+  Linking
 } from 'react-native';
 import Icon from '../../node_modules/react-native-vector-icons/dist/FontAwesome';
 import { connect } from 'react-redux';
 import Toast from 'react-native-simple-toast';
 
 import { loginRequest } from '../../actions/authentication';
-
+import navOptions from './navigator';
 class Home extends Component<{}> {
     constructor(props) {
       super(props);
   		this.state = {
   			loggedIn: false,
+        facebookurl: 'https://www.facebook.com/prestige.english',
+        cafeurl: 'http://cafe.naver.com/prestigeenglish',
   			username: 'test1',
   			password: 'test1',
         loginData: {
@@ -27,8 +30,10 @@ class Home extends Component<{}> {
           role: '',
         }
   		}
-		this.onLogin = this.onLogin.bind(this);
+    this.onLogin = this.onLogin.bind(this);
+    this.onOpenUrl = this.onOpenUrl.bind(this);
 	}
+  static navigationOptions = navOptions(undefined, undefined);
 	onLogin(){
 		this.props.loginRequest(this.state.username, this.state.password).then(()=>{
 			if(this.props.status === "SUCCESS"){
@@ -49,6 +54,26 @@ class Home extends Component<{}> {
       }
 		})
 	}
+  onOpenUrl(url_type){
+    let url = this.state[url_type+'url'];
+    Linking.canOpenURL(url).then(supported => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        console.log("Don't know how to open URI: " + url);
+      }
+    });
+  }
+  onOpenTel(){
+    
+    Linking.canOpenURL('tel:0629558505').then(supported => {
+      if (supported) {
+        Linking.openURL('tel:0629558505');
+      } else {
+        console.log("Don't know how to open URI: " + 'tel:0629558505');
+      }
+    });
+  }
 	render(){
 		const { navigate } = this.props.navigation;
 		const beforeLoginView = (
@@ -124,9 +149,18 @@ class Home extends Component<{}> {
         </View>
         <View style={styles.footer}>
           <View style={styles.footerContainer}>
-            <View style={styles.footerButtons}><Icon name="facebook-square" size={45} color="#FFFFFF" /></View>
-            <View style={styles.footerButtons}><Icon name="coffee" size={45} color="#FFFFFF" /></View>
-            <View style={styles.footerButtons}><Icon name="phone" size={45} color="#FFFFFF" /></View>
+            <View style={styles.footerButtons}>
+              <Icon name="facebook-square" size={45} color="#FFFFFF" 
+                onPress={() => this.onOpenUrl('facebook')}/>
+            </View>
+            <View style={styles.footerButtons}>
+              <Icon name="coffee" size={45} color="#FFFFFF" 
+                onPress={() => this.onOpenUrl('cafe')}/>
+            </View>
+            <View style={styles.footerButtons}>
+              <Icon name="phone" size={45} color="#FFFFFF" 
+                onPress={() => this.onOpenTel()}/>
+            </View>
           </View>
         </View>
       </View>

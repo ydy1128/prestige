@@ -68,6 +68,8 @@ export const LECTURE_EDIT_FAILURE = "LECTURE_EDIT_FAILURE";
 export const LECTURE_REMOVE = "LECTURE_REMOVE";
 export const LECTURE_REMOVE_SUCCESS = "LECTURE_REMOVE_SUCCESS";
 export const LECTURE_REMOVE_FAILURE = "LECTURE_REMOVE_FAILURE";
+
+export const LECTURE_PASS = "LECTURE_PASS";
 //===============HOMEWORKINFO===============
 /* Homework Board*/
 export const HOMEWORK_BOARD = "HOMEWORK_BOARD";

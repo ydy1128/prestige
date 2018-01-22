@@ -1,5 +1,6 @@
 import * as types from '../actions/ActionTypes';
 import update from 'react-addons-update';
+import Toast from 'react-native-simple-toast';
 
 const initialState = {
     board: {
@@ -17,6 +18,9 @@ const initialState = {
     remove: {
         status: 'INIT',
         error: -1
+    },
+    pass: {
+        data: {}
     }
 }
 
@@ -115,6 +119,13 @@ export default function lecture(state, action) {
                     error: { $set: action.error }
                 }
             });
+        case types.LECTURE_PASS:
+            Toast.show('ac: '+action.lecture.link);
+            return update(state, {
+                pass: { 
+                    data: {$set: action.lecture }
+                }
+            })
         default:
             return state;
     }
