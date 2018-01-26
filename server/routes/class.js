@@ -52,7 +52,7 @@ router.post('/', (req, res) => {
 
     let cls = new Class({
     	name: req.body.contents.name,
-    	teacher: req.session.loginInfo._id,
+    	teacher: req.session.loginInfo.user._id,
     	students: [],
         startTime: req.body.contents.startTime,
         endTime: req.body.contents.endTime,
@@ -86,7 +86,7 @@ router.put('/:id', (req, res) => {
         if(cls == undefined) return throwerror(res, 409);
 
         // If exists, check teacher
-        if(cls.teacher != req.session.loginInfo._id)
+        if(cls.teacher != req.session.loginInfo.user._id)
             return throwerror(res, 401, 'Unauthorized user.');
 
         // Modify class contents
@@ -121,7 +121,7 @@ router.delete('/:id', (req, res) => {
         if(err) return throwerror(res, 409, 'DB error.');
         if(!cls) return throwerror(res, 409);
         //check if teacher is valid
-        if(cls.teacher != req.session.loginInfo._id)
+        if(cls.teacher != req.session.loginInfo.user._id)
             return throwerror(res, 401, 'Unauthorized user.');
 
         // Remove class

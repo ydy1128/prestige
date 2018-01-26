@@ -98,17 +98,16 @@ router.post('/signin', (req, res) => {
 
         // ALTER SESSION
         let session = req.session;
+        account.password = '';
         session.loginInfo = {
-            _id: account._id,
-            username: account.username,
             role: 'student',
-            class: account.class
+            user: account,
         };
-        delete account.password;
+        
         // RETURN SUCCESS
         return res.json({
             success: true,
-            id: account,
+            id: session,
         });
     });
 });

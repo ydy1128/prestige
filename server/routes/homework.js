@@ -25,7 +25,7 @@ const createHomework = (req, res) => {
     let newhwInfo = Object.assign({}, hwInfo, {
         accomplishments: [],
         modifiedDate: "",
-        teacherId: req.session.loginInfo._id,
+        teacherId: req.session.loginInfo.user._id,
     });
 
     let hw = new Homework(newhwInfo);
@@ -48,7 +48,7 @@ const readHomework = (req, res) => {
 const updateHomework = (req, res) => {
     let modifiedHwInfo = req.body.contents;
     let hwId = req.params.id;
-    let userId = req.session.loginInfo._id;
+    let userId = req.session.loginInfo.user._id;
     delete modifiedHwInfo._id
 
     // Find Class
@@ -76,7 +76,7 @@ const deleteHomewerk = (req, res) => {
     if(not(loginInfo)) { throwError(res, 401, 'User not logged in.'); }
 
     Homework.findById(hwId, (err, hw) => {
-        let userId = req.session.loginInfo._id;
+        let userId = req.session.loginInfo.user._id;
         if(err) return throwerror(res, 409, 'DB error.');
         if(not(hw)) return throwError(res, 409);
         if(hw.teacherId != userId) return throwError(res, 401, 'Unauthorized user');

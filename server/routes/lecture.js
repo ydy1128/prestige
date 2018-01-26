@@ -21,7 +21,7 @@ const createLecture = (req, res) => {
     let lecture = new Lecture({
         name: lecture_obj.name,
         link: lecture_obj.link,
-        teacher: req.session.loginInfo._id,
+        teacher: req.session.loginInfo.user._id,
         class: lecture_obj.class,
         accomplishments: lecture_obj.accomplishments,
         date: new Date()
@@ -38,13 +38,13 @@ const readLecture = (req, res) =>{
         return throwerror(res, 401, 'User not logged in.');
     let condition = {};
     if(req.session.loginInfo.role == 'teacher'){
-        condition = {teacher: req.session.loginInfo._id};
+        condition = {teacher: req.session.loginInfo.user._id};
     }
     else{
-        if(req.session.loginInfo.class == undefined)
+        if(req.session.loginInfo.user.class == undefined)
             return throwerror(res, 403, 'Student is not assigned to class.');
         else
-            condition = {class: req.session.loginInfo.class};
+            condition = {class: req.session.loginInfo.user.class};
     }
     Lecture.find(condition)
     .exec((err, lectures) => {
@@ -61,9 +61,6 @@ const updateLecture = (id, req, res) =>{
         if(err) return throwerror(res, 409, 'DB error.');
         // IF Class does not exist
         if(lecture == undefined) return throwerror(res, 409);
-        // If exists, check teacher
-        // if(lecture.teacher != req.session.loginInfo._id)
-        //     return throwerror(res, 401, 'Unauthorized user.');
 
         // Modify class contents
         lecture.name = req.body.contents.name;
@@ -95,7 +92,7 @@ const deleteLecture = (id, req, res) =>{
         if(err) return throwerror(res, 409, 'DB error.');
         if(!lecture) return throwerror(res, 409);
         //check if teacher is valid
-        if(lecture.teacher != req.session.loginInfo._id)
+        if(lecture.teacher != req.session.loginInfo.user._id)
             return throwerror(res, 401, 'Unauthorized user.');
         // Remove class
         Lecture.remove({ _id: id }, err => {

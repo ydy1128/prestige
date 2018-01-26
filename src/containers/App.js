@@ -6,6 +6,7 @@ import { getStatusRequest, logoutRequest } from 'actions/authentication';
 class App extends React.Component {
     constructor(props) {
         super(props);
+        this.loginStatus = this.loginStatus.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
     }
     // get cookie by name
@@ -14,12 +15,10 @@ class App extends React.Component {
         var parts = value.split("; " + name + "=");
         if (parts.length == 2) return parts.pop().split(";").shift();
     }
-    componentDidMount() {
-
-
+    loginStatus(){
         // get loginData from cookie
         let loginData = this.getCookie('key');
-
+        console.log(loginData);
         // if loginData is undefined, do nothing
         if(typeof loginData === "undefined") return;
 
@@ -31,13 +30,13 @@ class App extends React.Component {
         let url_ref = loginData.role;
         // page refreshed & has a session in cookie,
         // check whether this cookie is valid or not
-        this.props.getStatusRequest(url_ref).then(
+        return this.props.getStatusRequest(url_ref).then(
             () => {
                 console.log(this.props.status);
                 // if session is not valid
                 if(!this.props.status.valid) {
-                	let current_role = loginData.role;
-                	console.log(current_role)
+                    let current_role = loginData.role;
+                    console.log(current_role)
                     // logout the session
                     loginData = {
                         isLoggedIn: false,
@@ -83,7 +82,9 @@ class App extends React.Component {
         return (
             <div className="App">
                 {isAuth ? undefined : <Header isLoggedIn={this.props.status.isLoggedIn}
-                								onLogout={this.handleLogout}/>}
+                								onLogout={this.handleLogout}
+                                                loginStatus={this.loginStatus}
+                                                userInfo={this.props.status.currentUser} />}
                 { this.props.children }
             </div>
         );

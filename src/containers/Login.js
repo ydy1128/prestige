@@ -15,7 +15,7 @@ class Login extends React.Component {
 			() => {
 				if(this.props.status === "SUCCESS"){
 					// create session data
-                    console.log(this.props.user._id)
+                    console.log(this.props.user)
 					let loginData = {
                         isLoggedIn: true,
                         id: this.props.user._id,

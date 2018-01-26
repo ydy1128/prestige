@@ -40,6 +40,7 @@ class LectureDialog extends React.Component{
     }
     updateVideo(event){
         let time = -1;
+        console.log('update video called')
         this.props.currObj.accomplishments.map((acc, i) =>{
             if(acc._id == this.getLoginData().id)
                 time = acc.accomplishments;
@@ -75,6 +76,9 @@ class LectureDialog extends React.Component{
         console.log(index, this.props.currObj)
         this.props.handleEdit(true, index, this.props.currObj);
     }
+    youTubeError(){
+        console.err('youtube loading error');
+    }
 	render(){
         const actions = [
             <FlatButton
@@ -83,6 +87,7 @@ class LectureDialog extends React.Component{
                 onClick={this.closeModal}
             />
         ];
+        console.log(this.getVideoId(this.props.currObj.link))
 		return (
             <Dialog
                 title={this.props.currObj.name}
@@ -96,7 +101,7 @@ class LectureDialog extends React.Component{
                 <YouTube videoId={this.getVideoId(this.props.currObj.link)} 
                         onReady={this.updateVideo}
                         onPause={this.onPause}
-
+                        onError={this.youTubeError}
                         />
             </Dialog>
 		)
