@@ -21,6 +21,9 @@ class Header extends React.Component {
                 role: '',
                 password: '',
                 classes: [],
+                school: '',
+                level: '',
+                class: '',
             },
             editMode: false,
         }
@@ -59,7 +62,7 @@ class Header extends React.Component {
         });
     }
     handleClose(){
-        this.setState({accountOpen: false});
+        this.setState({accountOpen: false, editMode: false});
     }
     handleClick(){
         if(this.state.editMode){
@@ -85,20 +88,55 @@ class Header extends React.Component {
                 <h5 style={{margin: 0, paddingTop: 10}}>계정정보</h5>
                 <div className="col m12" style={{marginTop: -10}}>
                     <TextField floatingLabelText="아이디" name="username" value={this.state.userInfo.username}
-                        style={{width: 190, cursor: 'default'}}
+                        style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
                         disabled={!this.state.editMode}
-                        className="textfield"
-                        inputStyle={{margin: 0, padding: '20px 0 0 0'}}
+                        inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
                     />
                 </div>
                 <div className="col m12" style={{marginTop: -10}}>
                     <TextField floatingLabelText="이름" name="name" value={this.state.userInfo.name}
-                        style={{width: 190, cursor: 'default'}}
+                        style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
                         disabled={!this.state.editMode}
-                        className="textfield"
-                        inputStyle={{margin: 0, padding: '20px 0 0 0'}}
+                        inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
                     />
                 </div>
+                {this.state.editMode ? 
+                <div className="col m12" style={{marginTop: -10}}>
+                    <TextField floatingLabelText="새 패스워드" name="password" value={this.state.userInfo.password}
+                        type="password"
+                        style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
+                        disabled={!this.state.editMode}
+                        inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                    />
+                </div>
+                : null}
+                {this.state.userInfo.role == 'student' ?
+                <div>
+                    <div className="col m12" style={{marginTop: -10}}>
+                        <TextField floatingLabelText="학교" name="school" value={this.state.userInfo.school}
+                            style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
+                            disabled={!this.state.editMode}
+                            inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                        />
+                    </div>
+                    <div className="col m12" style={{marginTop: -10}}>
+                        <TextField floatingLabelText="학년" name="level" value={this.state.userInfo.level}
+                            style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
+                            disabled={!this.state.editMode}
+                            inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                        />
+                    </div>
+                    {this.state.editMode ? null :
+                    <div className="col m12" style={{marginTop: -10}}>
+                        <TextField floatingLabelText="반" name="class" value={this.state.userInfo.class}
+                            style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
+                            disabled={!this.state.editMode}
+                            inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                        />
+                    </div>
+                    }
+                </div>
+                : null}
                 <div className="col m12" style={{paddingTop: 10, paddingBottom: 20, textAlign: 'right'}}>
                     <RaisedButton label={this.state.editMode? '저장' : '수정'} primary={this.state.editMode} secondary={!this.state.editMode} onClick={this.handleClick}/>
                 </div>
