@@ -11,7 +11,8 @@ import {
     AUTH_GET_STATUS,
     AUTH_GET_STATUS_SUCCESS,
     AUTH_GET_STATUS_FAILURE,
-    AUTH_LOGOUT
+    AUTH_LOGOUT,
+    EXTEND_SESSION
 } from './ActionTypes';
 
 //===============AUTHENTICATION===============
@@ -20,7 +21,6 @@ import {
 export function loginRequest(username, password) {
     return (dispatch) => {
         // inform that Login API is initiating
-        Toast.show('' + username + ' ' + password);
         dispatch(login());
         let post_url = ipaddress + '/api/student/signin'
         // API Request
@@ -105,11 +105,11 @@ export function getStatusRequest(url_ref) {
         // inform Get Status API is starting
         dispatch(getStatus());
 
-        let get_url = '/api/' + url_ref + '/getInfo'
+        let get_url = ipaddress + '/api/student/getInfo'
 
         return axios.get(get_url)
         .then((response) => {
-            dispatch(getStatusSuccess(response.data.info.username));
+            dispatch(getStatusSuccess(response.data.info));
         })
         .catch((error) => {
             dispatch(getStatusFailure());
@@ -152,4 +152,12 @@ export function logout() {
     return {
         type: AUTH_LOGOUT
     };
+}
+
+export function extendSession(sessionData){
+    // Toast.show('SessionData: '+sessionData.name)
+    return{
+        type: EXTEND_SESSION,
+        sessionData
+    }
 }

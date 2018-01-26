@@ -7,13 +7,14 @@ import {
 	View,
 	Image,
 	TouchableHighlight,
-  Linking
+  Linking,
+  AsyncStorage
 } from 'react-native';
 import Icon from '../../node_modules/react-native-vector-icons/dist/FontAwesome';
 import { connect } from 'react-redux';
 import Toast from 'react-native-simple-toast';
 
-import { loginRequest } from '../../actions/authentication';
+import { loginRequest, getStatusRequest, extendSession } from '../../actions/authentication';
 import navOptions from './navigator';
 class Home extends Component<{}> {
     constructor(props) {
@@ -28,32 +29,66 @@ class Home extends Component<{}> {
           id: '',
           username: '',
           role: '',
-        }
+        },
   		}
     this.onLogin = this.onLogin.bind(this);
     this.onOpenUrl = this.onOpenUrl.bind(this);
 	}
   static navigationOptions = navOptions(undefined, undefined);
+  componentWillMount(){
+    //add loading screen
+    AsyncStorage.getItem('loginData').then((token) =>{
+      // Toast.show(token);
+      let loginData = JSON.parse(token);
+      if(loginData != null){
+        this.props.getStatusRequest().then(() =>{
+          // if(!this.props.sessionStatus.valid){
+
+          // }
+          this.props.extendSession(loginData.user);
+          this.setState({loggedIn: true});
+          Toast.show(''+this.props.sessionStatus.currentUser);
+        })
+        .done();
+      }
+      else{
+        Toast.show('login data does not exists');
+      }
+    }).catch((error) =>{
+      Toast.show(''+error);
+    })
+    .done();
+  }
 	onLogin(){
 		this.props.loginRequest(this.state.username, this.state.password).then(()=>{
 			if(this.props.status === "SUCCESS"){
 				this.setState({loggedIn: true});
 				// create session data
-        // **Use AsyncStorage
 				let loginData = {
-            id: this.props.user._id,
-            username: username,
-            role: url_ref
+            user: this.props.user,
+            role: 'student'
         };
-				Toast.show('' + this.props.status + ' ' + this.state.username + ' ' + this.state.password);
-        this.setState({loginData: loginData});
+        let storageData = JSON.stringify(loginData);
+        Toast.show(''+storageData);
+        this.addLoginData(storageData);
 			}
 			else {
 
           return false;
       }
 		})
+    .done();
 	}
+  async addLoginData(storageData){
+    try {
+      await AsyncStorage.setItem('loginData', storageData);
+    } catch (error) {
+      Toast.show('Login Error. AsyncStorage.');
+    }
+  }
+  async getLoginData(){
+    return AsyncStorage.getItem('loginData');
+  }
   onOpenUrl(url_type){
     let url = this.state[url_type+'url'];
     Linking.canOpenURL(url).then(supported => {
@@ -93,7 +128,7 @@ class Home extends Component<{}> {
 						onChangeText={(text) => this.setState({password:text})}
 						underlineColorAndroid='white'
 						/>
-					<TouchableHighlight onPress={this.onLogin} style={styles.buttonLogin} underlayColor='#6b2027'>
+					<TouchableHighlight onPress={() => this.onLogin()} style={styles.buttonLogin} underlayColor='#6b2027'>
 						<Text style={styles.buttonText}>로그인</Text>
 					</TouchableHighlight>
 					<Image
@@ -287,6 +322,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => {
     return {
         status: state.authentication.login.status,
+        sessionStatus: state.authentication.status,
         user: state.authentication.status.currentUser
     };
 };
@@ -295,6 +331,12 @@ const mapDispatchToProps = (dispatch) => {
     return {
         loginRequest: (id, pw) => { 
             return dispatch(loginRequest(id,pw)); 
+        },
+        getStatusRequest: () =>{
+          return dispatch(getStatusRequest());
+        },
+        extendSession: (sessionData) => { 
+            return dispatch(extendSession(sessionData)); 
         }
     };
 };

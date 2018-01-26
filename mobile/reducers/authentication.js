@@ -91,6 +91,13 @@ export default function authentication(state, action) {
                     currentUser: { $set: '' }
                 }
             });
+        case types.EXTEND_SESSION:
+            return update(state, {
+                status: {
+                    isLoggedIn: { $set: true },
+                    currentUser: { $set: action.sessionData }
+                }
+            })
         default:
             return state;
     }
