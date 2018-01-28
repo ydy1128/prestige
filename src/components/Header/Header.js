@@ -1,0 +1,205 @@
+import React from 'react';
+import { Link } from 'react-router';
+import FontAwesome from 'react-fontawesome';
+import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
+import Paper from 'material-ui/Paper';
+import TextField from 'material-ui/TextField';
+import RaisedButton from 'material-ui/RaisedButton';
+
+import { connect } from 'react-redux';
+
+import './style.scss';
+
+class Header extends React.Component {
+    constructor(props){
+        super(props);
+        this.state={
+            accountOpen: false,
+            userInfo: {
+                username: '',
+                name: '',
+                role: '',
+                password: '',
+                classes: [],
+                school: '',
+                level: '',
+                class: '',
+            },
+            editMode: false,
+        }
+        this.handlePopover = this.handlePopover.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+    }
+    componentDidMount(){
+        if(this.props.loginStatus() != undefined)
+            this.props.loginStatus().then(()=>{
+                let userInfo = Object.assign({}, this.props.userInfo.user);
+                userInfo.role = this.props.userInfo.role;
+                console.log(userInfo)
+                this.setState({userInfo: userInfo});
+            })
+    }
+    getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+    getLoginData(){
+        let loginData = this.getCookie('key');
+        if(loginData == undefined)
+            loginData = {};
+        else
+            loginData = JSON.parse(atob(loginData));
+        console.log(loginData)
+        return loginData;
+    }
+    handlePopover(event){
+        event.preventDefault();
+        this.setState({
+            accountOpen: true,
+            anchorEl: event.currentTarget,
+        });
+    }
+    handleClose(){
+        this.setState({accountOpen: false, editMode: false});
+    }
+    handleClick(){
+        if(this.state.editMode){
+            this.setState({editMode: false});
+        }
+        else{
+            this.setState({editMode: true});
+        }
+    }
+    render() {
+        const accountButton = (
+            <a className="account-button">
+                <FontAwesome className='account-logo right header-buttons' name='user-circle' onClick={this.handlePopover} />
+            </a>
+        );
+        const logoutButton = (
+            <a onClick={this.props.onLogout} className="logout-button">
+                <FontAwesome className='logout-logo right header-buttons' name='sign-out' />
+            </a>
+        );
+        const userInfoDiv = (
+            <div className="row" style={{margin: 0, textAlign: 'center', width: 220}}>
+                <h5 style={{margin: 0, paddingTop: 10}}>계정정보</h5>
+                <div className="col m12" style={{marginTop: -10}}>
+                    <TextField floatingLabelText="아이디" name="username" value={this.state.userInfo.username}
+                        style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
+                        disabled={!this.state.editMode}
+                        inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                    />
+                </div>
+                <div className="col m12" style={{marginTop: -10}}>
+                    <TextField floatingLabelText="이름" name="name" value={this.state.userInfo.name}
+                        style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
+                        disabled={!this.state.editMode}
+                        inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                    />
+                </div>
+                {this.state.editMode ? 
+                <div className="col m12" style={{marginTop: -10}}>
+                    <TextField floatingLabelText="새 패스워드" name="password" value={this.state.userInfo.password}
+                        type="password"
+                        style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
+                        disabled={!this.state.editMode}
+                        inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                    />
+                </div>
+                : null}
+                {this.state.userInfo.role == 'student' ?
+                <div>
+                    <div className="col m12" style={{marginTop: -10}}>
+                        <TextField floatingLabelText="학교" name="school" value={this.state.userInfo.school}
+                            style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
+                            disabled={!this.state.editMode}
+                            inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                        />
+                    </div>
+                    <div className="col m12" style={{marginTop: -10}}>
+                        <TextField floatingLabelText="학년" name="level" value={this.state.userInfo.level}
+                            style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
+                            disabled={!this.state.editMode}
+                            inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                        />
+                    </div>
+                    {this.state.editMode ? null :
+                    <div className="col m12" style={{marginTop: -10}}>
+                        <TextField floatingLabelText="반" name="class" value={this.state.userInfo.class}
+                            style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
+                            disabled={!this.state.editMode}
+                            inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                        />
+                    </div>
+                    }
+                </div>
+                : null}
+                <div className="col m12" style={{paddingTop: 10, paddingBottom: 20, textAlign: 'right'}}>
+                    <RaisedButton label={this.state.editMode? '저장' : '수정'} primary={this.state.editMode} secondary={!this.state.editMode} onClick={this.handleClick}/>
+                </div>
+            </div>
+        );
+        return (
+            <div className="App-Header">
+	            <a className="App-logo">PRESTIGE</a>
+                { this.props.isLoggedIn ? logoutButton  : undefined }
+                { this.props.isLoggedIn ? accountButton  : undefined }
+                <Popover
+                    open={this.state.accountOpen}
+                    anchorEl={this.state.anchorEl}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'middle',}}
+                    targetOrigin={{ vertical: 'bottom', horizontal: 'middle',}}
+                    onRequestClose={this.handleClose}
+                    animation={PopoverAnimationVertical}
+                >
+                    
+                    <Paper zDepth={1}>
+                        { userInfoDiv }
+                    </Paper>
+                </Popover>
+            </div>
+        );
+    }
+}
+const styles = {
+    container: {
+        paddingBottom: 20,
+    },
+    labels: {
+        textAlign: 'left',
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#bdbdbd'
+    },
+    entries: {
+        textAlign: 'left',
+        fontSize: 17,
+        fontWeight: 'bold',
+        borderBottom: '1px solid #d3d3d3',
+    }
+}
+
+Header.propTypes = {
+    isLoggedIn: React.PropTypes.bool,
+    onLogout: React.PropTypes.func
+};
+
+Header.defaultProps = {
+    isLoggedIn: false,
+    onLogout: () => { console.error("logout function not defined");}
+};
+
+const mapStateToProps = (state) => {
+    return {
+    };
+};
+const mapDispatchToProps = (dispatch) => {
+    return {
+
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);

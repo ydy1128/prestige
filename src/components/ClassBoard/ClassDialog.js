@@ -37,20 +37,20 @@ class ClassDialog extends React.Component{
                 			floatingLabelStyle={styles.inputLabel} floatingLabelFocusStyle={styles.inputLabelFocus} 
                 			underlineStyle={styles.inputLine} underlineFocusStyle={styles.inputLineFocus}
                 			/>
-                <div className="col m12" style={{paddingTop: '20px', paddingBottom: '20px'}}>
-                	<Checkbox style={{display: 'inline-block', width: '12%'}} onCheck={this.props.handleDataChange}
+                <div className="col m12" style={styles.daySelector.div}>
+                	<Checkbox style={styles.daySelector.checkbox} onCheck={this.props.handleDataChange}
                 			  name="월" label={<h6>월</h6>} checked={this.props.data.days['월']}/>
-                	<Checkbox style={{display: 'inline-block', width: '12%'}} onCheck={this.props.handleDataChange}
+                	<Checkbox style={styles.daySelector.checkbox} onCheck={this.props.handleDataChange}
                 			  name="화" label={<h6>화</h6>} checked={this.props.data.days['화']}/>
-                	<Checkbox style={{display: 'inline-block', width: '12%'}} onCheck={this.props.handleDataChange}
+                	<Checkbox style={styles.daySelector.checkbox} onCheck={this.props.handleDataChange}
                 			  name="수" label={<h6>수</h6>} checked={this.props.data.days['수']}/>
-                	<Checkbox style={{display: 'inline-block', width: '12%'}} onCheck={this.props.handleDataChange}
+                	<Checkbox style={styles.daySelector.checkbox} onCheck={this.props.handleDataChange}
                 			  name="목" label={<h6>목</h6>} checked={this.props.data.days['목']}/>
-                	<Checkbox style={{display: 'inline-block', width: '12%'}} onCheck={this.props.handleDataChange}
+                	<Checkbox style={styles.daySelector.checkbox} onCheck={this.props.handleDataChange}
                 			  name="금" label={<h6>금</h6>} checked={this.props.data.days['금']}/>
-                	<Checkbox style={{display: 'inline-block', width: '12%'}} onCheck={this.props.handleDataChange}
+                	<Checkbox style={styles.daySelector.checkbox} onCheck={this.props.handleDataChange}
                 			  name="토" label={<h6>토</h6>} checked={this.props.data.days['토']}/>
-                	<Checkbox style={{display: 'inline-block', width: '12%'}} onCheck={this.props.handleDataChange}
+                	<Checkbox style={styles.daySelector.checkbox} onCheck={this.props.handleDataChange}
                 			  name="일" label={<h6>일</h6>} checked={this.props.data.days['일']}/>
                 </div>
                 <CustomTimePicker label="시작 시간" labelStyle={styles.inputLabelSmall} name="startTime" onTimeChange={this.props.handleDataChange} value={this.props.data.startTime}/>
@@ -73,7 +73,7 @@ class ClassDialog extends React.Component{
 		const studentMode = (
         		<div className="row Students-list">
                     <div className="col s6">
-                        <Table style={{border: '1px solid #d3d3d3'}} height={'300px'} onCellClick={this.onCellClick.bind(this, 'clickedInAllStudents')} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
+                        <Table style={styles.studentTable} height={'300px'} onCellClick={this.onCellClick.bind(this, 'clickedInAllStudents')} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
                             <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
                                 <TableRow>
                                     <TableHeaderColumn colSpan="3" style={{textAlign: 'center'}}>
@@ -99,7 +99,7 @@ class ClassDialog extends React.Component{
                         </Table>
                     </div>
                     <div className="col s6">
-                        <Table style={{border: '1px solid #d3d3d3'}} height={'300px'} onCellClick={this.onCellClick.bind(this, 'clickedInSelectedStudents')} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
+                        <Table style={styles.studentTable} height={'300px'} onCellClick={this.onCellClick.bind(this, 'clickedInSelectedStudents')} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
                             <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
                                 <TableRow>
                                     <TableHeaderColumn colSpan="3" style={{textAlign: 'center'}}>
@@ -155,6 +155,17 @@ class ClassDialog extends React.Component{
 }
 
 let styles = {
+    daySelector: {
+        div: {
+            paddingTop: '20px', paddingBottom: '20px'
+        }, 
+        checkbox: {
+            display: 'inline-block', width: '12%'
+        }
+    },
+    studentTable: {
+        border: '1px solid #d3d3d3'
+    },
 	inputLine: {
 		borderBottom: "1px solid #bdbdbd"
 	},

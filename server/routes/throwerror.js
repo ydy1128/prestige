@@ -25,6 +25,7 @@ const throwError = (res, code, message) => {
     }
     if (message != undefined) 
     	errorState.message = message;
+    console.error(errorState.message);
     return res.status(code).json(errorState);
 }
 

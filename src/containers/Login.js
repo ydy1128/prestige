@@ -15,10 +15,10 @@ class Login extends React.Component {
 			() => {
 				if(this.props.status === "SUCCESS"){
 					// create session data
-                    console.log(this.props.userid)
+                    console.log(this.props.user)
 					let loginData = {
                         isLoggedIn: true,
-                        id: this.props.userid,
+                        id: this.props.user._id,
                         username: username,
                         role: url_ref
                     };
@@ -50,7 +50,7 @@ class Login extends React.Component {
 const mapStateToProps = (state) => {
     return {
         status: state.authentication.login.status,
-        userid: state.authentication.status.currentUser
+        user: state.authentication.status.currentUser
     };
 };
 

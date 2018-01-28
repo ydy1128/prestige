@@ -12,7 +12,6 @@ import { ClassBoard,
           StudentBoard,
           HWBoard,
           TeacherLectureBoard,
-
           StudentLectureBoard
 } from 'components';
 

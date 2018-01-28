@@ -111,6 +111,7 @@ var container = (Present) =>{
 	    }
 	    handleEdit(silent, index, contents){
 	    	return this.props.lectureEditRequest(index, contents).then(()=>{
+	    		console.log(index);
 	    		if(this.props.lectureEditStatus.status === 'SUCCESS'){
                     if(!silent) { Materialize.toast('강의가 수정 되었습니다!', 2000); }
 	    		}

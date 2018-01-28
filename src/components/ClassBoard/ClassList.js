@@ -38,7 +38,6 @@ class ClassList extends React.Component{
 	}
 
 	render(){
-        const color_stock = ['#e57373', '#7986cb', '#26a69a', '#ffee58', '#8d6e63', '#f48fb1', '#64b5f6', '#66bb6a', '#ffd54f', '#bdbdbd', '#ce93d8', '#81d4fa', '#aed581', '#ffb74d', '#90a4ae']
 
         const gridListBody = data => {
             return data.map((cls, i) => {
@@ -47,11 +46,11 @@ class ClassList extends React.Component{
                         key={cls._id}
                         titlePosition="bottom"
                         titleBackground='rgba(0,0,0,0)'
-                        style={{backgroundColor: 'white'}}
+                        style={styles.grid}
                     >
                         <div style={{padding: '20px', paddingTop: '15px', borderTop: '10px solid ' + color_stock[i % color_stock.length]}}>
                             <div>
-                                <h5 style={{overflowX: 'hidden', overflowY: 'hidden', whiteSpace: 'nowrap'}}>
+                                <h5 style={styles.infoDiv}>
                                     <Checkbox 
                                     	name={cls._id + '-' + i}
                                         label={<h5 style={{margin: '0'}}>{cls.name}</h5>} checked={this.props.selected.includes(i)} onCheck={this.props.handleClick}
@@ -61,7 +60,7 @@ class ClassList extends React.Component{
                                 <p style={{margin: '5px'}}>{cls.days}</p>
                                 <p style={{margin: '5px'}}>{cls.startTime} ~ {cls.endTime}</p>
                             </div>
-                            <div style={{margin: '25px -20px 0 -20px', borderTop: '1px solid #d3d3d3'}} className="row" >
+                            <div style={styles.gridButtonsDiv} className="row" >
                                 <div className="col s6" style={{padding: '0'}} onClick={this.handleData.bind(this, i)}>
                                     <FlatButton label='학생관리' fullWidth={true} onClick={this.props.openStudentMode} labelStyle={{fontSize: '15px', fontFamily: 'HYSUPM'}} style={{height: '54px'}}/>
                                 </div>
@@ -92,6 +91,23 @@ ClassList.propTypes = {
 
 ClassList.defaultProps = {
     data: []
+}
+const color_stock = ['#e57373', '#7986cb', '#26a69a', '#ffee58', '#8d6e63', '#f48fb1', '#64b5f6', '#66bb6a', '#ffd54f', '#bdbdbd', '#ce93d8', '#81d4fa', '#aed581', '#ffb74d', '#90a4ae']
+
+let styles = {
+    grid: {
+        backgroundColor: 'white',
+        border: '1px solid #d3d3d3',
+    },
+    infoDiv: {
+        overflowX: 'hidden', 
+        overflowY: 'hidden', 
+        whiteSpace: 'nowrap'
+    },
+    gridButtonsDiv: {
+        margin: '25px -20px 0 -20px', 
+        borderTop: '1px solid #d3d3d3'
+    }
 }
 
 export default ClassList;

@@ -24,7 +24,7 @@ export function loginRequest(username, password, url_ref) {
         return axios.post(post_url, { username, password })
         .then((response) => {
             // Success
-            console.log(response.data)
+            console.log('login: ', response.data)
             dispatch(loginSuccess(response.data.id));
         })
         .catch((error) => {
@@ -103,7 +103,8 @@ export function getStatusRequest(url_ref) {
 
         return axios.get(get_url)
         .then((response) => {
-            dispatch(getStatusSuccess(response.data.info.username));
+            console.log('getStatus: ', response.data.info)
+            dispatch(getStatusSuccess(response.data.info));
         })
         .catch((error) => {
             dispatch(getStatusFailure());

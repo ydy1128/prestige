@@ -41,7 +41,7 @@ class LectureTable extends React.Component{
                         <TableRowColumn style={styles.tableButtonCol}><FontAwesome onClick={this.props.handleDialogOpen.bind(undefined, false, false, i)} className={'edit-button'} name="pencil" /></TableRowColumn>
                         <TableRowColumn>{lecture.name}</TableRowColumn>
                         <TableRowColumn>{this.props.searchClassNameById(lecture.class)}</TableRowColumn>
-                        <TableRowColumn><CircularProgress style={{verticalAlign: 'middle', marginRight: '10px'}} mode="determinate" value={parseFloat(acc)} size={20} thickness={4} />{acc + '%'}</TableRowColumn>
+                        <TableRowColumn><CircularProgress style={styles.progress} mode="determinate" value={parseFloat(acc)} size={20} thickness={4} />{acc + '%'}</TableRowColumn>
                         <TableRowColumn><DatePicker id={'tp'+lecture._id} value={new Date(lecture.date)} textFieldStyle={styles.datePickerStyle} disabled={true} /></TableRowColumn>
                     </TableRow>
                 );
@@ -85,6 +85,10 @@ let styles = {
         width: '120px', 
         height: '20px', 
         fontSize: '13px'
+    },
+    progress: {
+        verticalAlign: 'middle', 
+        marginRight: '10px'
     }
 };
 export default LectureTable;
