@@ -51,8 +51,6 @@ class HomeworkBoard extends React.Component {
     var xhr = new XMLHttpRequest()
     hw = Object.assign(hw,{files: hw.files.map((fileName) => {
       let path = "uploads/" + hw._id + '/' + fileName;
-      console.log(path);
-      // xhr.responseType = "blob";
       xhr.open("GET", path, false);  // true 면 async
       xhr.send(null)
       return new File([xhr.response], fileName)
@@ -71,7 +69,6 @@ class HomeworkBoard extends React.Component {
         teacherId: "TODO teacherId",
         dropzoneActive: false
       },
-      files:[],
       editorState: EditorState.createWithContent(ContentState.createFromText(content)),
     };
 
@@ -189,13 +186,12 @@ class HomeworkBoard extends React.Component {
   }
 
   _uploadFile() {
-    let files = this.state.files;
+    let files = this.state.contents.files;
     // Fileupload
     let data = new FormData();
     for (let file of files) {
       data.append('file', file, file.name);
     }
-    debugger
 
     const config = {
       headers: { 'content-type': 'multipart/form-data' }
@@ -205,7 +201,6 @@ class HomeworkBoard extends React.Component {
   }
 
   updateHomework() {
-    debugger
     let { mode, contents, index, editorState} = this.state;
     let requestContent = Object.assign({}, contents, {
       content: editorState.getCurrentContent().getPlainText()
@@ -285,7 +280,7 @@ class HomeworkBoard extends React.Component {
           >
           <div style={{position: 'absolute', left: 0, top:0, width:"100%", height:"100%",overflow: "scroll", backgroundColor: this.state.dropzoneActive ? "#aaaaaa" : "#f1f1f1"}}>
             {
-              this.state.files.map( (f, idx) => <div key={f.name}>{f.name} - {f.size} bytes <span onClick={this._onDelete(idx)}> x </span> </div>)
+              this.state.contents.files.map( (f, idx) => <div key={f.name}>{f.name} - {f.size} bytes <span onClick={this._onDelete(idx)}> x </span> </div>)
             }
           </div>
         </Dropzone>
@@ -296,10 +291,10 @@ class HomeworkBoard extends React.Component {
   _onDrop(accepted, rejected) {
     let files = accepted;
     // In case, new files has same file Name
-    let newFiles = Object.assign(this.state.files);
+    let newFiles = Object.assign(this.state.contents.files);
     for (let file of files) {
         let hasSameName = false;
-        this.state.files.map((stateFile, index) => {
+        this.state.contents.files.map((stateFile, index) => {
             if(stateFile.name == file.name) {
                 newFiles[index] = file;
                 hasSameName = true;
@@ -329,9 +324,11 @@ class HomeworkBoard extends React.Component {
   _onDelete(index) {
     return (e) => {
       e.stopPropagation()
-      let files = this.state.files;
+      let files = this.state.contents.files;
       let newFiles = [...files.slice(0,index), ...files.slice(index+1, files.length)]
-      this.setState({files:newFiles}) 
+      this.setState({contents: Object.assign({}, this.state.contents, {
+        files: newFiles
+      })})
     }
   }
 
