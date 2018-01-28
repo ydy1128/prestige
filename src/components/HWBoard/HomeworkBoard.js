@@ -12,6 +12,11 @@ import {Editor, EditorState, ContentState, RichUtils, Modifier} from 'draft-js';
 import Dropzone from 'react-dropzone';
 
 let style = {
+  containerStyle: {
+    padding: '16px',
+    boxSizing: 'border-box',
+    height: '518px'
+  },
   hwBoardHeadStyle: {
     position: 'relative',
     display: 'flex',
@@ -26,16 +31,13 @@ let style = {
     fontSize: '16px',
     // marginTop: '24px',
   },
-  contentContainerStyle: {
-    height: "361px",
-  },
   titleStyle: {
     flex: '0 0 300px',
   },
   editorStyle: {
     position: 'relative',
     width: '100%',
-    height: '50%',
+    height: '300px',
     cursor: 'text',
     backgroundColor: '#fefefe'
 
@@ -45,7 +47,16 @@ let style = {
 class HomeworkBoard extends React.Component {
   constructor(props) {
     super(props)
-    let {hw, closeBoard,  selectedHwIndex} = props;
+    let { hw, closeBoard,  selectedHwIndex} = props;
+    var xhr = new XMLHttpRequest()
+    hw = Object.assign(hw,{files: hw.files.map((fileName) => {
+      let path = "uploads/" + hw._id + '/' + fileName;
+      console.log(path);
+      // xhr.responseType = "blob";
+      xhr.open("GET", path, false);  // true 면 async
+      xhr.send(null)
+      return new File([xhr.response], fileName)
+    })});
     let content = hw ? hw.content : '';
     this.state = {
       mode: hw ? "update" : "create",
@@ -87,78 +98,66 @@ class HomeworkBoard extends React.Component {
     let { contents, editorState, mode } = this.state;
     let {title} = contents;
 
-    console.log(this.state.files);
-
     let dueDate = contents.dueDate ? new Date(parseInt(contents.dueDate)) : new Date();
 
     return (
-      
-      <Paper id="comment-paper"> 
-          <div style={style.contentContainerStyle}>
-            <div id="hw-board-head" style={style.hwBoardHeadStyle}>
-              <TextField id="homework-title"
-                style={style.titleStyle}
-                hintText="Title"
-                floatingLabelText="Title"
-                value={contents.title}
-                onChange={
-                  (e) => {
-                    this.setState({
-                      contents: Object.assign({}, contents, {title: e.target.value})
-                    });
-                  }
-                }
-              />
-              <div style={style.datePickerContainerStyle}>
-                <DatePicker id="due-date"
-                  floatingLabelText="Due Date"
-                  textFieldStyle={style.datePickerStyle}
-                  hintText="Landscape Dialog"
-                  mode="landscape"
-                  defaultDate={dueDate}
-                  onChange={this._dateOnChange}
-                />
-              </div>
-            </div>
-
-            <div
-              style={style.editorStyle}
-              onClick= {(e) => {
-                this.domEditor.focus()
-              }}
-            >
-              <Editor
-                editorState={this.state.editorState}
-                onChange={this._onChangeTextArea}
-                placeholder="Put your content..."
-                onTab={this._handleTab}
-                ref={ref => this.domEditor = ref}
-              />
-            </div>
-
-            <div id="accomplishments" > </div>
-            <div id="upload" style={{height: '100px', display: 'flex', flexDirection: "column"}}>
-              <div id="upload-header" style={{display: 'flex', flex:'0 0 36px', justifyContent:'space-between'}}>
-                <div >Upload File </div>
-                <FlatButton
-                  label="select files"
-                  onClick={(e) => {this.dropzoneRef.onClick(e)}}
-                />
-              </div>
-              {this._showUpload()}
-            </div>
+      <Paper style={style.containerStyle}> 
+        <div id="hw-board-head" style={style.hwBoardHeadStyle}>
+          <TextField id="homework-title"
+            style={style.titleStyle}
+            hintText="Title"
+            floatingLabelText="Title"
+            value={contents.title}
+            onChange={
+              (e) => {
+                this.setState({
+                  contents: Object.assign({}, contents, {title: e.target.value})
+                });
+              }
+            }
+          />
+          <div style={style.datePickerContainerStyle}>
+            <DatePicker id="due-date"
+              floatingLabelText="Due Date"
+              textFieldStyle={style.datePickerStyle}
+              hintText="Landscape Dialog"
+              mode="landscape"
+              defaultDate={dueDate}
+              onChange={this._dateOnChange}
+            />
           </div>
-          <FlatButton
-            label="Cancel"
-            primary={true}
-            onClick={this._cancleOnClick}
+        </div>
+
+        <div
+          style={style.editorStyle}
+          onClick= {(e) => {
+            this.domEditor.focus()
+          }}
+        >
+          <Editor
+            editorState={this.state.editorState}
+            onChange={this._onChangeTextArea}
+            placeholder="Put your content..."
+            onTab={this._handleTab}
+            ref={ref => this.domEditor = ref}
           />
-          <FlatButton
-            label={mode}
-            primary={true}
-            onClick={this._updateOnClick}
-            disabled={!title || !editorState.getCurrentContent().getPlainText()}
-          />
+        </div>
+
+        <div id="accomplishments" > </div>
+        <div id="upload" style={{height: '100px', display: 'flex', flexDirection: "column"}}>
+          <div id="upload-header" style={{display: 'flex', flex:'0 0 36px', justifyContent:'space-between'}}>
+            <div style={{color: "gray"}} >Upload File </div>
+            <FlatButton
+              label="upload"
+              onClick={this._uploadFile.bind(this)}
+            />
+            <FlatButton
+              label="select files"
+              onClick={(e) => {this.dropzoneRef.onClick(e)}}
+            />
+          </div>
+          {this._showUpload()}
+        </div>
       </Paper>
     );
   }
@@ -189,7 +188,24 @@ class HomeworkBoard extends React.Component {
     });
   }
 
+  _uploadFile() {
+    let files = this.state.files;
+    // Fileupload
+    let data = new FormData();
+    for (let file of files) {
+      data.append('file', file, file.name);
+    }
+    debugger
+
+    const config = {
+      headers: { 'content-type': 'multipart/form-data' }
+    }
+
+    return axios.post('/api/upload?hwId=' + this.props.hw._id , data, config);
+  }
+
   updateHomework() {
+    debugger
     let { mode, contents, index, editorState} = this.state;
     let requestContent = Object.assign({}, contents, {
       content: editorState.getCurrentContent().getPlainText()
@@ -201,18 +217,6 @@ class HomeworkBoard extends React.Component {
       this._handleHomeworkEdit(contents._id, index, requestContent);
     }
     this.props.closeBoard();
-
-    // Fileupload
-    let data = new FormData();
-    for (let file of this.state.files) {
-      data.append('file', file, file.name);
-    }
-
-    const config = {
-        headers: { 'content-type': 'multipart/form-data' }
-    }
-
-    return axios.post('/api/upload?hwId=' + this.props.hw._id , data, config);
   }
 
   _handleHomeworkPost(contents){

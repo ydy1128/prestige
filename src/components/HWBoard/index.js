@@ -54,9 +54,7 @@ var Present = ({ props, state, style, functions }) => {
             <div className="col m4"><h4>숙제관리</h4></div>
             <div className="icons col m8">
                 {
-                    boardOn ? 
-                    boardButtons :
-                    tableButtons 
+                    boardOn ? boardButtons : tableButtons 
                 }
             </div>
         </div>

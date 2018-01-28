@@ -16,9 +16,12 @@ var Present = ({ props, state, style, functions }) => {
 
     // STYLE
     let containerStyle = {
+        marginTop: '16px',
+        marginBottom: '16px',
         width: '100%',
-        height: '100%',
+        height: '400px',
         position: 'relative',
+        padding: '16px'
     };
 
     let cssStyle =
@@ -32,21 +35,21 @@ var Present = ({ props, state, style, functions }) => {
     }</style>
     
     return (
-        <div id='comment-board' style={containerStyle}>
+        <Paper id="comment-paper" style={containerStyle}>
             {cssStyle}
-            <Paper id="comment-paper"> 
-                <div id="comment-header" >
-                    comments
-                </div>
-                <div id="comment-board">
-                    {
-                        comments.map((comment) => null
-                        )       
-                    }
-                </div>
-                <div id="commnet-poster"></div>
-            </Paper>
-        </div>
+            <div id="comments-header" >
+                comments
+            </div>
+            <div id="comments-board">
+                {
+                    comments.map((comment) => null
+                    )       
+                }
+            </div>
+            <div id="commnet-poster">
+                
+            </div>
+        </Paper>
     )
 }
 export default contain(Present)

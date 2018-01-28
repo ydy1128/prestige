@@ -259,7 +259,7 @@ a{
 				.col.m12{
 					height: calc(100% - 30px);
 					>div{
-						height: calc(100% - 60px) !important;
+						height: calc(100% - 60px);
 						overflow: auto;
 					}
 				}
