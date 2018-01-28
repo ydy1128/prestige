@@ -31,7 +31,7 @@ class Home extends React.Component {
         //Commented for dev purposes
 
         this.state = {
-            view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_DASHBOARD' : 'STUDENT_DASHBOARD'
+            view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_HWBOARD' : 'STUDENT_DASHBOARD'
         }
         this.handleClassPost = this.handleClassPost.bind(this);
         this.handleClassEdit = this.handleClassEdit.bind(this);
@@ -56,7 +56,6 @@ class Home extends React.Component {
         this.props.lectureBoardRequest().then(() =>{
             console.log('lectureData', this.props.lectureData)
         });
-
     }
     componentDidMount(){
 

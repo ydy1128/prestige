@@ -3,10 +3,11 @@ import Homework from '../models/Homework';
 import mongoose from 'mongoose';
 import throwError from './throwerror';
 
+
 const router = express.Router();
 
 router.post('/', (req, res) => { createHomework(req, res); });
-router.get('/', (req, res) => { readHomework(req, res); });
+router.get('*', (req, res) => { readHomework(req, res); });
 router.put('/:id', (req, res) => { updateHomework(req, res); });
 router.delete('/:id', (req, res) => { deleteHomewerk(req, res); });
 
@@ -26,12 +27,13 @@ const createHomework = (req, res) => {
         accomplishments: [],
         modifiedDate: "",
         teacherId: req.session.loginInfo._id,
+        //commnetsId:
     });
 
     let hw = new Homework(newhwInfo);
 
     hw.save( err => {
-        if(err) return throwerror(res, 409, 'DB error.');
+        if(err) return throwError(res, 409, 'DB error.');
         return res.json({ success: true, homework: hw });
     });
 }
@@ -39,9 +41,8 @@ const createHomework = (req, res) => {
 const readHomework = (req, res) => {
     let hwId = req.params.id;
     Homework.find(hwId ? { _id: hwId } : null).exec((err, hws) => {
-        if(err) return throwerror(res, 409, 'DB error.');
-        if(Array.isArray(hws)) res.json(hws);
-        else res.json([hws]);
+        if(err) return throwError(res, 409, 'DB error.');
+        res.json(hws);
     })
 }
 
@@ -53,7 +54,7 @@ const updateHomework = (req, res) => {
 
     // Find Class
     Homework.findById( hwId, (err, hw) => {
-        if(err) return throwerror(res, 409, 'DB error.');
+        if(err) return throwError(res, 409, 'DB error.');
         if(not(hw)) return throwError(res, 409);
         if(hw.teacherId != userId) return throwError(res, 401, 'Unauthorized user');
 
@@ -61,7 +62,7 @@ const updateHomework = (req, res) => {
         Object.assign(hw, modifiedHwInfo)
 
         hw.save((err, hw) => {
-            if(err) return throwerror(res, 409, 'DB error.');
+            if(err) return throwError(res, 409, 'DB error.');
             return res.json({ success: true, homework: hw });
         });
     });
@@ -77,13 +78,13 @@ const deleteHomewerk = (req, res) => {
 
     Homework.findById(hwId, (err, hw) => {
         let userId = req.session.loginInfo._id;
-        if(err) return throwerror(res, 409, 'DB error.');
+        if(err) return throwError(res, 409, 'DB error.');
         if(not(hw)) return throwError(res, 409);
         if(hw.teacherId != userId) return throwError(res, 401, 'Unauthorized user');
 
         // Remove class
         Homework.remove({ _id: hwId }, err => {
-            if(err) return throwerror(res, 409, 'DB error.');
+            if(err) return throwError(res, 409, 'DB error.');
             res.json({ success: true });
         });
     });

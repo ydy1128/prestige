@@ -23,8 +23,8 @@ import {
 
   const mapDispatchToProps = (dispatch) => {
     return {
-      homeworkBoardRequest: (isInitial, listType, id, username) => {
-        return dispatch(homeworkBoardRequest(isInitial, listType, id, username));
+      homeworkBoardRequest: (id) => {
+        return dispatch(homeworkBoardRequest(id));
       },
       homeworkPostRequest: (contents) => {
         return dispatch(homeworkPostRequest(contents));
@@ -45,7 +45,7 @@ import {
       constructor(props) {
         super(props);
         this.state = {
-          dialogOn: false,
+          boardOn: false,
           clickedRowIndexes: [],
           selectedHw: null,
           deleteDialogOn: false,
@@ -56,12 +56,12 @@ import {
         this._loadHomeworkData = this._loadHomeworkData.bind(this);
         this._onClickCreateHomework = this._onClickCreateHomework.bind(this);
         this._onClickEditHomework = this._onClickEditHomework.bind(this);
-        this._closeDialog = this._closeDialog.bind(this);
+        this._closeBoard = this._closeBoard.bind(this);
         this._toggleDeleteDialog = this._toggleDeleteDialog.bind(this);
       }
 
       render() {
-        let presentState = ["dialogOn", "clickedRowIndexes", "selectedHw", "deleteDialogOn", "selectedHwIndex"];
+        let presentState = ["boardOn", "clickedRowIndexes", "selectedHw", "deleteDialogOn", "selectedHwIndex"];
         let presentProps = [
           "hwData"
         ];
@@ -74,7 +74,7 @@ import {
           handleRowSelection: this._handleRowSelection,
           onClickEditHomework: this._onClickEditHomework,
           onClickCreateHomework: this._onClickCreateHomework,
-          closeDialog: this._closeDialog,
+          closeBoard: this._closeBoard,
           toggleDeleteDialog: this._toggleDeleteDialog,
         }
 
@@ -106,21 +106,21 @@ import {
       componentWillUnmount() {}
 
       // CUSTOM FUNCTIONS
-      _toggleDialog(open) {
+      _toggleBoard(open) {
         this.setState({
-          dialogOn: open
+          boardOn: open
         })
       }
 
-      _closeDialog() {
-        this._toggleDialog(false);
+      _closeBoard() {
+        this._toggleBoard(false);
       }
 
       _onClickCreateHomework(e) {
         this.setState({
           selectedHw: null
         })
-        this._toggleDialog(true);
+        this._toggleBoard(true);
       }
 
       _toggleDeleteDialog(open) {
@@ -138,7 +138,7 @@ import {
             selectedHw: this.props.hwData[index],
             selectedHwIndex: index
           })
-          this._toggleDialog(true);
+          this._toggleBoard(true);
         }
       }
 

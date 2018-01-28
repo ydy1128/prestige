@@ -18,16 +18,16 @@ import {
 
 
 /* Homework Board */
-export function homeworkBoardRequest(isInitial, listType, id, username) {
+export function homeworkBoardRequest(id) {
     return (dispatch) => {
         dispatch(homeworkBoard());
-
-        let url = '/api/homework';
+        id = id || "";
+        let url = '/api/homework/' + id;
 
         return axios.get(url)
         .then((response) => {
             console.log("response",response);
-            dispatch(homeworkBoardSuccess(response.data, isInitial, listType));
+            dispatch(homeworkBoardSuccess(response.data));
         }).catch((error) => {
             dispatch(homeworkBoardFailure());
         });
@@ -40,12 +40,10 @@ export function homeworkBoard() {
     };
 }
 
-export function homeworkBoardSuccess(data, isInitial, listType) {
+export function homeworkBoardSuccess(data) {
     return {
         type: HOMEWORK_BOARD_SUCCESS,
         data,
-        isInitial,
-        listType
     };
 }
 

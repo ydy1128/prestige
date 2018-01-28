@@ -12,7 +12,7 @@ import {Editor, EditorState, ContentState, RichUtils, Modifier} from 'draft-js';
 import Dropzone from 'react-dropzone';
 
 let style = {
-  dialogHeadStyle: {
+  hwBoardHeadStyle: {
     position: 'relative',
     display: 'flex',
     justifyContent: 'space-between',
@@ -42,10 +42,10 @@ let style = {
   }
 };
 
-class HomeworkDialog extends React.Component {
+class HomeworkBoard extends React.Component {
   constructor(props) {
     super(props)
-    let {hw, closeDialog, dialogOn, selectedHwIndex} = props;
+    let {hw, closeBoard,  selectedHwIndex} = props;
     let content = hw ? hw.content : '';
     this.state = {
       mode: hw ? "update" : "create",
@@ -64,8 +64,7 @@ class HomeworkDialog extends React.Component {
       editorState: EditorState.createWithContent(ContentState.createFromText(content)),
     };
 
-    this._updateOnClick = this._updateOnClick.bind(this);
-    this._cancleOnClick = this._cancleOnClick.bind(this);
+    // this._updateOnClick = this._updateOnClick.bind(this);
     this._handleHomeworkPost = this._handleHomeworkPost.bind(this);
     this._handleHomeworkEdit = this._handleHomeworkEdit.bind(this);
     this._dateOnChange = this._dateOnChange.bind(this);
@@ -76,40 +75,27 @@ class HomeworkDialog extends React.Component {
     this._onDelete = this._onDelete.bind(this);
   }
 
+  componentDidMount() {
+    this.props.onRef(this)
+  }
+
+  componentWillUnmount() {
+    this.props.onRef(undefined)
+  }
+
   render() {
-    let { dialogOn } = this.props;
     let { contents, editorState, mode } = this.state;
     let {title} = contents;
 
     console.log(this.state.files);
 
-    const actions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onClick={this._cancleOnClick}
-      />,
-      <FlatButton
-        label={mode}
-        primary={true}
-        onClick={this._updateOnClick}
-        disabled={!title || !editorState.getCurrentContent().getPlainText()}
-      />,
-    ];
-
-
     let dueDate = contents.dueDate ? new Date(parseInt(contents.dueDate)) : new Date();
 
     return (
-      <div>
-        <Dialog
-          actions={actions}
-          modal={false}
-          open={dialogOn}
-          onRequestClose={this._cancleOnClick}
-        >
+      
+      <Paper id="comment-paper"> 
           <div style={style.contentContainerStyle}>
-            <div id="dialog-head" style={style.dialogHeadStyle}>
+            <div id="hw-board-head" style={style.hwBoardHeadStyle}>
               <TextField id="homework-title"
                 style={style.titleStyle}
                 hintText="Title"
@@ -162,10 +148,21 @@ class HomeworkDialog extends React.Component {
               {this._showUpload()}
             </div>
           </div>
-        </Dialog>
-      </div>
+          <FlatButton
+            label="Cancel"
+            primary={true}
+            onClick={this._cancleOnClick}
+          />
+          <FlatButton
+            label={mode}
+            primary={true}
+            onClick={this._updateOnClick}
+            disabled={!title || !editorState.getCurrentContent().getPlainText()}
+          />
+      </Paper>
     );
   }
+
   _onChangeTextArea(editorState) {
     this.setState({editorState})
   };
@@ -192,7 +189,7 @@ class HomeworkDialog extends React.Component {
     });
   }
 
-  _updateOnClick(e) {
+  updateHomework() {
     let { mode, contents, index, editorState} = this.state;
     let requestContent = Object.assign({}, contents, {
       content: editorState.getCurrentContent().getPlainText()
@@ -203,7 +200,7 @@ class HomeworkDialog extends React.Component {
     } else if ( mode == 'update' ){
       this._handleHomeworkEdit(contents._id, index, requestContent);
     }
-    this.props.closeDialog();
+    this.props.closeBoard();
 
     // Fileupload
     let data = new FormData();
@@ -216,10 +213,6 @@ class HomeworkDialog extends React.Component {
     }
 
     return axios.post('/api/upload?hwId=' + this.props.hw._id , data, config);
-  }
-
-  _cancleOnClick(e) {
-    this.props.closeDialog();
   }
 
   _handleHomeworkPost(contents){
@@ -348,4 +341,4 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, undefined)(HomeworkDialog);
+export default connect(mapStateToProps, undefined)(HomeworkBoard);
