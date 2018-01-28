@@ -10,16 +10,6 @@ const initialState = {
         status: 'INIT',
         error: -1
     },
-    editClassPrep: {
-        name: '',
-        days: '',
-        starttime: '',
-        endtime: '',
-        students: '',
-        index: '',
-        _id: '',
-        flag: true
-    },
     editClass: {
         status: 'INIT',
         error: -1,
@@ -80,19 +70,6 @@ export default function makeclass(state, action) {
                     error: { $set: action.error }
                 }
             });
-        case types.CLASS_EDIT_PREP:
-            return update(state, {
-                editClassPrep: {
-                    name: { $set: action.name },
-                    days: { $set: action.days },
-                    starttime: { $set: action.starttime },
-                    endtime: { $set: action.endtime },
-                    students: { $set: action.students },
-                    index: { $set: action.index },
-                    _id: { $set: action._id },
-                    flag: { $set: action.flag }
-                }
-            });
         case types.CLASS_EDIT: 
             return update(state, {
                 editClass: {
@@ -108,7 +85,7 @@ export default function makeclass(state, action) {
                 },
                 board: {
                     data: {
-                        [action.index]: { $set: action.cls }
+                        [action.index]: { $set: action.data }
                     }
                 }
             });

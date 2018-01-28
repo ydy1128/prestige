@@ -9,6 +9,9 @@ const initialState = {
         status: 'INIT',
         error: -1
     },
+    update: {
+        status: 'INIT',
+    },
     status: {
         valid: false,
         isLoggedIn: false,
@@ -82,6 +85,28 @@ export default function authentication(state, action) {
                 status: {
                     valid: { $set: false },
                     isLoggedIn: { $set: false }
+                }
+            });
+        case types.AUTH_UPDATE:
+            return update(state, {
+                update: {
+                    status: { $set: 'WAITING' }
+                }
+            });
+        case types.AUTH_UPDATE_SUCCESS:
+            return update(state, {
+                update: {
+                    status: { $set: 'SUCCESS' }
+                },
+                status: {
+                    isLoggedIn: { $set: true },
+                    currentUser: { $set: action.user }
+                }
+            });
+        case types.AUTH_UPDATE_FAILURE:
+            return update(state, {
+                update: {
+                    status: { $set: 'FAILURE' }
                 }
             });
         case types.AUTH_LOGOUT:

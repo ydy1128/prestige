@@ -8,8 +8,13 @@ import fs from 'fs';
 import throwerror from './throwerror';
 
 const router = express.Router();
+router.post('/test', (req, res) =>{ createData(req, res) });
+router.post('/', (req, res) =>{ createClass(req, res) });
+router.put('/:id', (req, res) =>{ updateClass(req, res) });
+router.delete('/:id', (req, res) =>{ deleteClass(req, res) });
+router.get('/', (req, res) => { getAllClasses(req, res) });
 
-router.post('/test', (req, res)=>{
+const createData = (req, res) =>{
     console.log('test uri called');
     let data = fs.readFileSync('server/data/class.csv');
     data = iconv.decode(data, 'EUC-KR').split('\n');
@@ -18,7 +23,6 @@ router.post('/test', (req, res)=>{
         let row = data[i].split(',');
         let proceed = false;
         Class.find({name: row[0]}, (err, checkcls) =>{
-            // console.log(JSON.stringify(checkcls), JSON.stringify([]),JSON.stringify(checkcls) == JSON.stringify([]))
             if(JSON.stringify(checkcls) == JSON.stringify([])){
                 let cls = new Class({
                     name: row[0],
@@ -34,11 +38,10 @@ router.post('/test', (req, res)=>{
             }
         })
     }
-})
+}
 
-// Create class
-router.post('/', (req, res) => {
-	//Check login status
+const createClass = (req, res) => {
+    //Check login status
     if(typeof req.session.loginInfo === 'undefined')
          return throwerror(res, 401, 'User not logged in.');
 
@@ -51,22 +54,20 @@ router.post('/', (req, res) => {
         return throwerror(res, 400, 'Empty contents.');
 
     let cls = new Class({
-    	name: req.body.contents.name,
-    	teacher: req.session.loginInfo.user._id,
-    	students: [],
+        name: req.body.contents.name,
+        teacher: req.session.loginInfo.user._id,
+        students: [],
         startTime: req.body.contents.startTime,
         endTime: req.body.contents.endTime,
-    	days: req.body.contents.days
+        days: req.body.contents.days
     })
     cls.save( err => {
         if(err) return throwerror(res, 409, 'DB error.');
         return res.json({ success: true, data: cls });
     });
-});
+}
 
-// Modify class
-router.put('/:id', (req, res) => {
-
+const updateClass = (req, res) => {
    // Check login status
     if(typeof req.session.loginInfo === 'undefined')
         return throwerror(res, 401, 'User not logged in.');
@@ -105,10 +106,9 @@ router.put('/:id', (req, res) => {
         });
 
     });
-});
+}
 
-// Delete class
-router.delete('/:id', (req, res) => {
+const deleteClass = (req, res) => {
     // Check class Validity
     if(!mongoose.Types.ObjectId.isValid(req.params.id))
         return throwError(res, 400, "Data format not valid.");
@@ -130,15 +130,15 @@ router.delete('/:id', (req, res) => {
             res.json({ success: true });
         });
     });
-});
+}
 
-// Get class list
-router.get('/', (req, res) => {
+const getAllClasses = (req, res)  => {
     Class.find()
     .exec((err, classes) => {
         if(err) return throwerror(res, 409, 'DB error.');
         res.json(classes);
     });
-});
+} 
+
 
 export default router;

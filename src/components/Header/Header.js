@@ -5,9 +5,10 @@ import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
 import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
-
+import axios from 'axios';
 import { connect } from 'react-redux';
-
+import {studentsInfoEditRequest, studentsInfoPwChangeRequest} from 'actions/studentinfo';
+import {updateUserRequest} from 'actions/authentication';
 import './style.scss';
 
 class Header extends React.Component {
@@ -20,7 +21,6 @@ class Header extends React.Component {
                 name: '',
                 role: '',
                 password: '',
-                classes: [],
                 school: '',
                 level: '',
                 class: '',
@@ -30,6 +30,7 @@ class Header extends React.Component {
         this.handlePopover = this.handlePopover.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleClick = this.handleClick.bind(this);
+        this.dataChange = this.dataChange.bind(this);
     }
     componentDidMount(){
         if(this.props.loginStatus() != undefined)
@@ -66,11 +67,27 @@ class Header extends React.Component {
     }
     handleClick(){
         if(this.state.editMode){
-            this.setState({editMode: false});
+            this.props.updateUserRequest(this.state.userInfo, this.state.userInfo.role).then(()=>{
+                if(this.props.status == 'SUCCESS'){
+                    this.setState({editMode: false});
+                    Materialize.toast('계정 정보가 수정 되었습니다.', 2000);
+                }
+                else{
+                    console.error('update user failed');
+                }
+            })
+            
         }
         else{
             this.setState({editMode: true});
         }
+    }
+    dataChange(event, data){
+        let nextState = {};
+        nextState.userInfo = this.state.userInfo;
+        nextState.userInfo[event.target.name] = data;
+        console.log(event.target.name, data)
+        this.setState(nextState);
     }
     render() {
         const accountButton = (
@@ -89,7 +106,7 @@ class Header extends React.Component {
                 <div className="col m12" style={{marginTop: -10}}>
                     <TextField floatingLabelText="아이디" name="username" value={this.state.userInfo.username}
                         style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
-                        disabled={!this.state.editMode}
+                        disabled={true}
                         inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
                     />
                 </div>
@@ -98,6 +115,7 @@ class Header extends React.Component {
                         style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
                         disabled={!this.state.editMode}
                         inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                        onChange={this.dataChange}
                     />
                 </div>
                 {this.state.editMode ? 
@@ -107,6 +125,7 @@ class Header extends React.Component {
                         style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
                         disabled={!this.state.editMode}
                         inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                        onChange={this.dataChange}
                     />
                 </div>
                 : null}
@@ -117,6 +136,7 @@ class Header extends React.Component {
                             style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
                             disabled={!this.state.editMode}
                             inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                            onChange={this.dataChange}
                         />
                     </div>
                     <div className="col m12" style={{marginTop: -10}}>
@@ -124,6 +144,7 @@ class Header extends React.Component {
                             style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
                             disabled={!this.state.editMode}
                             inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
+                            onChange={this.dataChange}
                         />
                     </div>
                     {this.state.editMode ? null :
@@ -194,11 +215,20 @@ Header.defaultProps = {
 
 const mapStateToProps = (state) => {
     return {
+        status: state.authentication.update.status
     };
 };
 const mapDispatchToProps = (dispatch) => {
     return {
-
+        studentsInfoEditRequest: (id, index, obj) => {
+            return dispatch(studentsInfoEditRequest(id, index, obj));
+        },
+        studentsInfoPwChangeRequest: (id, pw, check_pw) => {
+            return dispatch(studentsInfoPwChangeRequest(id, pw, check_pw));
+        },
+        updateUserRequest: (obj, url_ref) =>{
+            return dispatch(updateUserRequest(obj, url_ref));
+        }
     };
 };
 

@@ -49,9 +49,9 @@ class Home extends React.Component {
                 console.log('studentsData', this.props.studentsData)
             });
         }
-            this.props.classBoardRequest().then(() => {
-                console.log('classData', this.props.classData)
-            });
+        this.props.classBoardRequest().then(() => {
+            console.log('classData', this.props.classData)
+        });
         this.props.lectureBoardRequest().then(() =>{
             console.log('lectureData', this.props.lectureData)
         });

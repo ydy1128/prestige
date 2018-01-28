@@ -8,7 +8,15 @@ import fs from 'fs';
 
 const router = express.Router();
 
-router.post('/test', (req, res)=>{
+router.post('/test', (req, res)=>{ createData(req, res) });
+router.post('/signup', (req, res) => { userSignUp(req, res) });
+router.post('/signin', (req, res) => { userSignIn(req, res) });
+router.get('/getinfo', (req, res) => { getSessionData(req, res) });
+router.put('/updateinfo', (req, res) =>{ updateUser(req, res) });
+router.post('/logout', (req, res) => { userLogOut(req, res) });
+router.delete('/:id', (req, res) => { deleteUser(req, res) });
+
+const createData = (req, res) =>{
     console.log('test uri called');
     let data = fs.readFileSync('server/data/students.csv');
     data = iconv.decode(data, 'EUC-KR').split('\n');
@@ -42,11 +50,10 @@ router.post('/test', (req, res)=>{
             })
 
         })
-    }
-})
+    }  
+}
 
-
-router.post('/signup', (req, res) => {
+const userSignUp = (req, res) => {
     // CHECK USERNAME FORMAT
     let usernameRegex = /^[a-z0-9]+$/;
     if(!usernameRegex.test(req.body.username))
@@ -78,9 +85,9 @@ router.post('/signup', (req, res) => {
             return res.json({ success: true });
         });
     });
-});
+}
 
-router.post('/signin', (req, res) => {
+const userSignIn = (req, res) => {
     if(typeof req.body.password !== "string")
         return throwerror(res, 401, 'Login failed: password format not valid.');
 
@@ -110,73 +117,55 @@ router.post('/signin', (req, res) => {
             id: session,
         });
     });
-});
+}
 
-router.get('/getinfo', (req, res) => {
+
+const getSessionData = (req, res) =>{
     if(typeof req.session.loginInfo === "undefined")
         return throwerror(res, 401, 'User not logged in.');
 
     res.json({ info: req.session.loginInfo });
-});
+}
 
-router.put('/changepw/:id', (req, res)=>{
-    // CHECK PASS LENGTH
-    if(req.body.pw.length < 4 || typeof req.body.pw !== "string")
-        return throwerror(res, 401, 'Login failed: password format not valid.');
-
-    Student.findById(req.params.id, (err, std) => {
-        if(err) return throwerror(res, 409, 'DB error.');
-        // IF MEMO DOES NOT EXIST
-        if(!std) return throwerror(res, 409);
-
-        if(req.body.pw != req.body.check_pw)
-            return throwerror(res, 401, 'Login failed: wrong password.');
-
-        std.password = req.body.pw;
-        std.password = std.generateHash(std.password);
-
-        std.save((err, std) => {
+const updateUser = (req, res) =>{
+    if(typeof req.session.loginInfo === "undefined")
+        return throwerror(res, 401, 'User not logged in.');
+    console.log(req.session.loginInfo.user._id)
+    Teacher.findById(req.session.loginInfo.user._id , (err, account) => {
+        if(req.body.obj.password != ''){
+            if(req.body.password.length < 4 || typeof req.body.password !== "string")
+                return throwerror(res, 400, 'Bad password.');
+            account.password = account.generateHash(req.body.obj.password);
+        }
+        for (let key in req.body.obj){
+            if(key != 'password' && account.hasOwnProperty(key)){
+                account[key] = req.body.obj[key];
+            }
+        }
+        account.save((err, account) => {
             if(err) return throwerror(res, 409, 'DB error.');
-            return res.json({
-                success: true
-            });
-        });
-
-    });
-})
-
-router.put('/:id', (req, res)=>{
-    Student.findById(req.params.id, (err, std) => {
-        if(err) return throwerror(res, 409, 'DB error.');
-        // IF MEMO DOES NOT EXIST
-        if(!std) return throwerror(res, 409);
-
-        std.class = req.body.obj.class;
-        std.name = req.body.obj.name;
-        std.school = req.body.obj.school;
-        std.level = req.body.obj.level;
-        console.log(req.body.class);
-        console.log(std);
-
-        std.save((err, std) => {
-            if(err) return throwerror(res, 409, 'DB error.');
+            // ALTER SESSION
+            let session = req.session;
+            account.password = '';
+            session.loginInfo = {
+                user: account,
+                role: 'teacher'
+            };
+            // RETURN SUCCESS
             return res.json({
                 success: true,
-                std
+                account: session.loginInfo,
             });
-        });
-
+        })
     });
-})
+}
 
-
-
-router.post('/logout', (req, res) => {
+const userLogOut = (req, res) =>{
     req.session.destroy(err => { if(err) return throwerror(res, 409, 'DB error.'); });
-    return res.json({ sucess: true });
-});
+    return res.json({ sucess: true });  
+}
 
-router.delete('/:id', (req, res) => {
+const deleteUser = (req, res) =>{
     // Check login status
     if(typeof req.session.loginInfo === 'undefined')
         return throwerror(res, 401, 'User not logged in.');
@@ -191,7 +180,8 @@ router.delete('/:id', (req, res) => {
             res.json({ success: true });
         });
     });
-});
+}
+
 
 
 export default router;

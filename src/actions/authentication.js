@@ -9,6 +9,9 @@ import {
     AUTH_GET_STATUS,
     AUTH_GET_STATUS_SUCCESS,
     AUTH_GET_STATUS_FAILURE,
+    AUTH_UPDATE,
+    AUTH_UPDATE_SUCCESS,
+    AUTH_UPDATE_FAILURE,
     AUTH_LOGOUT
 } from './ActionTypes';
 
@@ -129,6 +132,45 @@ export function getStatusSuccess(username) {
 export function getStatusFailure() {
     return {
         type: AUTH_GET_STATUS_FAILURE
+    };
+}
+
+//update
+export function updateUserRequest(obj, url_ref) {
+    return (dispatch) => {
+        // inform Get Status API is starting
+        dispatch(updateUser());
+
+        let get_url = '/api/' + url_ref + '/updateinfo'
+
+        return axios.put(get_url, {obj})
+        .then((response) => {
+            console.log('updateUser: ', response.data.account)
+            dispatch(updateUserSuccess(response.data.account));
+        })
+        .catch((error) => {
+            dispatch(updateUserFailure());
+        });
+    };
+
+}
+
+export function updateUser() {
+    return {
+        type: AUTH_UPDATE
+    };
+}
+
+export function updateUserSuccess(user) {
+    return {
+        type: AUTH_UPDATE_SUCCESS,
+        user
+    };
+}
+
+export function updateUserFailure() {
+    return {
+        type: AUTH_UPDATE_FAILURE
     };
 }
 

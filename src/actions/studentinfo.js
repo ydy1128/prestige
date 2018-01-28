@@ -56,7 +56,7 @@ export function getStudentsInfoFailure(error) {
 export function studentsInfoEditRequest(id, index, obj) {
     return (dispatch) => {
         dispatch(studentsInfoEdit());
-        return axios.put('/api/student/' + id, {obj})
+        return axios.put('/api/teacher/changestudentinfo/' + id, {obj})
         .then((response) => {
             dispatch(studentsInfoEditSuccess(id, index, response.data.std));
         }).catch((error) => {
@@ -91,7 +91,7 @@ export function studentsInfoPwChangeRequest(id, pw, check_pw) {
     console.log(pw, check_pw)
     return (dispatch) => {
         dispatch(studentsInfoPwChange());
-        return axios.put('/api/student/changepw/' + id, {pw, check_pw})
+        return axios.put('/api/teacher/changestudentpw/' + id, {pw, check_pw})
         .then((response) => {
             dispatch(studentsInfoPwChangeSuccess(id));
         }).catch((error) => {

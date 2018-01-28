@@ -6,7 +6,18 @@ import throwerror from './throwerror';
 const router = express.Router();
 
 
-router.post('/signup', (req, res) => {
+router.post('/signup', (req, res) => { userSignUp(req, res) });
+router.post('/signin', (req, res) => { userSignIn(req, res) });
+router.get('/getinfo', (req, res) => { getSessionData(req, res) });
+router.put('/updateinfo', (req, res) =>{ updateUser(req, res) });
+
+router.get('/getstudentsinfo', (req, res) =>{ getAllStudents(req, res) });
+router.put('/changestudentpw/:id', (req, res)=>{ changeStudentPW(req, res) });
+router.put('/changestudentinfo/:id', (req, res)=>{ changeStudentInfo(req, res) })
+
+router.post('/logout', (req, res) => { userLogOut(req, res) });
+
+const userSignUp = (req, res) => {
     // CHECK USERNAME FORMAT
     let usernameRegex = /^[a-z0-9]+$/;
 
@@ -38,10 +49,10 @@ router.post('/signup', (req, res) => {
             return res.json({ success: true });
         });
 
-    });
-});
+    }); 
+}
 
-router.post('/signin', (req, res) => {
+const userSignIn = (req, res) => {
     if(typeof req.body.password !== "string")
         return throwerror(res, 401, 'Login failed: password format not valid.');
 
@@ -71,27 +82,111 @@ router.post('/signin', (req, res) => {
             id: session.loginInfo,
         });
     });
-});
+}
 
-router.get('/getinfo', (req, res) => {
+const getSessionData = (req, res) => {
     if(typeof req.session.loginInfo === "undefined")
         return throwerror(res, 401, 'User not logged in.');
 
     res.json({ info: req.session.loginInfo });
-});
+}
 
-router.get('/getstudentsinfo', (req, res) =>{
+const updateUser = (req, res) =>{
+    if(typeof req.session.loginInfo === "undefined")
+        return throwerror(res, 401, 'User not logged in.');
+    console.log(req.session.loginInfo.user._id)
+    Teacher.findById(req.session.loginInfo.user._id , (err, account) => {
+        if(req.body.obj.password != ''){
+            if(req.body.obj.password.length < 4 || typeof req.body.obj.password !== "string")
+                return throwerror(res, 400, 'Bad password.');
+            account.password = account.generateHash(req.body.obj.password);
+        }
+        for (let key in req.body.obj){
+            if(key != 'password' && account.hasOwnProperty(key)){
+                account[key] = req.body.obj[key];
+            }
+        }
+        account.save((err, account) => {
+            if(err) return throwerror(res, 409, 'DB error.');
+            // ALTER SESSION
+            let session = req.session;
+            account.password = '';
+            session.loginInfo = {
+                user: account,
+                role: 'teacher'
+            };
+            // RETURN SUCCESS
+            return res.json({
+                success: true,
+                account: session.loginInfo,
+            });
+        })
+    });
+}
+
+const getAllStudents = (req, res) => {
     if(typeof req.session.loginInfo === "undefined")
         return throwerror(res, 401, 'User not logged in.');
 
     Student.find({}, (err, accounts) =>{
         return res.json({ info: accounts });
     })
-});
+}
 
-router.post('/logout', (req, res) => {
+const changeStudentPW = (req, res) => {
+    // CHECK PASS LENGTH
+    if(req.body.pw.length < 4 || typeof req.body.pw !== "string")
+        return throwerror(res, 401, 'Update failed: password format not valid.');
+
+    Student.findById(req.params.id, (err, std) => {
+        if(err) return throwerror(res, 409, 'DB error.');
+        // IF MEMO DOES NOT EXIST
+        if(!std) return throwerror(res, 409);
+
+        if(req.body.pw != req.body.check_pw)
+            return throwerror(res, 401, 'Password does not match.');
+
+        std.password = req.body.pw;
+        std.password = std.generateHash(std.password);
+
+        std.save((err, std) => {
+            if(err) return throwerror(res, 409, 'DB error.');
+            return res.json({
+                success: true
+            });
+        });
+
+    });
+}
+
+const changeStudentInfo = (req, res) => {
+    Student.findById(req.params.id, (err, std) => {
+        if(err) return throwerror(res, 409, 'DB error.');
+        // IF MEMO DOES NOT EXIST
+        if(!std) return throwerror(res, 409);
+
+        std.class = req.body.obj.class;
+        std.name = req.body.obj.name;
+        std.school = req.body.obj.school;
+        std.level = req.body.obj.level;
+        console.log(req.body.class);
+        console.log(std);
+
+        std.save((err, std) => {
+            if(err) return throwerror(res, 409, 'DB error.');
+            return res.json({
+                success: true,
+                std
+            });
+        });
+
+    }); 
+}
+
+
+const userLogOut = (req, res) => {
     req.session.destroy(err => { if(err) return throwerror(res, 409, 'DB error.'); });
     return res.json({ sucess: true });
-});
+}
 
 export default router;

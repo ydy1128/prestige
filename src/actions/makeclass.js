@@ -5,7 +5,6 @@ import {
     CLASS_POST,
     CLASS_POST_SUCCESS,
     CLASS_POST_FAILURE,
-    CLASS_EDIT_PREP,
     CLASS_EDIT,
     CLASS_EDIT_SUCCESS,
     CLASS_EDIT_FAILURE,
@@ -90,20 +89,6 @@ export function classPostFailure(error) {
 }
 
 /* Class Edit */
-export function classEditPrep(name, days, starttime, endtime, index, _id, students, flag){
-    return {
-        type: CLASS_EDIT_PREP,
-        name,
-        days,
-        starttime,
-        endtime,
-        index,
-        _id,
-        students,
-        flag
-    };
-}
-
 export function classEditRequest(id, index, contents) {
     return (dispatch) => {
         dispatch(classEdit());
@@ -112,7 +97,7 @@ export function classEditRequest(id, index, contents) {
         .then((response) => {
             dispatch(classEditSuccess(index, response.data.cls));
         }).catch((error) => {
-            dispatch(classEditFailure(error.response.data.code));
+            dispatch(classEditFailure(error.response.data));
         });
     };
 }
@@ -123,11 +108,11 @@ export function classEdit() {
     };
 }
 
-export function classEditSuccess(index, cls) {
+export function classEditSuccess(index, data) {
     return {
         type: CLASS_EDIT_SUCCESS,
         index,
-        cls
+        data
     };
 }
 
