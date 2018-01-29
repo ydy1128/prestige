@@ -211,12 +211,13 @@ class StudentBoard extends React.Component{
                             openDialog={null} handleActive={this.handleActive}
                             onSearchEngineChange={this.onSearchEngineChange} blurSearchInput={this.blurSearchInput} />
                 <div className="Board-contents row">
-                    <div className="col m12">
+                    <div className="col m12 boardTable">
                     	<StudentTable studentsData={this.props.studentsData} filteredData={this.state.searchResult} 
                                         searchOpen={this.state.searchOpen} searchText={this.state.searchText} 
                     					clicked={this.state.clicked} filteredClick={this.state.filteredClick} searchClassNameById={this.searchClassNameById} 
                     					handleInfoOpen={this.handleInfoOpen} handlePassOpen={this.handlePassOpen}
-                    					handleFilteredRowClick={this.handleFilteredRowClick} handleRowClick={this.handleRowClick}/>
+                    					handleFilteredRowClick={this.handleFilteredRowClick} handleRowClick={this.handleRowClick}
+                                        style={{height: 'calc(100% - 60px)'}}/>
                     </div>
 
                 </div>

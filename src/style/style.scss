@@ -258,8 +258,8 @@ a{
 				height: 100%;
 				.col.m12{
 					height: calc(100% - 30px);
-					>div{
-						height: calc(100% - 60px);
+					&.boardTable>div{
+						height: calc(100% - 60px) !important;
 						overflow: auto;
 					}
 				}

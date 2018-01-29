@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { lectureEditRequest } from 'actions/lecture';
 import throwError from 'components/commons/throwError';
+import getLoginData from 'components/commons/SessionData';
 
 var container = (Present) =>{
 	class Container extends React.Component {
@@ -52,19 +53,6 @@ var container = (Present) =>{
 	    componentDidMount(){
 	    	this.filterAutocompleteData();
 	    }
-	    getCookie(name) {
-	        var value = "; " + document.cookie;
-	        var parts = value.split("; " + name + "=");
-	        if (parts.length == 2) return parts.pop().split(";").shift();
-	    }
-	    getLoginData(){
-	        let loginData = this.getCookie('key');
-	        if(loginData == undefined)
-	            loginData = {};
-	        else
-	            loginData = JSON.parse(atob(loginData));
-	        return loginData;
-	    }
 	    filterAutocompleteData(){
 	    	let acData = [...this.props.classData].map(obj => {return {text: obj.name, value: obj._id}; });
 	    	this.setState({classData: acData});
@@ -85,7 +73,7 @@ var container = (Present) =>{
 	    	}
 	    	let acc = nextState.currObj.accomplishments;
 	    	for(let i = 0; i < acc.length; i++){
-	    		if(this.getLoginData().id == acc[i]._id){
+	    		if(getLoginData().id == acc[i]._id){
 	    			let date = new Date();
 	    			acc[i].startTime = date;
 	    		}

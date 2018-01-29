@@ -41,20 +41,6 @@ class Header extends React.Component {
                 this.setState({userInfo: userInfo});
             })
     }
-    getCookie(name) {
-        var value = "; " + document.cookie;
-        var parts = value.split("; " + name + "=");
-        if (parts.length == 2) return parts.pop().split(";").shift();
-    }
-    getLoginData(){
-        let loginData = this.getCookie('key');
-        if(loginData == undefined)
-            loginData = {};
-        else
-            loginData = JSON.parse(atob(loginData));
-        console.log(loginData)
-        return loginData;
-    }
     handlePopover(event){
         event.preventDefault();
         this.setState({

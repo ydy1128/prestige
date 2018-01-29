@@ -16,21 +16,15 @@ import { ClassBoard,
 } from 'components';
 
 import throwError from 'components/commons/throwError';
-
+import getLoginData from 'components/commons/SessionData';
 class Home extends React.Component {
     constructor(props) {
         super(props);
 
         // TEACHER_DASHBOARD, TEACHER_STUDENTBOARD, TEACHER_CLASSBOARD, TEACHER_LECTUREBOARD, TEACHER_HWBOARD
         // STUDENT_DASHBOARD, STUDENT_LECTUREBOARD, STUDENT_HWBOARD
-        // this.state = {
-        //     view_type: 'TEACHER_STUDENTBOARD'
-        // }
-
-        //Commented for dev purposes
-
         this.state = {
-            view_type: this.getLoginData().role == 'teacher' ? 'TEACHER_HWBOARD' : 'STUDENT_DASHBOARD'
+            view_type: getLoginData().role == 'teacher' ? 'TEACHER_DASHBOARD' : 'STUDENT_DASHBOARD'
         }
         this.handleClassPost = this.handleClassPost.bind(this);
         this.handleClassEdit = this.handleClassEdit.bind(this);
@@ -44,7 +38,7 @@ class Home extends React.Component {
         this.setMenuActive = this.setMenuActive.bind(this);
     }
     componentWillMount(){
-        if(this.getLoginData().role == 'teacher'){
+        if(getLoginData().role == 'teacher'){
             this.props.getStudentsInfoRequest().then(() =>{
                 console.log('studentsData', this.props.studentsData)
             });
@@ -59,21 +53,8 @@ class Home extends React.Component {
     componentDidMount(){
 
     }
-    getCookie(name) {
-        var value = "; " + document.cookie;
-        var parts = value.split("; " + name + "=");
-        if (parts.length == 2) return parts.pop().split(";").shift();
-    }
-    getLoginData(){
-    	let loginData = this.getCookie('key');
-        if(loginData == undefined)
-            loginData = {};
-        else
-        	loginData = JSON.parse(atob(loginData));
-    	return loginData;
-    }
     handleClick(ref){
-    	let loginData = this.getLoginData();
+    	let loginData = getLoginData();
     	loginData.role = ref;
     	document.cookie='key=' + btoa(JSON.stringify(loginData));
     }
@@ -248,7 +229,7 @@ class Home extends React.Component {
     	)
     	const sideMenu = (
 			<div className="Side-menu">
-				{this.getLoginData().role == 'teacher' ? teacherMenu : studentMenu}
+				{getLoginData().role == 'teacher' ? teacherMenu : studentMenu}
 			</div>
     	)
     	const afterLoginView = (

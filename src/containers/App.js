@@ -1,6 +1,7 @@
 import React from 'react';
 import { Header } from 'components';
 import { connect } from 'react-redux';
+import getLoginData from 'components/commons/SessionData';
 import { getStatusRequest, logoutRequest } from 'actions/authentication';
 
 class App extends React.Component {
@@ -9,21 +10,9 @@ class App extends React.Component {
         this.loginStatus = this.loginStatus.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
     }
-    // get cookie by name
-    getCookie(name) {
-        var value = "; " + document.cookie;
-        var parts = value.split("; " + name + "=");
-        if (parts.length == 2) return parts.pop().split(";").shift();
-    }
     loginStatus(){
-        // get loginData from cookie
-        let loginData = this.getCookie('key');
-        console.log(loginData);
-        // if loginData is undefined, do nothing
+        let loginData = getLoginData();
         if(typeof loginData === "undefined") return;
-
-        // decode base64 & parse json
-        loginData = JSON.parse(atob(loginData));
 
         // if not logged in, do nothing
         if(!loginData.isLoggedIn) return;
@@ -35,13 +24,11 @@ class App extends React.Component {
                 console.log(this.props.status);
                 // if session is not valid
                 if(!this.props.status.valid) {
-                    let current_role = loginData.role;
-                    console.log(current_role)
                     // logout the session
                     loginData = {
                         isLoggedIn: false,
                         username: '',
-                        role: current_role
+                        role: url_ref
                     };
 
                     document.cookie='key=' + btoa(JSON.stringify(loginData));

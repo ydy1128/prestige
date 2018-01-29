@@ -327,7 +327,7 @@ class ClassBoard extends React.Component{
             <div className="Boards">
                 { boardHeader }
 	            <div className="Board-contents row">
-                    <div className="col m12">
+                    <div className="col m12 boardTable">
                         <ClassList classData={this.props.data} selected={this.state.selected}
                                     processData={this.processData} handleClick={this.handleListClick} 
                                    openClassMode={this.openDialogClassMode} openStudentMode={this.openDialogStudentMode} />
