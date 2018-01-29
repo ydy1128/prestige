@@ -9,5 +9,10 @@ const getLoginData = () => {
     	loginData = JSON.parse(atob(loginData));
 	return loginData;
 }
+const saveLoginData = (category, data) =>{
+	let loginData = getLoginData();
+	loginData[category] = data;
+	document.cookie='key=' + btoa(JSON.stringify(loginData));
+}
 
-export default getLoginData;
+export { getLoginData, saveLoginData };

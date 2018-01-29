@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { lectureEditRequest } from 'actions/lecture';
 import throwError from 'components/commons/throwError';
-import getLoginData from 'components/commons/SessionData';
+import { getLoginData } from 'components/commons/SessionData';
 
 var container = (Present) =>{
 	class Container extends React.Component {

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router';
+import { getLoginData } from 'components/commons/SessionData';
+
 
 class Authentication extends React.Component {
     constructor(props) {
         super(props);
-
-        let loginData = this.getCookie('key');
-        loginData = JSON.parse(atob(loginData));
-
+        let loginData = getLoginData();
+        console.log(loginData.role);
         let initial_ref = loginData.role == undefined ? 'student' : loginData.role;
 
         this.state = {

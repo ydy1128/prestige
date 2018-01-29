@@ -1,7 +1,7 @@
 import React from 'react';
 import { Header } from 'components';
 import { connect } from 'react-redux';
-import getLoginData from 'components/commons/SessionData';
+import { getLoginData } from 'components/commons/SessionData';
 import { getStatusRequest, logoutRequest } from 'actions/authentication';
 
 class App extends React.Component {
@@ -42,8 +42,7 @@ class App extends React.Component {
         );
     }
     handleLogout() {
-        let loginData = this.getCookie('key');
-        loginData = JSON.parse(atob(loginData));
+        let loginData = getLoginData();
         let url_ref = loginData.role;
 
         this.props.logoutRequest(url_ref).then(
@@ -58,6 +57,7 @@ class App extends React.Component {
                 };
 
                 document.cookie = 'key=' + btoa(JSON.stringify(loginData));
+                location.reload(false);
             }
         );
     }

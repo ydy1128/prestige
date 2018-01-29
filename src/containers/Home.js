@@ -16,7 +16,7 @@ import { ClassBoard,
 } from 'components';
 
 import throwError from 'components/commons/throwError';
-import getLoginData from 'components/commons/SessionData';
+import { getLoginData } from 'components/commons/SessionData';
 import { BeforeLogin } from 'components/HomeView';
 
 class Home extends React.Component {
@@ -55,12 +55,6 @@ class Home extends React.Component {
     componentDidMount(){
 
     }
-    handleClick(ref){
-    	let loginData = getLoginData();
-    	loginData.role = ref;
-    	document.cookie='key=' + btoa(JSON.stringify(loginData));
-    }
-
     handleStudentEdit(stdobj, index, silent){
         return this.props.studentsInfoEditRequest(stdobj._id, index, stdobj).then(() =>{
             if(this.props.studentEditStatus.status === "SUCCESS") {
@@ -185,34 +179,6 @@ class Home extends React.Component {
         return '';
     }
     render() {
-    	// const beforeLoginView = (
-     //    	<div className="row Main-contents">
-     //    		<h1>프레스티지 수시영어전문학원</h1>
-     //    		<div className="col s12 m6 Main-buttons">
-     //    			<div className="card">
-     //    				<div className="card-image">
-     //    					<Link to="login" onClick={this.handleClick.bind(this, 'student')}>
-	    //     					<img src="img/students.jpg" />
-	    //     					<span className="card-title">학생 로그인</span>
-     //    					</Link>
-     //    				</div>
-     //    			</div>
-     //    		</div>
-     //    		<div className="col s12 m6 Main-buttons">
-     //    			<div className="card">
-     //    				<div className="card-image">
-     //    					<Link to="/login" onClick={this.handleClick.bind(this, 'teacher')}>
-	    //     					<img src="img/teachers.png" />
-	    //     					<span className="card-title">선생님 로그인</span>
-     //    					</Link>
-     //    				</div>
-     //    			</div>
-     //    		</div>
-     //    		<div className="col m12 Main-footer">
-     //    			<Link to="/register" className="Register-button">회원가입</Link>
-     //    		</div>
-     //    	</div>
-    	// );
     	const teacherMenu = (
 			<ul className="">
 				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_DASHBOARD')}    name="TEACHER_DASHBOARD"    ><FontAwesome name="dashboard"  onClick={this.handleMenuClick}/></a></li>
@@ -230,14 +196,14 @@ class Home extends React.Component {
 			</ul>
     	)
     	const sideMenu = (
-			<div className="Side-menu">
+			<div className="Side-menu" style={{paddingTop: 80}}>
 				{getLoginData().role == 'teacher' ? teacherMenu : studentMenu}
 			</div>
     	)
     	const afterLoginView = (
     		<div className="row Main-loggedin">
     			{ sideMenu }
-    			<div className="Boards-wrapper">
+    			<div className="Boards-wrapper" style={{paddingTop: 80}}>
                     { this.getView() }
     			</div>
 
