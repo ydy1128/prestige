@@ -67,7 +67,7 @@ class App extends React.Component {
         let isAuth = re.test(this.props.location.pathname);
 
         return (
-            <div className="App">
+            <div style={{width: '100%', height: '100%', minWidth: 1024, minHeight: 768}}>
                 {isAuth ? undefined : <Header isLoggedIn={this.props.status.isLoggedIn}
                 								onLogout={this.handleLogout}
                                                 loginStatus={this.loginStatus}
