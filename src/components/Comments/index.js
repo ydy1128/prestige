@@ -7,11 +7,12 @@ import demoData from './demoData';
 
 // SUBCOMPONENTS
 import Paper from 'material-ui/Paper';
+import Comment from './Comment';
 
 var Present = ({ props, state, style, functions }) => {
     let { comments } = props;
     let { } = state;
-    let { } = functions;
+    let { updateComments } = functions;
     comments = comments || demoData;
 
     // STYLE
@@ -37,13 +38,10 @@ var Present = ({ props, state, style, functions }) => {
     return (
         <Paper id="comment-paper" style={containerStyle}>
             {cssStyle}
-            <div id="comments-header" >
-                comments
-            </div>
+            <div id="comments-header" > comments </div>
             <div id="comments-board">
-                {
-                    comments.map((comment) => null
-                    )       
+                { comments.map((comment) => 
+                    <Comment comment={comment} update={updateComments}/>)
                 }
             </div>
             <div id="commnet-poster">

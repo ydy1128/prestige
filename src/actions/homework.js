@@ -28,6 +28,7 @@ export function homeworkBoardRequest(id) {
         .then((response) => {
             console.log("response",response);
             dispatch(homeworkBoardSuccess(response.data));
+            return response
         }).catch((error) => {
             dispatch(homeworkBoardFailure());
         });
@@ -62,6 +63,7 @@ export function homeworkPostRequest(contents) {
         .then((response) => {
             console.log(response.data.homework)
             dispatch(homeworkPostSuccess(response.data.homework));
+            return response
         }).catch((error) => {
             dispatch(homeworkPostFailure(error.response.data.homework));
         });

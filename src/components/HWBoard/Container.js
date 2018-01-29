@@ -18,6 +18,7 @@ import {
       hwPostStatus: homework.post,
       hwEditStatus: homework.edit,
       hwRemoveStatus: homework.remove,
+      userInfo: state.authentication.status.currentUser
     }
   }
 
@@ -106,22 +107,32 @@ import {
       componentWillUnmount() {}
 
       // CUSTOM FUNCTIONS
-      _toggleBoard(open) {
-        this.setState({
-          boardOn: open
-        })
-      }
-
       _closeBoard() {
-        this._toggleBoard(false);
+        this.setState({
+          boardOn: false
+        })
       }
 
       _onClickCreateHomework(e) {
-        this.setState({
-          selectedHw: null
-        })
-        this._toggleBoard(true);
-      }
+        let contents = {
+          title: "",
+          files: [],
+          comments: [],
+          content: "",
+          accomplishments: [],
+          dueDate: Date.parse(new Date()),
+          writtenDate: Date.parse(new Date()),
+          teacherId: this.props.userInfo.user._id,
+        }
+
+        this.props.homeworkPostRequest(contents).then( (res) => {
+          this.setState({
+            selectedHw: res.data.homework,
+            selectedHwIndex: this.props.hwData.length,
+            boardOn: true
+          })
+        });
+     }
 
       _toggleDeleteDialog(open) {
         return (e) => {
@@ -136,9 +147,9 @@ import {
           e.stopPropagation();
           this.setState({
             selectedHw: this.props.hwData[index],
-            selectedHwIndex: index
+            selectedHwIndex: index,
+            boardOn: true
           })
-          this._toggleBoard(true);
         }
       }
 

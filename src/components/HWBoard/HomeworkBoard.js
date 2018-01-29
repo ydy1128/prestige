@@ -47,33 +47,25 @@ let style = {
 class HomeworkBoard extends React.Component {
   constructor(props) {
     super(props)
-    let { hw, closeBoard,  selectedHwIndex} = props;
-    var xhr = new XMLHttpRequest()
-    hw = Object.assign(hw,{files: hw.files.map((fileName) => {
+    let { hw, selectedHwIndex} = props;
+    var xhr = new XMLHttpRequest();
+    let hwId = hw._id;
+    // file path를 바탕으로 File object를 만듦
+    let contents = Object.assign({}, hw, {files: hw.files.length ? hw.files.map((fileName) => {
       let path = "uploads/" + hw._id + '/' + fileName;
       xhr.open("GET", path, false);  // true 면 async
       xhr.send(null)
       return new File([xhr.response], fileName)
-    })});
-    let content = hw ? hw.content : '';
+    }) : [] });
+
     this.state = {
-      mode: hw ? "update" : "create",
       index: selectedHwIndex,
-      contents: hw || {// initial contents
-        title: null,
-        files: [],
-        accomplishments: [],
-        dueDate: Date.parse(new Date()),
-        writtenDate: null,
-        modifiedDate: null,
-        teacherId: "TODO teacherId",
-        dropzoneActive: false
-      },
-      editorState: EditorState.createWithContent(ContentState.createFromText(content)),
+      contents,
+      hwId,
+      editorState: EditorState.createWithContent(ContentState.createFromText(contents.content)),
+      dropzoneActive: false
     };
 
-    // this._updateOnClick = this._updateOnClick.bind(this);
-    this._handleHomeworkPost = this._handleHomeworkPost.bind(this);
     this._handleHomeworkEdit = this._handleHomeworkEdit.bind(this);
     this._dateOnChange = this._dateOnChange.bind(this);
     this._onChangeTextArea = this._onChangeTextArea.bind(this);
@@ -92,7 +84,7 @@ class HomeworkBoard extends React.Component {
   }
 
   render() {
-    let { contents, editorState, mode } = this.state;
+    let { contents, editorState } = this.state;
     let {title} = contents;
 
     let dueDate = contents.dueDate ? new Date(parseInt(contents.dueDate)) : new Date();
@@ -201,46 +193,12 @@ class HomeworkBoard extends React.Component {
   }
 
   updateHomework() {
-    let { mode, contents, index, editorState} = this.state;
+    let { contents, index, editorState} = this.state;
     let requestContent = Object.assign({}, contents, {
       content: editorState.getCurrentContent().getPlainText()
     })
-    if (mode == 'create') {
-      requestContent.writtenDate = Date.now() + "";
-      this._handleHomeworkPost(requestContent);
-    } else if ( mode == 'update' ){
-      this._handleHomeworkEdit(contents._id, index, requestContent);
-    }
-    this.props.closeBoard();
-  }
-
-  _handleHomeworkPost(contents){
-    this.props.homeworkPostRequest(contents).then(
-      () => {
-        console.log(this.props.homeworkPostStatus)
-        if(this.props.homeworkPostStatus == "SUCCESS") {
-          Materialize.toast('숙제가 등록되었습니다!', 2000);
-        }
-        else {
-          let $toastContent;
-          switch(this.props.homeworkPostStatus.error) {
-            case 1:
-              $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
-              Materialize.toast($toastContent, 2000);
-              setTimeout(()=> {location.reload(false);}, 2000);
-              break;
-            case 2:
-              $toastContent = $('<span style="color: #FFB4BA">모든 정보를채워주세요.</span>');
-              Materialize.toast($toastContent, 2000);
-              break;
-            default:
-              $toastContent = $('<span style="color: #FFB4BA">서버 에러 발생. <br /> 관리자에게 문의하세요.</span>');
-              Materialize.toast($toastContent, 2000);
-              break;
-          }
-        }
-      }
-    );
+    delete requestContent.files 
+    this._handleHomeworkEdit(contents._id, index, requestContent);
   }
 
   _handleHomeworkEdit(id, index, content){
@@ -248,25 +206,27 @@ class HomeworkBoard extends React.Component {
       if(this.props.homeworkPostStatus == "SUCCESS") {
         Materialize.toast('숙제가 갱신되었습니다!', 2000);
       }
-      else {
-        let $toastContent;
-        switch(this.props.homeworkEditStatus.error) {
-          case 1:
-          $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
-          Materialize.toast($toastContent, 2000);
-          setTimeout(()=> {location.reload(false);}, 2000);
-          break;
-          case 2:
-          $toastContent = $('<span style="color: #FFB4BA">모든 정보를채워주세요.</span>');
-          Materialize.toast($toastContent, 2000);
-          break;
-          default:
-          $toastContent = $('<span style="color: #FFB4BA">서버 에러 발생. <br /> 관리자에게 문의하세요.</span>');
-          Materialize.toast($toastContent, 2000);
-          break;
-        }
-      }
+      else { this._handleError(this.props.homeworkEditStatus.error) }
     });
+  }
+
+  _handleError(error) {
+    let $toastContent;
+    switch(error) {
+      case 1:
+        $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
+        Materialize.toast($toastContent, 2000);
+        setTimeout(()=> {location.reload(false);}, 2000);
+        break;
+      case 2:
+        $toastContent = $('<span style="color: #FFB4BA">모든 정보를채워주세요.</span>');
+        Materialize.toast($toastContent, 2000);
+        break;
+      default:
+        $toastContent = $('<span style="color: #FFB4BA">서버 에러 발생. <br /> 관리자에게 문의하세요.</span>');
+        Materialize.toast($toastContent, 2000);
+        break;
+    }
   }
 
   _showUpload(props) {

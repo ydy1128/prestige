@@ -22,14 +22,12 @@ var Present = ({ props, state, style, functions }) => {
     let {
         onClickCreateHomework,
         onClickEditHomework,
-        homeworkPostRequest,
         homeworkEditRequest,
         deleteHomeworks,
         handleRowSelection,
         closeBoard,
         toggleDeleteDialog
     } = functions;
-    console.log("hwdata", hwData);
     
     const tableButtons = [
         <a onClick={toggleDeleteDialog(true)}>
@@ -44,7 +42,7 @@ var Present = ({ props, state, style, functions }) => {
         <a onClick={closeBoard}>
             <FontAwesome id="stdBoardRemove" className={'remove-button right '} name="arrow-left" />
         </a>,
-        <a onClick={(e) => {console.log(homeworkBoard); homeworkBoard.updateHomework()}}>
+        <a onClick={(e) => {homeworkBoard.updateHomework(); closeBoard();}}>
             <FontAwesome id="stdBoardRemove" className={'remove-button right '} name="upload" />
         </a>    
     ];
@@ -70,11 +68,9 @@ var Present = ({ props, state, style, functions }) => {
                             onRef={(ref) => {homeworkBoard = ref}}
                             hw={selectedHw}
                             selectedHwIndex={selectedHwIndex}
-                            closeBoard={closeBoard}
-                            homeworkPostRequest={homeworkPostRequest}
                             homeworkEditRequest={homeworkEditRequest}
                         />      
-                        <Comments />
+                        <Comments comments={selectedHw ? selectedHw.comments : null}/>
                     </div>
                     :
                     <div className="col m12">

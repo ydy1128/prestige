@@ -60,36 +60,6 @@ class DeleteDialog extends React.Component {
         this.props.closeDialog();
     }
 
-    _handleHomeworkPost(contents){
-        return this.props.homeworkPostRequest(contents).then(
-            () => {
-                console.log(this.props.homeworkPostStatus.status)
-                if(this.props.homeworkPostStatus === "SUCCESS") {
-                    Materialize.toast('숙제가 등록되었습니다!', 2000);
-                }
-                else {
-                    let $toastContent;
-                    switch(this.props.homeworkPostStatus.error) {
-                        case 1:
-                        $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
-                        Materialize.toast($toastContent, 2000);
-                        setTimeout(()=> {location.reload(false);}, 2000);
-                        break;
-                        case 2:
-                        $toastContent = $('<span style="color: #FFB4BA">모든 정보를채워주세요.</span>');
-                        Materialize.toast($toastContent, 2000);
-                        break;
-                        default:
-                        $toastContent = $('<span style="color: #FFB4BA">서버 에러 발생. <br /> 관리자에게 문의하세요.</span>');
-                        Materialize.toast($toastContent, 2000);
-                        break;
-                    }
-
-                }
-            }
-        );
-    }
-
 }
 
 const mapStateToProps = (state) => {

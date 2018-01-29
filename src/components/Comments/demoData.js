@@ -3,7 +3,7 @@ export default [
         writtenDate: (new Date()).getTime(),
         editedDate: (new Date()).getTime(),
         name: "손준혁",
-        type: "teacher",
+        role: "teacher",
         id: "1234567",
         content: "준혁 선생",
         // replies: [String] // ids of comment
@@ -12,7 +12,7 @@ export default [
         writtenDate: (new Date()).getTime(),
         editedDate: (new Date()).getTime(),
         name: "윤대영인대영",
-        type:"student",
+        role:"student",
         id: "1234565",
         content: "나는 윤대영인데영",
         // replies: [String] // ids of comment

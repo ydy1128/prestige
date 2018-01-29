@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+import axios from 'axios';
 
 // ACTIONS
 import { } from 'actions/homework';
@@ -9,7 +10,8 @@ import { } from 'actions/homework';
 // STORE
 function mapStateToProps (state) {
   let homework  = state.homework;
-  return { }
+  let userInfo = state.authentication.status.currentUser;
+  return { userInfo }
 }
 
 const mapDispatchToProps = (dispatch) => {
@@ -25,6 +27,8 @@ var contain = (Present)  => {
     // CLASS INNER FUNCTIONS
     constructor(props) {
       super(props);
+      let comments = this.props.comments;
+      axios.get('/api/comments',{ comments })
       this.state = {
       };
     }
@@ -36,6 +40,7 @@ var contain = (Present)  => {
       let customProps = {
       };
       let presentFunctions = {
+        updateComments: this._updateComments.bind(this)
       }
 
       return (  // Do not modify!!
@@ -48,8 +53,7 @@ var contain = (Present)  => {
     }
 
     // COMPONENT LIFE CYCLE
-    componentWillMount() {
-    }
+    componentWillMount() {}
 
     componentWillReceiveProps(nextProps) {}
 
@@ -64,6 +68,9 @@ var contain = (Present)  => {
     componentWillUnmount() {}
 
     // CUSTOM FUNCTIONS
+    _updateComments() {
+
+    }
   }
 
   // PROPS SETTING
