@@ -11,7 +11,7 @@ html, body{
 	height: 100%;
 	width: 100%;
 	font-family: 'HYSUPM';
-	background-color: $back-color;
+	// background-color: $back-color;
 }
 a{
 	color: black;
@@ -24,9 +24,7 @@ a{
 }
 
 .App{
-	background-color: #E6DDDD;
-	height: 100%;
-	width: 100%;
+	background-color: #d3d3d3;
 	-webkit-transition: 0.4s;
     transition: 0.4s;
     .App-Contents{
@@ -46,38 +44,6 @@ a{
 		height: 130px;
 		text-align: center;
 
-	}
-}
-
-.App-Header{
-	height: 80px;
-	background-color: $point-color;
-	color: white;
-	box-shadow: 0 0 20px #3f3f3f;
-	.App-logo{
-		display: inline-block;
-		font-size: 28px;
-		margin: 17.5px 25px;
-		padding: 0px;
-		height: 45px;
-		width: 170px;
-		text-align: center;
-		border: 4px solid white;
-		border-radius: 8px;
-		color: white;
-	}
-	.header-buttons{
-		font-size: 40px;
-		height: 40px;
-		margin: 20px 20px;
-		cursor: pointer;
-		color: white;
-		&:hover{
-			color: $active-color;
-		}
-	}
-	.dropdown-button{
-		float: right;
 	}
 }
 

@@ -17,6 +17,7 @@ import { ClassBoard,
 
 import throwError from 'components/commons/throwError';
 
+import { BeforeLogin } from 'components/HomeView';
 class Home extends React.Component {
     constructor(props) {
         super(props);
@@ -202,34 +203,34 @@ class Home extends React.Component {
         return '';
     }
     render() {
-    	const beforeLoginView = (
-        	<div className="row Main-contents">
-        		<h1>프레스티지 수시영어전문학원</h1>
-        		<div className="col s12 m6 Main-buttons">
-        			<div className="card">
-        				<div className="card-image">
-        					<Link to="login" onClick={this.handleClick.bind(this, 'student')}>
-	        					<img src="img/students.jpg" />
-	        					<span className="card-title">학생 로그인</span>
-        					</Link>
-        				</div>
-        			</div>
-        		</div>
-        		<div className="col s12 m6 Main-buttons">
-        			<div className="card">
-        				<div className="card-image">
-        					<Link to="/login" onClick={this.handleClick.bind(this, 'teacher')}>
-	        					<img src="img/teachers.png" />
-	        					<span className="card-title">선생님 로그인</span>
-        					</Link>
-        				</div>
-        			</div>
-        		</div>
-        		<div className="col m12 Main-footer">
-        			<Link to="/register" className="Register-button">회원가입</Link>
-        		</div>
-        	</div>
-    	);
+    	// const beforeLoginView = (
+     //    	<div className="row Main-contents">
+     //    		<h1>프레스티지 수시영어전문학원</h1>
+     //    		<div className="col s12 m6 Main-buttons">
+     //    			<div className="card">
+     //    				<div className="card-image">
+     //    					<Link to="login" onClick={this.handleClick.bind(this, 'student')}>
+	    //     					<img src="img/students.jpg" />
+	    //     					<span className="card-title">학생 로그인</span>
+     //    					</Link>
+     //    				</div>
+     //    			</div>
+     //    		</div>
+     //    		<div className="col s12 m6 Main-buttons">
+     //    			<div className="card">
+     //    				<div className="card-image">
+     //    					<Link to="/login" onClick={this.handleClick.bind(this, 'teacher')}>
+	    //     					<img src="img/teachers.png" />
+	    //     					<span className="card-title">선생님 로그인</span>
+     //    					</Link>
+     //    				</div>
+     //    			</div>
+     //    		</div>
+     //    		<div className="col m12 Main-footer">
+     //    			<Link to="/register" className="Register-button">회원가입</Link>
+     //    		</div>
+     //    	</div>
+    	// );
     	const teacherMenu = (
 			<ul className="">
 				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_DASHBOARD')}    name="TEACHER_DASHBOARD"    ><FontAwesome name="dashboard"  onClick={this.handleMenuClick}/></a></li>
@@ -260,9 +261,13 @@ class Home extends React.Component {
 
     		</div>
     	)
+        const beforeLoginView = (
+            <BeforeLogin />
+            
+        )
 
         return (
-        	<div className="row Main">
+        	<div style={{height: '100%', width: '100%'}}>
 	        	{ this.props.isLoggedIn ? afterLoginView : beforeLoginView }
         	</div>
         );
