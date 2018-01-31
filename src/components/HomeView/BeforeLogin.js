@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import FontAwesome from 'react-fontawesome';
 
 import './style.scss';
-import { saveLoginData } from 'components/commons/SessionData';
+import { getLoginData, saveLoginData } from 'components/commons/SessionData';
 
 let interval;
 class BeforeLogin extends React.Component {
@@ -17,7 +17,11 @@ class BeforeLogin extends React.Component {
         this.rotateOpposite = this.rotateOpposite.bind(this);
     }
     componentDidMount(){
-        interval = setInterval(this.rotateTimer, 4000);
+        if(!getLoginData().isLoggedIn)
+            interval = setInterval(this.rotateTimer, 4000);
+    }
+    componentWillUnmount(){
+        clearInterval(interval);
     }
     rotateTimer(event){
         let fullCount = Object.keys(this.refs).length;
@@ -61,7 +65,7 @@ class BeforeLogin extends React.Component {
                 <div style={{position: 'absolute', height: '35%', width: '100%', backgroundColor: '#86272d', backgroundImage: 'url("img/backpattern.png")'}}>
                 </div>
                 <div style={{position: 'relative', display: 'flex', flexDirection: 'column', height: 'calc(100% - 100px)', width: '90%', margin: 'auto ', paddingTop: 100}}>
-                    <div style={{position: 'absolute', width: '100%', height: 'calc(100% - 100px)', zIndex: 0, overflow: 'hidden', whiteSpace: 'nowrap'}}>
+                    <div style={{position: 'absolute', width: '100%', height: 'calc(100% - 100px)', zIndex: 0, overflow: 'hidden', whiteSpace: 'nowrap', backgroundColor: 'black'}}>
                         <div id="rotateDiv" style={{width: 100 * Object.keys(this.refs).length + '%', height: '100%'}}>
                             <img ref="img1" style={{display: 'inline-block', width: 100 / Object.keys(this.refs).length + '%', height: '100%'}} src="img/1.jpg" />
                             <img ref="img2" style={{display: 'inline-block', width: 100 / Object.keys(this.refs).length + '%', height: '100%'}} src="img/2.jpg" />

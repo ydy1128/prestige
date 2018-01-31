@@ -177,7 +177,6 @@ class StudentBoard extends React.Component{
     onSearchEngineChange(event, value){
         let data = [];
         let filteredClick = [];
-        console.log(value, 'clicked: ', this.state.clicked, '')
         this.props.studentsData.map((std, i) =>{
             let push=false;
             let obj = std;
