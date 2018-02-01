@@ -37,7 +37,7 @@ class LectureTable extends React.Component{
                 acc /= lecture.accomplishments.length;
                 acc = acc.toFixed(2);
                 return(
-                    <TableRow selected={this.props.clicked.includes(i)} key={lecture._id}>
+                    <TableRow selected={this.props.searchOpen ? this.props.filteredClick.includes(i) : this.props.clicked.includes(i)} key={lecture._id}>
                         <TableRowColumn style={styles.tableButtonCol}><FontAwesome onClick={this.props.handleDialogOpen.bind(undefined, false, false, i)} className={'edit-button'} name="pencil" /></TableRowColumn>
                         <TableRowColumn>{lecture.name}</TableRowColumn>
                         <TableRowColumn>{this.props.searchClassNameById(lecture.class)}</TableRowColumn>
@@ -50,13 +50,13 @@ class LectureTable extends React.Component{
 
 		return (
             <Table  style={styles.table} 
-                    onCellClick={this.props.handleRowClick} 
+                    onCellClick={this.props.searchOpen ? this.props.handleFilteredRowClick : this.props.handleRowClick} 
                     fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
                 <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
                     { tableHeader }
                 </TableHeader>
                 <TableBody displayRowCheckbox={true} deselectOnClickaway={false} showRowHover={true} stripedRows={false}>
-                   { tableBody(this.props.lectureData) }
+                   { tableBody(this.props.searchOpen ? (this.props.searchText == '' ? this.props.lectureData : this.props.filteredData) : this.props.lectureData) }
                 </TableBody>
             </Table>
 		)

@@ -159,7 +159,8 @@ a{
 		height: 100%;
 		width: 80px;
 		padding: 0;
-		background-color: #1c240d;
+		background-color: #171D0B;
+
 		ul{
 			width: 100%;
 			margin: 0;
@@ -172,19 +173,21 @@ a{
 					color: $back-color;
 					width: 100%;
 					text-align: center;
-					border-bottom: 2px solid $back-color;
+					// border-bottom: 2px solid $back-color;
+					color: #939393;
 					span{
 						padding-top: 25px;
 						height: 80px;
 						width: 80px;
+
 					}
 					&:hover{
-						background-color: $back-color;
-						color: black;
+						background-color: #080A04;
 					}
 					&.active{
-						background-color: $back-color;
-						color: black;
+						background-color: #080A04;
+						border-left: 5px solid $point-color;
+						color: white;
 					}
 				}
 			}

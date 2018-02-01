@@ -8,12 +8,15 @@ const getLoginData = () => {
     if(loginData != undefined)
     	loginData = JSON.parse(atob(loginData));
     else
-    	loginData = {}
+    	loginData = {};
 	return loginData;
 }
 const saveLoginData = (category, data) =>{
 	let loginData = getLoginData();
 	loginData[category] = data;
+	document.cookie='key=' + btoa(JSON.stringify(loginData));
+}
+const changeLoginData = (loginData) => {
 	document.cookie='key=' + btoa(JSON.stringify(loginData));
 }
 

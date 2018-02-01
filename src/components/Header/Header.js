@@ -149,7 +149,6 @@ class Header extends React.Component {
                 </div>
             </div>
         );
-        console.log(this.props.isLoggedIn);
         return (
             <div className="App-Header" style={{backgroundColor: this.props.isLoggedIn ? '#86272d' : 'none'}}>
 	            <a className="App-logo">PRESTIGE</a>
