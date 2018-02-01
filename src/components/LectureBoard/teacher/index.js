@@ -24,6 +24,7 @@ let Present = ({ props, state, style, functions }) => {
          handleEdit,
          handleRemove,
          handleRowClick,
+         focusSearchInput,
          blurSearchInput,
          onSearchEngineChange,
          handleFilteredRowClick
@@ -47,28 +48,15 @@ let Present = ({ props, state, style, functions }) => {
         }
         closeDialog();
     }
-    // const boardHeader = (
-    //     <div className="Board-header col m12">
-    //         <div className="col m4"><h4>강의관리</h4></div>
-    //         <div className="icons col m8">
-    //             <a onClick={remove_active ? removeLectures : null}>
-    //                 <FontAwesome className={'remove-button right '+ getRemoveActive(false)} name="trash-o" />
-    //             </a>
-    //             <a onClick={remove_active ? null : openDialog.bind(undefined, true, true)}>
-    //                 <FontAwesome className={'plus-button right '+ getRemoveActive(true)} name="plus" />
-    //             </a>
-
-    //         </div>
-    //     </div>
-    // )
     return (
         <div className="Boards">
             <BoardHeader title='강의관리' remove_active={remove_active} handleRemove={handleRemove}
-                            plus_button={true} remove_button={true} search_engine={true}
+                            plus_button={true} remove_button={true} search_engine={true} searchOpen={searchOpen}
                             openDialog={openDialog.bind(undefined, true, true)} handleActive={getRemoveActive}
-                            onSearchEngineChange={onSearchEngineChange} blurSearchInput={blurSearchInput} />
+                            onSearchEngineChange={onSearchEngineChange} 
+                            focusSearchInput={focusSearchInput} blurSearchInput={blurSearchInput} />
             <div className="Board-contents row">
-                <div className="col m12">
+                <div className="col m12 boardTable">
                 	<LectureTable lectureData={lectureData} filteredData={searchResult} 
                               searchOpen={searchOpen} searchText={searchText} 
                               clicked={clicked} filteredClick={filteredClick}

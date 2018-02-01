@@ -29,6 +29,7 @@ class StudentBoard extends React.Component{
             remove_active: false,
             modal_state: true,
             searchOpen: false,
+            searchStart: false,
             searchText: '',
             searchResult: []
         }
@@ -47,6 +48,7 @@ class StudentBoard extends React.Component{
         //handle button active
         this.handleActive = this.handleActive.bind(this);
         this.searchClassNameById = this.searchClassNameById.bind(this);
+        this.focusSearchInput = this.focusSearchInput.bind(this);
         this.blurSearchInput = this.blurSearchInput.bind(this);
         this.onSearchEngineChange = this.onSearchEngineChange.bind(this);
 	}
@@ -170,9 +172,13 @@ class StudentBoard extends React.Component{
             }
         }
     }
+    focusSearchInput(){
+        this.setState({searchOpen: true});
+    }
     blurSearchInput(){ 
+        this.setState({searchOpen: false})
         if(this.state.searchText == '')
-            this.setState({searchOpen: false, searchText: '', filteredClick: []});
+            this.setState({searchStart: false, searchText: '', filteredClick: []});
     }
     onSearchEngineChange(event, value){
         let data = [];
@@ -188,7 +194,7 @@ class StudentBoard extends React.Component{
             if(push) data.push(obj);
         })
         if(value == ''){
-            this.setState({searchOpen: false, searchResult: [], filteredClick: [], searchText: ''});
+            this.setState({searchOpen: true, searchStart: false, searchResult: [], filteredClick: [], searchText: ''});
         }
         else{
             if(this.state.clicked != []){
@@ -199,20 +205,21 @@ class StudentBoard extends React.Component{
                     }
                 }
             }
-            this.setState({searchOpen: true, searchResult: data, filteredClick: filteredClick, searchText: value});
+            this.setState({searchOpen: true, searchStart: true, searchResult: data, filteredClick: filteredClick, searchText: value});
         }
     }
     render(){
         return(
             <div className="Boards">
                 <BoardHeader title='학생관리' remove_active={this.state.remove_active} handleRemove={this.handleRemove}
-                            plus_button={false} remove_button={true} search_engine={true}
+                            plus_button={false} remove_button={true} search_engine={true} searchOpen={this.state.searchOpen}
                             openDialog={null} handleActive={this.handleActive}
-                            onSearchEngineChange={this.onSearchEngineChange} blurSearchInput={this.blurSearchInput} />
+                            onSearchEngineChange={this.onSearchEngineChange} 
+                            focusSearchInput={this.focusSearchInput} blurSearchInput={this.blurSearchInput} />
                 <div className="Board-contents row">
                     <div className="col m12 boardTable">
                     	<StudentTable studentsData={this.props.studentsData} filteredData={this.state.searchResult} 
-                                        searchOpen={this.state.searchOpen} searchText={this.state.searchText} 
+                                        searchStart={this.state.searchStart} searchText={this.state.searchText} 
                     					clicked={this.state.clicked} filteredClick={this.state.filteredClick} searchClassNameById={this.searchClassNameById} 
                     					handleInfoOpen={this.handleInfoOpen} handlePassOpen={this.handlePassOpen}
                     					handleFilteredRowClick={this.handleFilteredRowClick} handleRowClick={this.handleRowClick}

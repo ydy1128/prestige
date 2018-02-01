@@ -39,6 +39,7 @@ class ClassBoard extends React.Component{
             clickedInSelectedStudents: [],
 
             filteredClick: [],
+            searchStart: false,
             searchOpen: false,
             searchText: '',
             searchResult: [],
@@ -63,6 +64,7 @@ class ClassBoard extends React.Component{
         this.handlePost = this.handlePost.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
         this.handleRemove = this.handleRemove.bind(this);
+        this.focusSearchInput = this.focusSearchInput.bind(this);
         this.blurSearchInput = this.blurSearchInput.bind(this);
         this.onSearchEngineChange = this.onSearchEngineChange.bind(this);
 
@@ -335,9 +337,13 @@ class ClassBoard extends React.Component{
             remove_active: true
         })
     }
+    focusSearchInput(){
+        this.setState({searchOpen: true});
+    }
     blurSearchInput(){
+        this.setState({searchOpen: false})
         if(this.state.searchText == '')
-            this.setState({searchOpen: false, searchText: '', filteredClick: []});
+            this.setState({searchStart: false, searchText: '', filteredClick: []});
     }
     onSearchEngineChange(event, value){
         let data = [];
@@ -353,7 +359,7 @@ class ClassBoard extends React.Component{
             console.log(data)
         })
         if(value == ''){
-            this.setState({searchOpen: false, searchResult: [], filteredClick: [], searchText: ''});
+            this.setState({searchOpen: true, searchStart: false, searchResult: [], filteredClick: [], searchText: ''});
         }
         else{
             if(this.state.clicked != []){
@@ -364,34 +370,21 @@ class ClassBoard extends React.Component{
                     }
                 }
             }
-            this.setState({searchOpen: true, searchResult: data, filteredClick: filteredClick, searchText: value});
+            this.setState({searchOpen: true, searchStart: true, searchResult: data, filteredClick: filteredClick, searchText: value});
         }
     }
 	render(){
-        // const boardHeader = (
-        //     <div className="Board-header col m12">
-        //         <div className="col m4"><h4>수업관리</h4></div>
-        //         <div className="icons col m8">
-        //             <a onClick={this.state.plus_active ? null : this.handleRemove}>
-        //                 <FontAwesome className={'remove-button right ' + this.removeActive(false)} name="trash-o" />
-        //             </a>
-        //             <a onClick={this.state.plus_active ? this.openDialog.bind(true) : nul}>
-        //                 <FontAwesome className={'plus-button right ' + this.removeActive(true)} name="plus" />
-        //             </a>
-        //         </div>
-        //     </div>
-        // )
-
 		return(
             <div className="Boards">
                 <BoardHeader title='수업관리' remove_active={this.state.remove_active} handleRemove={this.handleRemove}
-                                plus_button={true} remove_button={true} search_engine={true}
+                                plus_button={true} remove_button={true} search_engine={true} searchOpen={this.state.searchOpen}
                                 openDialog={this.openDialog.bind(true)} handleActive={this.removeActive}
-                                onSearchEngineChange={this.onSearchEngineChange} blurSearchInput={this.blurSearchInput} />
+                                onSearchEngineChange={this.onSearchEngineChange} 
+                                focusSearchInput={this.focusSearchInput} blurSearchInput={this.blurSearchInput} />
 	            <div className="Board-contents row">
                     <div className="col m12 boardTable">
                         <ClassList classData={this.props.data} filteredData={this.state.searchResult}
-                                    searchOpen={this.state.searchOpen} searchText={this.state.searchText} 
+                                    searchStart={this.state.searchStart} searchText={this.state.searchText} 
                                     clicked={this.state.clicked} filteredClick={this.state.filteredClick}
                                     processData={this.processData}
                                     handleClick={this.handleListClick}  handleFilteredClick={this.handleFilteredListClick}

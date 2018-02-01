@@ -26,10 +26,9 @@ class StudentTable extends React.Component{
             </TableRow>
         )
         const tableBody = data => {
-            console.log(this.props.searchOpen)
             return data.map((stdobj, i) => {
                 return(
-                    <TableRow selected={this.props.searchOpen ? this.props.filteredClick.includes(i) : this.props.clicked.includes(i)} key={stdobj._id}>
+                    <TableRow selected={this.props.searchStart ? this.props.filteredClick.includes(i) : this.props.clicked.includes(i)} key={stdobj._id}>
                         <TableRowColumn style={styles.tableButtonCol}><FontAwesome onClick={this.props.handleInfoOpen} className={'edit-button'} name="pencil" /></TableRowColumn>
                         <TableRowColumn style={styles.tableButtonCol}><FontAwesome onClick={this.props.handlePassOpen} className={'password-button'} name="lock" /></TableRowColumn>
                         <TableRowColumn>{stdobj.username}</TableRowColumn>
@@ -44,14 +43,14 @@ class StudentTable extends React.Component{
 
 		return (
             <Table style={styles.table} 
-                    onCellClick={this.props.searchOpen ? this.props.handleFilteredRowClick : this.props.handleRowClick} 
+                    onCellClick={this.props.searchStart ? this.props.handleFilteredRowClick : this.props.handleRowClick} 
                     fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
                 <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
                     { tableHeader }
                 </TableHeader>
-                <TableBody displayRowCheckbox={true} deselectOnClickaway={false} showRowHover={true} stripedRows={false}>
-                   { tableBody(this.props.searchOpen ? (this.props.searchText == '' ? this.props.studentsData : this.props.filteredData) : this.props.studentsData) }
-                </TableBody>
+                    <TableBody displayRowCheckbox={true} deselectOnClickaway={false} showRowHover={true} stripedRows={false}>
+                       { tableBody(this.props.searchStart ? (this.props.searchText == '' ? this.props.studentsData : this.props.filteredData) : this.props.studentsData) }
+                    </TableBody>
             </Table>
 		)
 	}

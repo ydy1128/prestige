@@ -24,6 +24,7 @@ var container = (Present) =>{
                 	accomplishments: [],
                 },
                 remove_active: false,
+                searchStart: false,
                 searchOpen: false,
                 searchText: '',
                 searchResult: [],
@@ -51,12 +52,13 @@ var container = (Present) =>{
 
             this.handleRowClick = this.handleRowClick.bind(this);
             this.handleFilteredRowClick = this.handleFilteredRowClick.bind(this);
+            this.focusSearchInput = this.focusSearchInput.bind(this);
             this.blurSearchInput = this.blurSearchInput.bind(this);
             this.onSearchEngineChange = this.onSearchEngineChange.bind(this);
 
         }
 	    render() {
-	        let presentState = ['dialogOpen', 'dialogEditMode', 'clicked', 'currObj', 'newOne', 'editlec', 'remove_active', 'filteredClick', 'searchOpen', 'searchText', 'searchResult'];
+	        let presentState = ['dialogOpen', 'dialogEditMode', 'clicked', 'currObj', 'newOne', 'editlec', 'remove_active', 'filteredClick', 'searchStart', 'searchOpen', 'searchText', 'searchResult'];
 	        let presentProps = [];
 	        let customProps = {
 	        	classData: this.state.classData,
@@ -76,6 +78,7 @@ var container = (Present) =>{
 	        	handleEdit: this.handleEdit,
 	        	handleRowClick: this.handleRowClick,
 	        	handleRemove: this.handleRemove,
+	        	focusSearchInput: this.focusSearchInput,
 	        	blurSearchInput: this.blurSearchInput,
 	        	onSearchEngineChange: this.onSearchEngineChange,
 	        	handleFilteredRowClick: this.handleFilteredRowClick,
@@ -255,9 +258,13 @@ var container = (Present) =>{
 	        // console.log(clicked, filteredClick)
 	        this.setState({clicked: clicked, filteredClick: filteredClick, remove_active: (filteredClick == 0 || clicked == 0)? false : true})
 	    }
+	    focusSearchInput(){
+	        this.setState({searchOpen: true});
+	    }
 	    blurSearchInput(){
+	    	this.setState({searchOpen: false})
 	        if(this.state.searchText == '')
-	            this.setState({searchOpen: false, searchText: '', filteredClick: []});
+	            this.setState({searchStart: false, searchText: '', filteredClick: []});
 	    }
 	    onSearchEngineChange(event, value){
 	        let data = [];
@@ -273,7 +280,7 @@ var container = (Present) =>{
 
 	        })
 	        if(value == ''){
-	            this.setState({searchOpen: false, searchResult: [], filteredClick: [], searchText: ''});
+	            this.setState({searchOpen: true, searchStart: false, searchResult: [], filteredClick: [], searchText: ''});
 	        }
 	        else{
 	            if(this.state.clicked != []){
@@ -284,7 +291,7 @@ var container = (Present) =>{
 	                    }
 	                }
 	            }
-	            this.setState({searchOpen: true, searchResult: data, filteredClick: filteredClick, searchText: value});
+	            this.setState({searchOpen: true, searchStart: true, searchResult: data, filteredClick: filteredClick, searchText: value});
 	        }
 	    }
 	}

@@ -201,7 +201,7 @@ a{
 		overflow-y: auto;
 		.Boards{
 			height: calc(100% - 60px);
-			margin: 20px 30px 0;
+			// margin: 20px 30px 0;
 			.Board-header{
 				// *{
 				// 	height: 65px;
@@ -227,9 +227,13 @@ a{
 				height: 100%;
 				.col.m12{
 					height: calc(100% - 30px);
-					&.boardTable>div{
-						height: calc(100% - 60px) !important;
-						overflow: auto;
+					padding: 0 25px;
+					&.boardTable{
+						&>div{
+							height: calc(100% - 60px) !important;
+							overflow: auto;
+							margin-top: 20px !important;
+						}
 					}
 				}
 			}
