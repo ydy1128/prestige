@@ -7,6 +7,8 @@ const getLoginData = () => {
 	let loginData = getCookie('key');
     if(loginData != undefined)
     	loginData = JSON.parse(atob(loginData));
+    else
+    	loginData = {}
 	return loginData;
 }
 const saveLoginData = (category, data) =>{

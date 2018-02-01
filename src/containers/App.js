@@ -12,7 +12,6 @@ class App extends React.Component {
     }
     loginStatus(){
         let loginData = getLoginData();
-        if(typeof loginData === "undefined") return;
 
         // if not logged in, do nothing
         if(!loginData.isLoggedIn) return;
@@ -57,7 +56,7 @@ class App extends React.Component {
                 };
 
                 document.cookie = 'key=' + btoa(JSON.stringify(loginData));
-                location.reload(false);
+                this.forceUpdate();
             }
         );
     }
