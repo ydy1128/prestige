@@ -53,7 +53,9 @@ class ClassList extends React.Component{
                                 <h5 style={styles.infoDiv}>
                                     <Checkbox 
                                     	name={cls._id + '-' + i}
-                                        label={<h5 style={{margin: '0'}}>{cls.name}</h5>} checked={this.props.selected.includes(i)} onCheck={this.props.handleClick}
+                                        label={<h5 style={{margin: '0'}}>{cls.name}</h5>} 
+                                        checked={this.props.searchStart ? this.props.filteredClick.includes(i) : this.props.clicked.includes(i)} 
+                                        onCheck={this.props.searchStart ? this.props.handleFilteredClick : this.props.handleClick}
                                         style={{verticalAlignment:'middle'}}/>
                                     
                                 </h5>
@@ -79,7 +81,7 @@ class ClassList extends React.Component{
                 cellHeight={200}
                 padding={15}
             >
-                {gridListBody(this.props.classData)}
+                { gridListBody( this.props.searchStart ? (this.props.searchText == '' ? this.props.classData : this.props.filteredData) : this.props.classData) }
             </GridList>
 		)
 	}

@@ -5,13 +5,14 @@ import FontAwesome from 'react-fontawesome';
 
 import ClassList from './ClassList';
 import ClassDialog from './ClassDialog';
+import BoardHeader from 'components/commons/BoardHeader';
 
 class ClassBoard extends React.Component{
 	constructor(props){
 		super(props);
         this.state = {
-            selected: [],
-            plus_active: true,
+            clicked: [],
+            remove_active: false,
             newClass: true,
             dialogOpen: false,
             dialogMode: true,
@@ -35,13 +36,18 @@ class ClassBoard extends React.Component{
             allStudents: [],
             selectedStudents: [],
             clickedInAllStudents: [],
-            clickedInSelectedStudents: []
+            clickedInSelectedStudents: [],
+
+            filteredClick: [],
+            searchStart: false,
+            searchOpen: false,
+            searchText: '',
+            searchResult: [],
         }
         //Dialog Mode and Open state
         this.toggleDialog = this.toggleDialog.bind(this);
         this.toggleDialogMode = this.toggleDialogMode.bind(this);
-        this.openDialogStudentMode = this.openDialogStudentMode.bind(this);
-        this.openDialogClassMode = this.openDialogClassMode.bind(this);
+        this.openDialog = this.openDialog.bind(this);
         this.closeDialog = this.closeDialog.bind(this);
         //Handling Dialog Data
         this.processData = this.processData.bind(this);
@@ -51,12 +57,17 @@ class ClassBoard extends React.Component{
         this.addToClass = this.addToClass.bind(this);
         this.removeFromClass = this.removeFromClass.bind(this);
         this.handleListClick = this.handleListClick.bind(this);
+        this.handleFilteredListClick = this.handleFilteredListClick.bind(this);
 
-        this.getPlusActive = this.getPlusActive.bind(this);
+        this.removeActive = this.removeActive.bind(this);
         this.activateModal = this.activateModal.bind(this);
         this.handlePost = this.handlePost.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
         this.handleRemove = this.handleRemove.bind(this);
+        this.focusSearchInput = this.focusSearchInput.bind(this);
+        this.blurSearchInput = this.blurSearchInput.bind(this);
+        this.onSearchEngineChange = this.onSearchEngineChange.bind(this);
+
 	}
     //Dialog Mode and Open state
     toggleDialog(setOpen){
@@ -65,12 +76,8 @@ class ClassBoard extends React.Component{
     toggleDialogMode(setMode){
         this.setState({dialogMode: setMode})
     }
-    openDialogClassMode(){
-        this.toggleDialogMode(true);
-        this.toggleDialog(true);
-    }
-    openDialogStudentMode(){
-        this.toggleDialogMode(false);
+    openDialog(mode){
+        this.toggleDialogMode(mode);
         this.toggleDialog(true);
     }
     closeDialog(){
@@ -200,44 +207,66 @@ class ClassBoard extends React.Component{
     }
 
 
-    handleListClick(event, selected){
-        let selected_array = [...this.state.selected];
-        let plus_active = true;
+    handleListClick(event, clicked){
+        let clicked_array = [...this.state.clicked];
+        let remove_active = false;
 
-        console.log(selected);
-        console.log(event.target.name.split('-')[1])
         let index = parseInt(event.target.name.split('-')[1]);
-        let index_in_selected = selected_array.findIndex(x => x == index);
-        if(selected){
-            selected_array.push(index);
+        let index_in_clicked = clicked_array.findIndex(x => x == index);
+        if(clicked){
+            clicked_array.push(index);
         }
         else{
-            selected_array.splice(index_in_selected, 1);
+            clicked_array.splice(index_in_clicked, 1);
         }
-        console.log(selected_array);
+        console.log(clicked_array);
 
-        if(selected_array.length > 0){
-            plus_active = false;
+        if(clicked_array.length > 0){
+            remove_active = true;
         }
         else{
-            plus_active = true;
+            remove_active = false;
         }
         this.setState({
-            selected: selected_array,
-            plus_active: plus_active
+            clicked: clicked_array,
+            remove_active: remove_active
         })
     }
+    handleFilteredListClick(event, rowNumber){
+        // let filteredClick = [...this.state.filteredClick];
+        // let index = filteredClick.indexOf(rowNumber);
+        // let push = false;
+        // if(index == -1){
+        //     filteredClick.push(rowNumber);
+        //     index = rowNumber;
+        //     push = true;
+        // }
+        // else
+        //     filteredClick.splice(index, 1);
+        // let clicked = [...this.state.clicked];
+        // let origIndex = this.state.searchResult[index].index;
 
-    getPlusActive(plus_button){
-        if(plus_button){
-            return this.state.plus_active? '':'inactive';
+
+        // if(push){
+        //     clicked.push(origIndex);
+        // }
+        // else{
+        //     origIndex = clicked.indexOf(origIndex);
+        //     clicked.splice(origIndex, 1);
+        // }
+        // // console.log(clicked, filteredClick)
+        // this.setState({clicked: clicked, filteredClick: filteredClick, remove_active: (filteredClick == 0 || clicked == 0)? false : true})
+    }
+    removeActive(remove_button){
+        if(remove_button){
+            return this.state.remove_active? 'inactive':'';
         }
         else{
-            return this.state.plus_active? 'inactive':'';
+            return this.state.remove_active? '':'inactive';
         }
     }
     activateModal(){
-        if(this.state.plus_active)
+        if(this.state.remove_active)
             return 'modal-trigger';
         else
             return '';
@@ -290,10 +319,10 @@ class ClassBoard extends React.Component{
     }
     handleRemove(){
         let props = this.props;
-        let selected = [...this.state.selected];
+        let clicked = [...this.state.clicked];
         let student_ids = [];
-        // console.log(selected)
-        this.state.selected.map(function(index, i){
+        // console.log(clicked)
+        this.state.clicked.map(function(index, i){
             student_ids = [...student_ids, ...props.data[index].students];
             props.onRemove(props.data[index]._id, index);
         });
@@ -304,38 +333,67 @@ class ClassBoard extends React.Component{
             props.onStudentEdit(std_obj, std_idx, true);
         }
         this.setState({
-            selected: [],
-            plus_active: true
+            clicked: [],
+            remove_active: true
         })
     }
-	render(){
-        const boardHeader = (
-            <div className="Board-header col m12">
-                <div className="col m4"><h4>수업관리</h4></div>
-                <div className="icons col m8">
-                    <a onClick={this.state.plus_active ? null : this.handleRemove}>
-                        <FontAwesome className={'remove-button right ' + this.getPlusActive(false)} name="trash-o" />
-                    </a>
-                    <a onClick={this.state.plus_active ? this.openDialogClassMode : null}>
-                        <FontAwesome className={'plus-button right ' + this.getPlusActive(true)} name="plus" />
-                    </a>
-                </div>
-            </div>
-        )
+    focusSearchInput(){
+        this.setState({searchOpen: true});
+    }
+    blurSearchInput(){
+        this.setState({searchOpen: false})
+        if(this.state.searchText == '')
+            this.setState({searchStart: false, searchText: '', filteredClick: []});
+    }
+    onSearchEngineChange(event, value){
+        let data = [];
+        let filteredClick = [];
+        this.props.data.map((cls, i) =>{
+            let push=false;
+            let obj = cls;
+            obj.index = i;
 
+            if(obj.name.includes(value)) push = true;
+            if(obj.days.includes(value)) push = true;
+            if(push) data.push(obj);
+            console.log(data)
+        })
+        if(value == ''){
+            this.setState({searchOpen: true, searchStart: false, searchResult: [], filteredClick: [], searchText: ''});
+        }
+        else{
+            if(this.state.clicked != []){
+                for(let i = 0; i < this.state.clicked.length; i++){
+                    let filteredIndex = data.indexOf(this.props.data[this.state.clicked[i]]);
+                    if(filteredIndex != -1){
+                        filteredClick.push(filteredIndex);
+                    }
+                }
+            }
+            this.setState({searchOpen: true, searchStart: true, searchResult: data, filteredClick: filteredClick, searchText: value});
+        }
+    }
+	render(){
 		return(
             <div className="Boards">
-                { boardHeader }
+                <BoardHeader title='수업관리' remove_active={this.state.remove_active} handleRemove={this.handleRemove}
+                                plus_button={true} remove_button={true} search_engine={true} searchOpen={this.state.searchOpen}
+                                openDialog={this.openDialog.bind(true)} handleActive={this.removeActive}
+                                onSearchEngineChange={this.onSearchEngineChange} 
+                                focusSearchInput={this.focusSearchInput} blurSearchInput={this.blurSearchInput} />
 	            <div className="Board-contents row">
-                    <div className="col m12">
-                        <ClassList classData={this.props.data} selected={this.state.selected}
-                                    processData={this.processData} handleClick={this.handleListClick} 
-                                   openClassMode={this.openDialogClassMode} openStudentMode={this.openDialogStudentMode} />
+                    <div className="col m12 boardTable">
+                        <ClassList classData={this.props.data} filteredData={this.state.searchResult}
+                                    searchStart={this.state.searchStart} searchText={this.state.searchText} 
+                                    clicked={this.state.clicked} filteredClick={this.state.filteredClick}
+                                    processData={this.processData}
+                                    handleClick={this.handleListClick}  handleFilteredClick={this.handleFilteredListClick}
+                                    openClassMode={this.openDialog.bind(true)} openStudentMode={this.openDialog.bind(false)} />
                     </div>
 	            </div>
                 <ClassDialog mode={this.state.dialogMode} newClass={this.state.newClass} open={this.state.dialogOpen} data={this.state.editClass}
                              allStudents={this.state.allStudents} selectedStudents={this.state.selectedStudents} clickedInSelectedStudents={this.state.clickedInSelectedStudents} clickedInAllStudents={this.state.clickedInAllStudents}
-                             handleDataChange={this.handleDialogDataChange} handleCheck={this.handleDialogDayCheck} onCellClick={this.onCellClick}
+                             handleDataChange={this.handleDialogDataChange} onCellClick={this.onCellClick}
                              handlePost={this.handlePost} handleEdit={this.handleEdit}
                              addToClass={this.addToClass} removeFromClass={this.removeFromClass} handleClose={this.closeDialog} />
             </div>

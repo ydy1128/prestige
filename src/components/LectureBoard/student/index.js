@@ -29,7 +29,7 @@ let Present = ({ props, state, style, functions }) => {
         <div className="Boards">
             { boardHeader }
             <div className="Board-contents row">
-                <div className="col m12">
+                <div className="col m12 boardTable">
                 	<LectureTable lectureData={lectureData} 
                                   handleDialogOpen={openDialog} searchClassNameById={searchClassNameById}
                                   handleRowClick={null}

@@ -1,12 +1,15 @@
 @import '../../style/vars.scss';
 
 .App-Header{
+	// background-color: $point-color;
+	// box-shadow: 0 0 20px #3f3f3f;
+	position: absolute;
+	width: 100%;
+	left: 0;
+	top: 0;
 	height: 80px;
-	background-color: $point-color;
 	color: white;
-	box-shadow: 0 0 20px #3f3f3f;
-
-
+	z-index: 1;
 	.dropdown-button{
 		float: right;
 	}

@@ -12,6 +12,7 @@ var container = (Present) =>{
                 dialogEditMode: true,
                 newOne: true,
                 clicked: [],
+                filteredClick: [],
                 classData: [],
                 editlec: -1,
                 currObj: {
@@ -23,6 +24,11 @@ var container = (Present) =>{
                 	accomplishments: [],
                 },
                 remove_active: false,
+                searchStart: false,
+                searchOpen: false,
+                searchText: '',
+                searchResult: [],
+
             };
             this.filterAutocompleteData = this.filterAutocompleteData.bind(this);
 
@@ -45,10 +51,14 @@ var container = (Present) =>{
             this.handleRemove = this.handleRemove.bind(this);
 
             this.handleRowClick = this.handleRowClick.bind(this);
+            this.handleFilteredRowClick = this.handleFilteredRowClick.bind(this);
+            this.focusSearchInput = this.focusSearchInput.bind(this);
+            this.blurSearchInput = this.blurSearchInput.bind(this);
+            this.onSearchEngineChange = this.onSearchEngineChange.bind(this);
 
         }
 	    render() {
-	        let presentState = ['dialogOpen', 'dialogEditMode', 'clicked', 'currObj', 'newOne', 'editlec', 'remove_active'];
+	        let presentState = ['dialogOpen', 'dialogEditMode', 'clicked', 'currObj', 'newOne', 'editlec', 'remove_active', 'filteredClick', 'searchStart', 'searchOpen', 'searchText', 'searchResult'];
 	        let presentProps = [];
 	        let customProps = {
 	        	classData: this.state.classData,
@@ -68,6 +78,10 @@ var container = (Present) =>{
 	        	handleEdit: this.handleEdit,
 	        	handleRowClick: this.handleRowClick,
 	        	handleRemove: this.handleRemove,
+	        	focusSearchInput: this.focusSearchInput,
+	        	blurSearchInput: this.blurSearchInput,
+	        	onSearchEngineChange: this.onSearchEngineChange,
+	        	handleFilteredRowClick: this.handleFilteredRowClick,
 	        }
 
 	        return (
@@ -218,6 +232,67 @@ var container = (Present) =>{
 	        else
 	            clicked.splice(index, 1);
 	        this.setState({clicked: clicked, remove_active: clicked.length == 0 ? false : true})
+	    }
+	    handleFilteredRowClick(rowNumber, columnId){
+	        let filteredClick = [...this.state.filteredClick];
+	        let index = filteredClick.indexOf(rowNumber);
+	        let push = false;
+	        if(index == -1){
+	            filteredClick.push(rowNumber);
+	            index = rowNumber;
+	            push = true;
+	        }
+	        else
+	            filteredClick.splice(index, 1);
+	        let clicked = [...this.state.clicked];
+	        let origIndex = this.state.searchResult[index].index;
+
+
+	        if(push){
+	            clicked.push(origIndex);
+	        }
+	        else{
+	            origIndex = clicked.indexOf(origIndex);
+	            clicked.splice(origIndex, 1);
+	        }
+	        // console.log(clicked, filteredClick)
+	        this.setState({clicked: clicked, filteredClick: filteredClick, remove_active: (filteredClick == 0 || clicked == 0)? false : true})
+	    }
+	    focusSearchInput(){
+	        this.setState({searchOpen: true});
+	    }
+	    blurSearchInput(){
+	    	this.setState({searchOpen: false})
+	        if(this.state.searchText == '')
+	            this.setState({searchStart: false, searchText: '', filteredClick: []});
+	    }
+	    onSearchEngineChange(event, value){
+	        let data = [];
+	        let filteredClick = [];
+	        this.props.lectureData.map((lec, i) =>{
+	            let push=false;
+	            let obj = lec;
+	            obj.index = i;
+
+	            if(obj.name.includes(value)) push = true;
+	            if(this.searchClassNameById(obj.class).includes(value)) push = true;
+	            if(push) data.push(obj);
+
+	        })
+	        if(value == ''){
+	            this.setState({searchOpen: true, searchStart: false, searchResult: [], filteredClick: [], searchText: ''});
+	        }
+	        else{
+	            if(this.state.clicked != []){
+	                for(let i = 0; i < this.state.clicked.length; i++){
+	                    let filteredIndex = data.indexOf(this.props.lectureData[this.state.clicked[i]]);
+	                    if(filteredIndex != -1){
+	                        filteredClick.push(filteredIndex);
+	                    }
+	                }
+	            }
+	            this.setState({searchOpen: true, searchStart: true, searchResult: data, filteredClick: filteredClick, searchText: value});
+	        }
 	    }
 	}
 	Container.propTypes = {

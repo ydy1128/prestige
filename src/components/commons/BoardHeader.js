@@ -8,35 +8,63 @@ import TextField from 'material-ui/TextField';
 class BoardHeader extends React.Component{
 	constructor(props){
 		super(props);
+		this.state = {
+			buttonCount: 0,
+		}
+        this.getButtonCount = this.getButtonCount.bind(this);
         this.focusSearchInput = this.focusSearchInput.bind(this);
+    }
+    componentWillMount(){
+    	this.getButtonCount()
     }
     focusSearchInput(){
         this.refs.searchEngine.focus();
+        this.props.focusSearchInput();
+    }
+    getButtonCount(){
+    	let buttonCount = 0;
+    	if(this.props.remove_button) buttonCount++;
+    	if(this.props.plus_button) buttonCount++;
+    	if(this.props.search_engine) buttonCount++;
+    	console.log(buttonCount);
+    	this.setState({buttonCount: buttonCount});
     }
 	render(){
 		const remove_button = (
-            <a onClick={this.props.remove_active? this.props.handleRemove : null}>
-                <FontAwesome id="stdBoardRemove" className={'remove-button right ' + this.props.handleActive(false)} name="trash-o" />
+            <a onClick={this.props.remove_active? this.props.handleRemove : null} style={{float: 'right'}}>
+                <FontAwesome id="stdBoardRemove" className={'remove-button ' + this.props.handleActive(false)} name="trash-o" />
             </a>
 		)
 		const plus_button = (
-            <a onClick={this.props.remove_active ? null : this.props.openDialog}>
-                <FontAwesome className={'plus-button right '+ this.props.handleActive(true)} name="plus" />
+            <a onClick={this.props.remove_active ? null : this.props.openDialog} style={{float: 'right'}}>
+                <FontAwesome className={'plus-button '+ this.props.handleActive(true)} name="plus" />
             </a>
 		)
 		const search_button = (
-            <a onClick={this.focusSearchInput}>
-                <FontAwesome  className={'search-button left '} name="search" />
+            <a onClick={this.focusSearchInput} 
+            	style={{float: 'right', marginRight: this.props.searchOpen? '270px': 0}} >
+                <FontAwesome  className={'search-button'} name="search" />
             </a>
 		)
 		const search_engine = (
             <TextField name="searchEngine" ref="searchEngine"
             		onChange={this.props.onSearchEngineChange} onFocus={this.focusSearchInput} onBlur={this.props.blurSearchInput} 
-            		style={styles.searchEngine}/>
+            		style={{
+						position: 'absolute',
+						right: this.state.buttonCount * 50,
+						height: '55px',
+						width: this.props.searchOpen ? '250px' : 0,
+						zIndex: this.props.searchOpen ? 0 : -10,
+						margin: '10px 10px -20px -20px',
+						padding: '0 10px'
+					}}/>
 		) 
+		console.log(this.props.searchOpen);
 		return(
-	        <div className="Board-header col m12">
-	            <div style={styles.boardTitle} className="col m4"><h4>{this.props.title}</h4></div>
+	        <div className="Board-header col m12" style={styles.boardHeader}>
+	            <div style={styles.boardTitle} className="col m4">
+	            	<h4 style={styles.boardTitleText}>{this.props.title}</h4>
+	            </div>
 	            <div style={styles.boardIcons}className="icons col m8">
 	            	{this.props.remove_button ? remove_button : null}
 	            	{this.props.plus_button ? plus_button : null}
@@ -49,13 +77,24 @@ class BoardHeader extends React.Component{
 }
 
 let styles = {
+	boardHeader: {
+		backgroundColor: 'white',
+		borderBottom: '2px solid #d3d3d3',
+		color: '#939393'
+	},
 	boardTitle: {
-		width: '180px'
+		width: '200px',
+		textAlign: 'center'
+	},
+	boardTitleText: {
+		margin: '20px 0'
 	},
 	boardIcons: {
-		width: 'calc(100% - 180px)'
+		width: 'calc(100% - 200px)'
 	},
 	searchEngine: {
+		position: 'absolute',
+		right: 0,
 		height: '55px',
 		margin: '10px 10px -20px -20px',
 		padding: '0 10px'

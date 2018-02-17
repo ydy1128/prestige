@@ -1,0 +1,15 @@
+.hoverDiv:hover{
+	background-color: rgba(145, 59, 64, .6);
+}
+.links{
+	color: #d3d3d3;
+	&:hover{
+		color: #f8c709;
+	}
+}
+.rotateButton{
+	cursor: pointer;
+	&:hover{
+		color: #f8c709;
+	}
+}
