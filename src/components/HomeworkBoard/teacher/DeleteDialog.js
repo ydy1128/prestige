@@ -22,16 +22,16 @@ class DeleteDialog extends React.Component {
         // let { } = this.state;
 
         const actions = [
-          <FlatButton
-            label="Cancel"
-            primary={true}
-            onClick={this._cancleOnClick}
-          />,
-          <FlatButton
-            label="Delete"
-            primary={true}
-            onClick={this._deleteOnClick}
-          />,
+            <FlatButton
+                label="Delete"
+                primary={true}
+                onClick={this._deleteOnClick}
+            />,
+            <FlatButton
+                label="Cancel"
+                primary={true}
+                onClick={this._cancleOnClick}
+            />,
         ];
 
         return (

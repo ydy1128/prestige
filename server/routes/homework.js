@@ -3,8 +3,11 @@ import Homework from '../models/Homework';
 import mongoose from 'mongoose';
 import throwError from './throwerror';
 import { log } from 'util';
+import path from 'path';
+import rimraf from 'rimraf';
 
 const router = express.Router();
+const uploadBasePath = 'public/uploads/';
 
 router.post('/', (req, res) => { createHomework(req, res); });
 router.get('*', (req, res) => { readHomework(req, res); });
@@ -74,6 +77,11 @@ const deleteHomework = (req, res) => {
         // Remove class
         Homework.remove({ _id: hwId }, err => {
             if(err) return throwError(res, 409, 'DB error.');
+            let filePath = path.join(__dirname, "../../", uploadBasePath , hwId);
+            rimraf(filePath, 
+                (res)=>{ }, 
+                (err)=>{ }
+            );
             res.json({ success: true });
         });
     });

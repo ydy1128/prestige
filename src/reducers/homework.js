@@ -132,9 +132,9 @@ export default function makeclass(state, action) {
                 remove:{
                     status: { $set: 'SUCCESS' }
                 },
-                board: {
-                    data: { $splice: [[action.index, 1]] }
-                }
+                // board: {
+                //     data: { $splice: [[action.index, 1]] }
+                // }
             });
         case types.HOMEWORK_REMOVE_FAILURE:
             return update(state, {

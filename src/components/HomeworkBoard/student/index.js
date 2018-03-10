@@ -3,22 +3,18 @@ import contain from './Container';
 
 import FontAwesome from 'react-fontawesome';
 
-// style
-import getStyleWith from './style';
-
 // SUBCOMPONENTS
-import HomeworkTable from './HomeworkTable';
-import HomeworkBoard from './HomeworkBoard';
-import DeleteDialog from './DeleteDialog';
+// import HomeworkTable from './HomeworkTable';
+// import HomeworkBoard from './HomeworkBoard';
 
 import Comments from '../Comments';
+import { log } from "util";
 
 let homeworkBoard = null;
 
 var Present = ({ props, state, style, functions }) => {
-    let styles = getStyleWith(props) // Do not modify!!
     let { hwData } = props;
-    let { boardOn, clickedRowIndexes, selectedHw, deleteDialogOn, selectedHwIndex} = state;
+    let { boardOn, clickedRowIndexes, deleteDialogOn, selectedHwIndex} = state;
     let {
         onClickCreateHomework,
         onClickEditHomework,
@@ -42,11 +38,12 @@ var Present = ({ props, state, style, functions }) => {
         <a onClick={closeBoard}>
             <FontAwesome id="stdBoardRemove" className={'remove-button right '} name="arrow-left" />
         </a>,
-        <a onClick={(e) => {homeworkBoard.updateHomework(); closeBoard();}}>
+        <a onClick={(e) => {homeworkBoard.updateHomework(selectedHwIndex); closeBoard();}}>
             <FontAwesome id="stdBoardRemove" className={'remove-button right '} name="upload" />
         </a>    
     ];
-    
+    let selectedHw = hwData[selectedHwIndex] ? hwData[selectedHwIndex] : null ;
+
     const boardHeader = (
         <div className="Board-header col m12">
             <div className="col m4"><h4>숙제관리</h4></div>
@@ -57,11 +54,13 @@ var Present = ({ props, state, style, functions }) => {
             </div>
         </div>
     )
+
+    if(selectedHw) console.log(selectedHw , selectedHw.comments)
     return (
         <div className="Boards" id='homework-section'>
             { boardHeader }
             <div className="Board-contents row">
-                {   
+                {/*  
                     boardOn ?
                     <div className="col m12">
                         <HomeworkBoard key={Math.random()*1000000}
@@ -69,8 +68,8 @@ var Present = ({ props, state, style, functions }) => {
                             hw={selectedHw}
                             selectedHwIndex={selectedHwIndex}
                             homeworkEditRequest={homeworkEditRequest}
-                        />      
-                        <Comments comments={selectedHw ? selectedHw.comments : null}/>
+                        />
+                        <Comments key={selectedHw._id} hwId={selectedHw._id} comments={selectedHw ? selectedHw.comments : null}/>
                     </div>
                     :
                     <div className="col m12">
@@ -80,14 +79,8 @@ var Present = ({ props, state, style, functions }) => {
                             onClickEditHomework={onClickEditHomework}
                         />
                     </div>
-                    
-                }
+                */}
             </div>
-            <DeleteDialog key={Math.random()*1000000}
-                dialogOn={deleteDialogOn}
-                closeDialog={toggleDeleteDialog(false)}
-                deleteHomeworks={deleteHomeworks}
-            />
         </div>
     )
 }

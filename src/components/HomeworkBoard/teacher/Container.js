@@ -33,8 +33,8 @@ import {
       homeworkEditRequest: (id, index, contents) => {
         return dispatch(homeworkEditRequest(id, index, contents));
       },
-      homeworkRemoveRequest: (id, index) => {
-        return dispatch(homeworkRemoveRequest(id, index));
+      homeworkRemoveRequest: (id) => {
+        return dispatch(homeworkRemoveRequest(id));
       }
     };
   };
@@ -47,36 +47,48 @@ import {
         super(props);
         this.state = {
           boardOn: false,
-          clickedRowIndexes: [],
           selectedHw: null,
           deleteDialogOn: false,
           selectedHwIndex: null,
+
+          filteredClick: [],
+          searchOpen: false,
+          searchText: '',
+          searchResult: [],
+          isNewHomework: false,
         };
-        this._handleRowSelection = this._handleRowSelection.bind(this);
-        this._deleteHomeworks = this._deleteHomeworks.bind(this);
-        this._loadHomeworkData = this._loadHomeworkData.bind(this);
-        this._onClickCreateHomework = this._onClickCreateHomework.bind(this);
-        this._onClickEditHomework = this._onClickEditHomework.bind(this);
-        this._closeBoard = this._closeBoard.bind(this);
-        this._toggleDeleteDialog = this._toggleDeleteDialog.bind(this);
       }
 
       render() {
-        let presentState = ["boardOn", "clickedRowIndexes", "selectedHw", "deleteDialogOn", "selectedHwIndex"];
+        let presentState = [
+          "boardOn", 
+          "selectedHw", 
+          "deleteDialogOn", 
+          "selectedHwIndex",
+          
+          "searchOpen",
+          "searchText",
+          "searchResult",
+          "filteredClick",
+          "isNewHomework"
+        ];
         let presentProps = [
           "hwData"
         ];
         let customProps = {
         };
         let presentFunctions = {
-          homeworkPostRequest: this.props.homeworkPostRequest,
-          homeworkEditRequest: this.props.homeworkEditRequest,
-          deleteHomeworks: this._deleteHomeworks,
-          handleRowSelection: this._handleRowSelection,
-          onClickEditHomework: this._onClickEditHomework,
-          onClickCreateHomework: this._onClickCreateHomework,
-          closeBoard: this._closeBoard,
-          toggleDeleteDialog: this._toggleDeleteDialog,
+          homeworkPostRequest: this.props.homeworkPostRequest.bind(this),
+          homeworkEditRequest: this.props.homeworkEditRequest.bind(this),
+          deleteHomeworks: this._deleteHomeworks.bind(this),
+          handleRowSelection: this._handleRowSelection.bind(this),
+          onClickEditHomework: this._onClickEditHomework.bind(this),
+          onClickCreateHomework: this._onClickCreateHomework.bind(this),
+          closeBoard: this._closeBoard.bind(this),
+          toggleDeleteDialog: this._toggleDeleteDialog.bind(this),
+          focusSearchInput: this._focusSearchInput.bind(this),
+          blurSearchInput: this._blurSearchInput.bind(this),
+          onSearchEngineChange:this._onSearchEngineChange.bind(this),
         }
 
         return (  // Do not modify!!
@@ -90,7 +102,6 @@ import {
 
       // COMPONENT LIFE CYCLE
       componentWillMount() {
-        console.log("this");
         this._loadHomeworkData();
       }
 
@@ -109,7 +120,8 @@ import {
       // CUSTOM FUNCTIONS
       _closeBoard() {
         this.setState({
-          boardOn: false
+          boardOn: false,
+          isNewHomework: false,
         })
       }
 
@@ -125,10 +137,11 @@ import {
           teacherId: this.props.userInfo.user._id,
         }
 
-        this.props.homeworkPostRequest(contents).then( (res) => {
+        this.props.homeworkPostRequest(contents).then((res) => {
           this.setState({
+            isNewHomework: true,
             selectedHw: res.data.homework,
-            selectedHwIndex: this.props.hwData.length,
+            selectedHwIndex: this.props.hwData.length-1,
             boardOn: true
           })
         });
@@ -155,25 +168,69 @@ import {
 
       _handleRowSelection(rowIds) {
         this.setState({
-          clickedRowIndexes: rowIds
-        })
+          filteredClick: rowIds
+        });
       }
 
       _deleteHomeworks() {
-        let targetHomeworkIndexes = this.state.clickedRowIndexes;
-        let desSortedIndexes = targetHomeworkIndexes.sort((a,b)=>{return a<b})
+        let {filteredClick, searchResult} = this.state;
+        let targetHwData = searchResult.length != 0 ? searchResult : this.props.hwData;
+        let desSortedIndexes = filteredClick.sort((a,b)=>{return a<b});
         for(var targetIndex of desSortedIndexes){
-          let targetId = this.props.hwData[targetIndex]._id;
-          this.props.homeworkRemoveRequest(targetId, targetIndex);
+          let targetId = targetHwData[targetIndex]._id;
+          this.props.homeworkRemoveRequest(targetId);
         }
-
+        this.props.homeworkBoardRequest().then(() => {});
         this.setState({
-          clickedRowIndexes: []
+          filteredClick: []
         })
       }
 
       _loadHomeworkData(){
         this.props.homeworkBoardRequest().then(() => {});
+      }
+
+      _focusSearchInput(){
+        this.setState({searchOpen: true});
+      }
+
+      _blurSearchInput(){
+          this.setState({searchOpen: false})
+          if(this.state.searchText == '')
+              this.setState({searchText: '', filteredClick: []});
+      }
+
+      _onSearchEngineChange(event, value) {
+        let hwData = [];
+        let filteredClick = [];
+        if(value == ''){
+            this.setState({searchOpen: true, searchResult: [], filteredClick, searchText: ''});
+        }
+        else{
+          this.props.hwData.map((hw, i) =>{
+            let push = false;
+            let obj = hw;
+            obj.index = i;
+
+            if(obj.title.includes(value)) push = true;
+            if(obj.content.includes(value)) push = true;
+            if(push) hwData.push(obj);
+          });
+          if(this.state.filteredClick.lenth != 0){
+              for(let i = 0; i < this.state.filteredClick.length; i++){
+                  let filteredIndex = hwData.indexOf(this.props.hwData[this.state.filteredClick[i]]);
+                  if(filteredIndex != -1){
+                      filteredClick.push(filteredIndex);
+                  }
+              }
+          }
+          this.setState({
+            searchOpen: true, 
+            searchResult: hwData, 
+            filteredClick: filteredClick, 
+            searchText: value
+          });
+        }
       }
     }
 
@@ -184,7 +241,9 @@ import {
     }
 
     Container.defaultProps = {
+  
       values: [1,3],
+
     }
 
 

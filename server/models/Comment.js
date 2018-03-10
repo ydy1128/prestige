@@ -6,7 +6,6 @@ const Comment = new Schema({
 	writtenDate: String,
 	editedDate: String,
 	writer: Object,
-	role: String,
 	content: String,
 	homeworkId: String,
 	// replies: [String] // ids of comment

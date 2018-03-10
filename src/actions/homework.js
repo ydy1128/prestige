@@ -140,12 +140,12 @@ export function homeworkEditFailure(error) {
 }
 
 /* HOMEWORK REMOVE */
-export function homeworkRemoveRequest(id, index) {
+export function homeworkRemoveRequest(id) {
     return (dispatch) => {
         dispatch(homeworkRemove());
         return axios.delete('/api/homework/' + id)
         .then((response) => {
-            dispatch(homeworkRemoveSuccess(index));
+            dispatch(homeworkRemoveSuccess());
         }).catch((error) => {
             dispatch(homeworkRemoveFailure());
         });
@@ -158,10 +158,9 @@ export function homeworkRemove() {
     };
 }
 
-export function homeworkRemoveSuccess(index) {
+export function homeworkRemoveSuccess() {
     return {
-        type: HOMEWORK_REMOVE_SUCCESS,
-        index
+        type: HOMEWORK_REMOVE_SUCCESS
     };
 }
 

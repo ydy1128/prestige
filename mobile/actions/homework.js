@@ -140,7 +140,7 @@ export function homeworkEditFailure(error) {
 }
 
 /* HOMEWORK REMOVE */
-export function homeworkRemoveRequest(id, index) {
+export function homeworkRemoveRequest(id) {
     return (dispatch) => {
         dispatch(homeworkRemove());
         return axios.delete('/api/homework/' + id)
