@@ -36,7 +36,6 @@ let Present = ({ props, state, style, functions }) => {
             return remove_active ? '' : 'inactive';
     }
     let removeLectures = ()=>{
-
         for(let i = 0; i < clicked.length; i++){
             console.log(i, ' : ', lectureData[clicked[i]].name, clicked[i])
             handleRemove(lectureData[clicked[i]]._id, clicked[i]);

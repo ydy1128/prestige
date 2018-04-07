@@ -22,7 +22,8 @@ class BoardHeader extends React.Component{
         this.props.focusSearchInput();
     }
     getButtonCount(){
-    	let buttonCount = 0;
+		let buttonCount = 0;
+		if(this.props.homeworkButtons) buttonCount += 2;
     	if(this.props.remove_button) buttonCount++;
     	if(this.props.plus_button) buttonCount++;
     	if(this.props.search_engine) buttonCount++;
@@ -30,16 +31,16 @@ class BoardHeader extends React.Component{
     	this.setState({buttonCount: buttonCount});
     }
 	render(){
-		const remove_button = (
+		const remove_button = this.props.remove_button ? (
             <a onClick={this.props.remove_active? this.props.handleRemove : null} style={{float: 'right'}}>
                 <FontAwesome id="stdBoardRemove" className={'remove-button ' + this.props.handleActive(false)} name="trash-o" />
             </a>
-		)
-		const plus_button = (
+		) : null;
+		const plus_button = this.props.plus_button ? (
             <a onClick={this.props.remove_active ? null : this.props.openDialog} style={{float: 'right'}}>
                 <FontAwesome className={'plus-button '+ this.props.handleActive(true)} name="plus" />
             </a>
-		)
+		) : null;
 		const search_button = (
             <a onClick={this.focusSearchInput} 
             	style={{float: 'right', marginRight: this.props.searchOpen? '270px': 0}} >
@@ -74,6 +75,7 @@ class BoardHeader extends React.Component{
 	            	{this.props.remove_button ? remove_button : null}
 	            	{this.props.back_button ? back_button: null}
 	            	{this.props.plus_button ? plus_button : null}
+					{this.props.homeworkButtons}
 	            	{this.props.search_engine ? search_button : null}
 	            	{this.props.search_engine ? search_engine : null}
 
@@ -87,9 +89,13 @@ BoardHeader.defaultProps = {
     plus_button: false,
     search_engine: false,
     back_button: false,
-    
     searchOpen: false,
+	remove_active: false,
+	handleRemove: false,
+	homeworkButtons: null,
+	openDialog: null,
 
+};
     buttonCount: 0,
 
     handleRemove: () => {console.log('remove action not defined.')},

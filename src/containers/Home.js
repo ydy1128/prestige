@@ -12,7 +12,8 @@ import { getMemoListRequest } from 'actions/memolist';
 import { ClassBoard,
           DashBoard,
           StudentBoard,
-          HWBoard,
+          TeacherHomeworkBoard,
+          StudentHomeworkBoard,
           TeacherLectureBoard,
           StudentLectureBoard
 } from 'components';
@@ -164,8 +165,10 @@ class Home extends React.Component {
                 return (<TeacherLectureBoard classData={this.props.classData}
                                 studentsData={this.props.studentsData}
                                 lectureData={this.props.lectureData} />);
-            case 'TEACHER_HWBOARD':
-                return (<HWBoard />);
+            case 'TEACHER_HOMEWORKBOARD':
+                return (<TeacherHomeworkBoard />);
+            case 'STUDENT_HOMEWORKBOARD':
+                return (<StudentHomeworkBoard />);
             case 'STUDENT_DASHBOARD':
                 return (<div>DASHBOARD</div>);
             case 'STUDENT_LECTUREBOARD':
@@ -190,7 +193,7 @@ class Home extends React.Component {
                 <li><a className={'waves-effect '+this.setMenuActive('TEACHER_STUDENTBOARD')} name="TEACHER_STUDENTBOARD" ><FontAwesome name="street-view" onClick={this.handleMenuClick} /></a></li>
 				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_CLASSBOARD')}   name="TEACHER_CLASSBOARD"   ><FontAwesome name="university"  onClick={this.handleMenuClick}/></a></li>
 				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_LECTUREBOARD')} name="TEACHER_LECTUREBOARD" ><FontAwesome name="tv" onClick={this.handleMenuClick} /></a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_HWBOARD')}      name="TEACHER_HWBOARD"      ><FontAwesome name="file-o" onClick={this.handleMenuClick} /></a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('TEACHER_HOMEWORKBOARD')}name="TEACHER_HOMEWORKBOARD"      ><FontAwesome name="file-o" onClick={this.handleMenuClick} /></a></li>
 			</ul>
     	)
     	const studentMenu = (
@@ -198,6 +201,7 @@ class Home extends React.Component {
 				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_DASHBOARD')}    name="STUDENT_DASHBOARD"    ><FontAwesome name="dashboard"  onClick={this.handleMenuClick}/></a></li>
 				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_LECTUREBOARD')} name="STUDENT_LECTUREBOARD" ><FontAwesome name="tv" onClick={this.handleMenuClick} /></a></li>
 				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_HWBOARD')}      name="STUDENT_HWBOARD"      ><FontAwesome name="file-o" onClick={this.handleMenuClick} /></a></li>
+				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_HOMEWORKBOARD')}name="STUDENT_HOMEWORKBOARD"      ><FontAwesome name="file-o" onClick={this.handleMenuClick} /></a></li>                
 			</ul>
     	)
     	const sideMenu = (

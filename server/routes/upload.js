@@ -20,7 +20,6 @@ const storage = multer.diskStorage({
     callback(null, path);
   },
   filename: (req, file, callback) => {
-    console.log('file in filename', file)
     callback(null, file.originalname); //callback(null, file.fieldname + '-' + Date.now());
   }
 });
@@ -29,18 +28,15 @@ const upload = multer({ storage : storage });
 
 let removeMiddleware = router.post('*',
   (req, res, next) => {
-    console.log('test1')
     let filePath = path.join(__dirname, "../../", uploadBasePath , req.query.hwId);
     rimraf(filePath, 
     (res)=>{
       mkdirp(filePath, err => {
-        console.log('before next');
         next();
       });
     }, 
     (err)=>{
       mkdirp(filePath, err => {
-        console.log('before next');
         next();
       });
     });
@@ -48,7 +44,6 @@ let removeMiddleware = router.post('*',
 )
 
 let uploadMiddleware = router.post('*', upload.array('file'),(req,res) => {
-    console.log('after next');
     let hwId = req.query.hwId;
     let userId = req.session.loginInfo.user._id;
     let fileNames = req.files.map((file) => {

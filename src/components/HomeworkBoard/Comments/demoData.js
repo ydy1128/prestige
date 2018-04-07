@@ -2,18 +2,28 @@ export default [
     {
         writtenDate: (new Date()).getTime(),
         editedDate: (new Date()).getTime(),
-        name: "손준혁",
-        type: "teacher",
-        id: "1234567",
+        writer: {
+            role:"teacher",
+            user: {
+                name: "손준혁",
+                _id: "5a115cc83b04ca83dbb682be",
+            }
+        }, 
+        _id: "1234563",
         content: "준혁 선생",
         // replies: [String] // ids of comment
     },
     {
         writtenDate: (new Date()).getTime(),
         editedDate: (new Date()).getTime(),
-        name: "윤대영인대영",
-        type:"student",
-        id: "1234565",
+        writer: {
+            role:"student",
+            user: {
+                name: "윤대영인대영",
+                _id: "wwwwwwwwwww",
+            }
+        },
+        _id: "1234565",
         content: "나는 윤대영인데영",
         // replies: [String] // ids of comment
     }
