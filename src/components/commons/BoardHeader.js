@@ -94,8 +94,6 @@ BoardHeader.defaultProps = {
 	handleRemove: false,
 	homeworkButtons: null,
 	openDialog: null,
-
-};
     buttonCount: 0,
 
     handleRemove: () => {console.log('remove action not defined.')},
