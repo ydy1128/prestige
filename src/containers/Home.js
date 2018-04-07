@@ -7,8 +7,10 @@ import axios from 'axios';
 import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest } from 'actions/makeclass';
 import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest, studentsInfoPwChangeRequest } from 'actions/studentinfo';
 import { lectureBoardRequest } from 'actions/lecture';
+import { getMemoListRequest } from 'actions/memolist';
 
 import { ClassBoard,
+          DashBoard,
           StudentBoard,
           HWBoard,
           TeacherLectureBoard,
@@ -43,6 +45,9 @@ class Home extends React.Component {
         if(getLoginData().role == 'teacher'){
             this.props.getStudentsInfoRequest().then(() =>{
                 console.log('studentsData', this.props.studentsData)
+            });
+            this.props.getMemoListRequest().then(() =>{
+                console.log('memoListData', this.props.memoListData)
             });
         }
         this.props.classBoardRequest().then(() => {
@@ -135,11 +140,11 @@ class Home extends React.Component {
     getView(){
         switch(this.state.view_type){
             case 'TEACHER_DASHBOARD':
-                return (<div>
-                            DashBoard
-                            <button onClick={this.loadCsvClassData}>load classes</button>
-                            <button onClick={this.loadCsvStudentsData}>load students</button>
-                        </div>);
+                return (
+                            <DashBoard memoListData={this.props.memoListData} />
+                            /*<button onClick={this.loadCsvClassData}>load classes</button>
+                            <button onClick={this.loadCsvStudentsData}>load students</button>*/
+                        );
             case 'TEACHER_STUDENTBOARD':
                 return (<StudentBoard studentsData={this.props.studentsData}
                                 classData={this.props.classData}
@@ -226,6 +231,8 @@ const mapStateToProps = (state) => {
     return {
         isLoggedIn: state.authentication.status.isLoggedIn,
 
+        memoListData: state.memolist.get.data,
+
         classData: state.makeclass.board.data,
         classPostStatus: state.makeclass.post,
         classEditStatus: state.makeclass.editClass,
@@ -242,6 +249,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
+        getMemoListRequest: () => {
+            return dispatch(getMemoListRequest());
+        },
         getStudentsInfoRequest: (classname) => {
             return dispatch(getStudentsInfoRequest(classname));
         },

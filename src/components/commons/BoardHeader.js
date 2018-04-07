@@ -46,6 +46,11 @@ class BoardHeader extends React.Component{
                 <FontAwesome  className={'search-button'} name="search" />
             </a>
 		)
+		const back_button = (
+	        <a onClick={this.props.backAction}>
+	            <FontAwesome id="stdBoardRemove" className={'remove-button right '} name="arrow-left" />
+	        </a>
+		)
 		const search_engine = (
             <TextField name="searchEngine" ref="searchEngine"
             		onChange={this.props.onSearchEngineChange} onFocus={this.focusSearchInput} onBlur={this.props.blurSearchInput} 
@@ -59,7 +64,7 @@ class BoardHeader extends React.Component{
 						padding: '0 10px'
 					}}/>
 		) 
-		console.log(this.props.searchOpen);
+
 		return(
 	        <div className="Board-header col m12" style={styles.boardHeader}>
 	            <div style={styles.boardTitle} className="col m4">
@@ -67,15 +72,32 @@ class BoardHeader extends React.Component{
 	            </div>
 	            <div style={styles.boardIcons}className="icons col m8">
 	            	{this.props.remove_button ? remove_button : null}
+	            	{this.props.back_button ? back_button: null}
 	            	{this.props.plus_button ? plus_button : null}
 	            	{this.props.search_engine ? search_button : null}
 	            	{this.props.search_engine ? search_engine : null}
+
 	            </div>
 	        </div>
         )
 	}
 }
+BoardHeader.defaultProps = {
+    remove_button: false,
+    plus_button: false,
+    search_engine: false,
+    back_button: false,
+    
+    searchOpen: false,
 
+    buttonCount: 0,
+
+    handleRemove: () => {console.log('remove action not defined.')},
+    backAction: () => {console.log('back action not defined.')},
+    onSearchEngineChange: () => {console.log('searchEngine change not defiend.')},
+    focusSearchInput: () => {console.log('searchInput functions not defined.')},
+	blurSearchInput: () => {console.log('searchInput functions not defined.')},
+}
 let styles = {
 	boardHeader: {
 		backgroundColor: 'white',

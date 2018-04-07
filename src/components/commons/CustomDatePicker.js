@@ -1,31 +1,40 @@
 import React, { PropTypes } from 'react';
-import TimePicker from 'material-ui/TimePicker';
+import DatePicker from 'material-ui/DatePicker';
 import Checkbox from 'material-ui/Checkbox';
 
-class CustomTimePicker extends React.Component {
+class CustomDatePicker extends React.Component {
 	constructor() {
 		super();
 		this.state = {
 			checkboxChecked: false,
 		};
-
 		this.onChange = this.onChange.bind(this);
+		this.convertToDateObj = this.convertToDateObj.bind(this);
 		this.changeCheckBox = this.changeCheckBox.bind(this);
 	}
-	onChange(event, date){
-		console.log(date.toLocaleTimeString());
-		const { onTimeChange, name } = this.props;
-
-		this.props.onTimeChange(name, date);
+	componentWillMount(){
+		this.setState({checkboxChecked: this.props.value == '' ? false : true});
 	}
-	convertToTimeObj(dateString){
+	onChange(event, date){
+		console.log('onchange called')
+		const { disabled, name } = this.props;
+		// console.log(date, this.props.value);
+		this.props.onDataChange(name, (disabled ? '' : date));
+	}
+	convertToDateObj(dateString){
+		console.log('convert called')
+		console.log(dateString)
 		let date = new Date();
-		let dateArray = dateString.split(' ')[0].split(':');
-		date.setHours(dateArray[0]);
-		date.setMinutes(dateArray[1]);
+		let dateArray = dateString.split('-');
+		console.log(dateString)
+		date.setFullYear(dateArray[0]);
+		date.setMonth(parseInt(dateArray[1]) - 1);
+		date.setDate(dateArray[2]);
 		return date;
 	}
 	changeCheckBox(){
+		console.log('change cb called')
+		this.onChange(undefined, !this.state.checkboxChecked ? new Date() : '');
 		this.setState({checkboxChecked: !this.state.checkboxChecked});
 	}
 	render(){
@@ -40,8 +49,8 @@ class CustomTimePicker extends React.Component {
 			disabled,
 			checkBox
 	    } = this.props;
+	    const dateValue = value == '' ? new Date() : this.convertToDateObj(value);
 
-	    const timevalue = value == '' ? new Date() : this.convertToTimeObj(value);
 	    return(
 	    	<div>
 	    		{checkBox ? 
@@ -53,12 +62,12 @@ class CustomTimePicker extends React.Component {
 		    	: null}
 		    	<label style={labelStyle}>{label}</label>
 
-		        <TimePicker 
+		        <DatePicker 
 		        	name={name} 
 		        	okLabel={'확인'} 
 		        	cancelLabel={'취소'} 
 		        	onChange={this.onChange} 
-		        	value={timevalue}
+		        	value={dateValue}
 		        	fullWidth={fullWidth}
 		        	style={style}
 			        textFieldStyle={textFieldStyle}
@@ -69,17 +78,9 @@ class CustomTimePicker extends React.Component {
 	}
 }
 
-CustomTimePicker.propTypes = {
-  name: PropTypes.string.isRequired,
-  onDataChange: PropTypes.func.isRequired,
-  fullWidth: PropTypes.bool,
-  style: PropTypes.object,
-  textFieldStyle: PropTypes.object
-};
-
-CustomTimePicker.defaultProps = {
+CustomDatePicker.defaultProps = {
   name: '',
-  value: '12:00 PM',
+  value: '',
   onDataChange: () => {},
   fullWidth: true,
   style: {},
@@ -90,4 +91,4 @@ CustomTimePicker.defaultProps = {
 };
 
 
-export default CustomTimePicker;
+export default CustomDatePicker;

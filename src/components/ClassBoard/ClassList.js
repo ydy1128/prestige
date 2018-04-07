@@ -5,6 +5,8 @@ import {GridList, GridTile} from 'material-ui/GridList';
 import Checkbox from 'material-ui/Checkbox';
 import FlatButton from 'material-ui/FlatButton';
 
+import ColorStock from 'components/commons/ColorStock';
+
 class ClassList extends React.Component{
 	constructor(props){
 		super(props);
@@ -48,7 +50,7 @@ class ClassList extends React.Component{
                         titleBackground='rgba(0,0,0,0)'
                         style={styles.grid}
                     >
-                        <div style={{padding: '20px', paddingTop: '15px', borderTop: '10px solid ' + color_stock[i % color_stock.length]}}>
+                        <div style={{padding: '20px', paddingTop: '15px', borderTop: '10px solid ' + ColorStock[i % ColorStock.length]}}>
                             <div>
                                 <h5 style={styles.infoDiv}>
                                     <Checkbox 
@@ -94,7 +96,6 @@ ClassList.propTypes = {
 ClassList.defaultProps = {
     data: []
 }
-const color_stock = ['#e57373', '#7986cb', '#26a69a', '#ffee58', '#8d6e63', '#f48fb1', '#64b5f6', '#66bb6a', '#ffd54f', '#bdbdbd', '#ce93d8', '#81d4fa', '#aed581', '#ffb74d', '#90a4ae']
 
 let styles = {
     grid: {
