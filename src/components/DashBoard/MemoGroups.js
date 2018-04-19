@@ -18,6 +18,7 @@ class MemoGroups extends React.Component{
 
 		}
 		this.onMemoClick = this.onMemoClick.bind(this);
+		this.handlePost = this.handlePost.bind(this);
 		this.handleRemove = this.handleRemove.bind(this);
     }
     componentDidMount(){
@@ -45,6 +46,13 @@ class MemoGroups extends React.Component{
     			this.props.handleRemove(memo._id, memoIndex);
     		// }, 100);
     	}
+    	this.setState({clickedMemos: []})
+    }
+    handlePost(index){
+    	this.props.toggleMode(1, index); 
+    	setTimeout(()=>{
+    		this.props.openDialog(2, undefined, false, undefined)
+    	}, 100)
     }
     render(){
     	const listBody = data => {
@@ -60,8 +68,8 @@ class MemoGroups extends React.Component{
 								targetOrigin={{horizontal: 'left', vertical: 'top'}}
 								>
 								<MenuItem primaryText="수정" onClick={this.props.openDialog.bind(undefined, 1, i, true)}/>
-								<MenuItem primaryText="카드추가" />
-								<MenuItem primaryText="카드삭제" onClick={() => {this.props.toggleMode(1, i); setTimeout(()=>{console.log('timeout'); this.handleRemove(i)}, 100)}} />
+								<MenuItem primaryText="메모추가"  onClick={this.handlePost.bind(undefined, i)}/>
+								<MenuItem primaryText="메모삭제" onClick={() => {this.props.toggleMode(1, i); setTimeout(()=>{console.log('timeout'); this.handleRemove(i)}, 100)}} />
 								<MenuItem primaryText="그룹삭제" onClick={this.props.handleRemove.bind(undefined, memogroup._id, i)}/>
 						    </IconMenu>
                 			
@@ -71,22 +79,22 @@ class MemoGroups extends React.Component{
                 				let dontDispTop = memo.dueDate == '' && memo.label == '-1';
                 				return(
                 					<div key={'memo-' + i + '-' + j} style={styles.memo} onClick={() => {this.props.toggleMode(1, i); setTimeout(()=>{this.props.openDialog(2, j, true, undefined)}, 100)}}>
-                						{
-                							dontDispTop ? 
-                							null : 
-	                						<div style={styles.memoTop}>
-	                							<div style={styles.memoTopquarter}>
-	                								<Checkbox 
-					                                	name={memo._id + i +'-' + j}
-					                                	checked={this.state.clickedMemos.includes(j)}
-					                                	onClick={this.onMemoClick.bind(undefined, i, j)}
-					                                    style={{marginTop: -5}}
-					                                    iconStyle={{width: 20, height: 20}}
-					                                    />
-	                							</div>
+                						<div style={styles.memoTop}>
+                							<div style={styles.memoTopquarter}>
+                								<Checkbox 
+				                                	name={memo._id + i +'-' + j}
+				                                	checked={this.state.clickedMemos.includes(j)}
+				                                	onClick={this.onMemoClick.bind(undefined, i, j)}
+				                                    style={{marginTop: -5}}
+				                                    iconStyle={{width: 20, height: 20}}
+				                                    />
+                							</div>
+                							{dontDispTop ? null : 
 	                							<div style={styles.memoTopquarter}>
 	                								<div style={{width: '100%', height: '100%', borderRadius: 5, backgroundColor: memo.label == '-1' ? 'none' : ColorStock[parseInt(memo.label)]}}></div>
 	                							</div>
+	                						}
+	                						{dontDispTop ? null : 
 	                							<div style={styles.memoTophalf}>{
 	                								memo.dueDate == '' ?'' : 
 	                								<div> 
@@ -94,15 +102,15 @@ class MemoGroups extends React.Component{
 	                									{' ' + memo.dueDate}
 	            									</div>}
 	                							</div>
-	                						</div>
-	                					}
+	                						}
+                						</div>
                 						<div style={{wordWrap: 'break-word',marginTop: dontDispTop ? 0 : 10}}>{memo.text}</div>
                 					</div>
                 				)
                 			})
                 		}</div>
-                		<div style={styles.addDiv} onClick={() => {this.props.toggleMode(1, i); setTimeout(()=>{this.props.openDialog(2, undefined, false, undefined)}, 100)}}>
-                			+ 카드 추가
+                		<div style={styles.addDiv} onClick={this.handlePost.bind(undefined, i)}>
+                			+ 메모 추가
                 		</div>
                 	</div>
                 );

@@ -56,7 +56,9 @@ const createData = (req, res) =>{
 const userSignUp = (req, res) => {
     // CHECK USERNAME FORMAT
     let usernameRegex = /^[a-z0-9]+$/;
-    if(!usernameRegex.test(req.body.username))
+    if(!validateContents(req.body))
+        return throwerror(res, 400, 'Empty content exists.');
+    if(!usernameRegex.test(req.body.username) || req.body.username.length < 4)
         return throwerror(res, 400, 'Bad username.');
 
     // CHECK PASS LENGTH
@@ -114,7 +116,7 @@ const userSignIn = (req, res) => {
         // RETURN SUCCESS
         return res.json({
             success: true,
-            id: session,
+            id: session.loginInfo,
         });
     });
 }
@@ -182,6 +184,17 @@ const deleteUser = (req, res) =>{
     });
 }
 
+let verifyList = ['username', 'password', 'name', 'school', 'class'];
+let validateContents = (contents) =>{
+    for(let i = 0; i < verifyList.length; i++){
+        let key = verifyList[i];
+        if(contents[key] == undefined || contents[key] == ''){
+            console.error('value not found: ', key, contents[key]);
+            return false;
+        }
+    }
+    return true;
+}
 
 
 export default router;

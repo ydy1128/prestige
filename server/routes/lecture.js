@@ -102,10 +102,21 @@ const deleteLecture = (id, req, res) =>{
     });
 }
 
-let validateId = (id) =>{
+let validateId = (id) => {
 	return mongoose.Types.ObjectId.isValid(id) ? true : false;
 }
 
+let verifyList = ['name', 'link', 'class'];
+let validateContents = (contents) =>{
+    for(let i = 0; i < verifyList.length; i++){
+        let key = verifyList[i];
+        if(contents[key] == undefined || contents[key] == ''){
+            console.error('value not found: ', key, contents[key]);
+            return false;
+        }
+    }
+    return true;
+}
 
 
 export default router;

@@ -72,7 +72,7 @@ export function registerRequest(username, password, name, school, level, url_ref
         })
         .catch((error) => {
             //fail
-            dispatch(registerFailure(error.response.data.code));
+            dispatch(registerFailure(error.response.data));
         });
     };
 }

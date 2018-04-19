@@ -24,7 +24,7 @@ export function postMemoListRequest(contents) {
             dispatch(postMemoListSuccess(response.data.memolist));
         }).catch((error) => {
             if(error.response == undefined) console.error(error);
-            dispatch(postMemoListFailure(error.response.data.code));
+            dispatch(postMemoListFailure(error.response.data));
         });
     };
 }

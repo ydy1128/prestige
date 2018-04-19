@@ -24,6 +24,9 @@ router.delete('/groups-by-list-id/:id', (req, res) => { deleteMemoGroupsById(req
 const createMemoList = (req, res) =>{
 	let memoListObj = req.body.contents;
 
+    if(memoListObj.name == '' || memoListObj.name == undefined)
+        return throwerror(res, 400, 'Bad contents.')
+
     if(req.session.loginInfo == undefined)
         return throwerror(res, 401, 'User not logged in.');
 
@@ -101,7 +104,8 @@ const deleteMemoList = (id, req, res) =>{
 
 const createMemoGroup = (req, res) =>{
     let memoGroupObj = req.body.contents;
-
+    if(memoGroupObj.name == '' || memoGroupObj.name == undefined)
+        return throwerror(res, 400, 'Bad contents.')
     if(req.session.loginInfo == undefined)
         return throwerror(res, 401, 'User not logged in.');
 
