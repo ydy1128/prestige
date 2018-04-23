@@ -22,15 +22,17 @@ class Login extends React.Component {
                         username: username,
                         role: url_ref
                     };
-
+                    console.log(loginData)
+                    console.log(this.props.user.user.name, url_ref)
                     document.cookie = 'key=' + btoa(JSON.stringify(loginData));
-
-                    Materialize.toast('Welcome, ' + username + '!', 2000);
+                    let msg = '환영합니다,\n' + this.props.user.user.name + 
+                        (url_ref == 'teacher' ? ' 선생님' : ' 학생') + ' !';
+                    Materialize.toast(msg, 2000);
                     browserHistory.push('/');
                     return true;
 				}
 				else {
-                    let $toastContent = $('<span style="color: #FFB4BA">Incorrect username or password</span>');
+                    let $toastContent = $('<span style="color: #FFB4BA">아이디 혹은 패스워드를 확인해주세요</span>');
                     Materialize.toast($toastContent, 2000);
                     return false;
                 }

@@ -20,8 +20,9 @@ router.post('/logout', (req, res) => { userLogOut(req, res) });
 const userSignUp = (req, res) => {
     // CHECK USERNAME FORMAT
     let usernameRegex = /^[a-z0-9]+$/;
-
-    if(!usernameRegex.test(req.body.username))
+    if(!validateContents(req.body))
+        return throwerror(res, 400, 'Empty content exists.');
+    if(!usernameRegex.test(req.body.username) || req.body.username.length < 4)
         return throwerror(res, 400, 'Bad username.');
 
     // CHECK PASS LENGTH
@@ -187,6 +188,18 @@ const changeStudentInfo = (req, res) => {
 const userLogOut = (req, res) => {
     req.session.destroy(err => { if(err) return throwerror(res, 409, 'DB error.'); });
     return res.json({ sucess: true });
+}
+
+let verifyList = ['username', 'password', 'name'];
+let validateContents = (contents) =>{
+    for(let i = 0; i < verifyList.length; i++){
+        let key = verifyList[i];
+        if(contents[key] == undefined || contents[key] == ''){
+            console.error('value not found: ', key, contents[key]);
+            return false;
+        }
+    }
+    return true;
 }
 
 export default router;

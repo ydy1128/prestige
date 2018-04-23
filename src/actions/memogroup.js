@@ -27,7 +27,7 @@ export function postMemoGroupRequest(contents) {
             dispatch(postMemoGroupSuccess(response.data.memogroup));
         }).catch((error) => {
             if(error.response == undefined) console.error(error);
-            dispatch(postMemoGroupFailure(error.response.data.code));
+            dispatch(postMemoGroupFailure(error.response.data));
         });
     };
 }

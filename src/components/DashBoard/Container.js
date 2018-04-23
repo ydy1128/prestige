@@ -176,22 +176,29 @@ var container = (Present) =>{
                             this.closeDialog();
                         }
                         else{
+                            console.log(this.props.memoListPostStatus)
                             return throwError(false, '보드', this.props.memoListPostStatus.error, '');
                         }    
                     });
                 case 1:
                     return this.props.postMemoGroupRequest(contents).then(() =>{
                         if(this.props.memoGroupPostStatus.status === 'SUCCESS'){
-                            Materialize.toast('메모그룹이 생성 되었습니다!', 2000);
+                            Materialize.toast('메모장이 생성 되었습니다!', 2000);
                             this.closeDialog();
                         }
                         else{
-                            return throwError(false, '메모그룹', this.props.memoGroupPostStatus.error, '');
+                            return throwError(false, '메모장', this.props.memoGroupPostStatus.error, '');
                         }    
                     });
                 case 2:
                     let currGroup = this.state.currGroup;
                     contents.memoGroup = currGroup.index;
+                    if(contents.dueDate == undefined || 
+                        contents.label == undefined || contents.label < -1 || contents.label > 5 || 
+                        contents.text == '' || contents.text == undefined){
+                        return throwError(false, '메모', {code: 400}, '');
+                    }
+                    // console.log(contents)
                     currGroup.memos.push(contents);
                     return this.props.editMemoGroupRequest(currGroup.index, currGroup).then(() => {
                         if(this.props.memoGroupEditStatus.status === 'SUCCESS'){
@@ -220,11 +227,11 @@ var container = (Present) =>{
                 case 1:
                     return this.props.editMemoGroupRequest(contents.index, contents).then(() => {
                         if(this.props.memoGroupEditStatus.status === 'SUCCESS'){
-                            Materialize.toast('메모그룹이 수정 되었습니다!', 2000);
+                            Materialize.toast('메모장이 수정 되었습니다!', 2000);
                             this.closeDialog();
                         }
                         else{
-                            return throwError(false, '메모그룹', this.props.memoGroupEditStatus.error, '');
+                            return throwError(false, '메모장', this.props.memoGroupEditStatus.error, '');
                         }    
                     })
                     break;
@@ -271,11 +278,11 @@ var container = (Present) =>{
                     // console.log(id, index);
                     return this.props.removeMemoGroupRequest(id, index).then(() => {
                         if(this.props.memoGroupRemoveStatus.status === 'SUCCESS'){
-                            Materialize.toast('메모그룹가 삭제 되었습니다!', 2000);
+                            Materialize.toast('메모장이 삭제 되었습니다!', 2000);
                             this.closeDialog();
                         }
                         else{
-                            return throwError(false, '메모', this.props.memoGroupRemoveStatus.error, '');
+                            return throwError(false, '메모장', this.props.memoGroupRemoveStatus.error, '');
                         }
                     })
                     break;

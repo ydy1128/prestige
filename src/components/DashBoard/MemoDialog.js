@@ -47,7 +47,6 @@ class MemoDialog extends React.Component{
                 pass = nextProps[dataName]._id == undefined ? true : false;
                 break;
         }
-        console.log(pass);
         if(!pass){
             if(!this.state.initialState.hasOwnProperty('_id') || this.props.mode != this.state.currentMode ){
                 let obj = Object.assign({}, nextProps[dataName]);
@@ -85,6 +84,10 @@ class MemoDialog extends React.Component{
             target: {
                 name: name
             }
+        }
+        if(date.getDate() < (new Date()).getDate()){
+            Materialize.toast('제출일이 현재 날짜보다 이르기 때문에,<br/>오늘로 자동 변경됩니다.', 2000);
+            date = new Date();
         }
 
         date = this.convertToDateString(date);
