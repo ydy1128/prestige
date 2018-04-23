@@ -6,18 +6,20 @@ import FontAwesome from 'react-fontawesome';
 import LectureTable from './LectureTable';
 import LectureDialog from './LectureDialog';
 import BoardHeader from 'components/commons/BoardHeader';
+import DeleteDialog from './DeleteDialog';
 
 
 let Present = ({ props, state, style, functions }) => {
 	let { classData, lectureData } = props;
-	let { dialogOpen, dialogEditMode, clicked, currObj, newOne, editlec, remove_active, filteredClick, searchOpen, searchText, searchResult } = state;
+	let { dialogOpen, deleteDialogOpen, dialogEditMode, clicked, currObj, newOne, editlec, remove_active, filteredClick, searchOpen, searchText, searchResult } = state;
 	let {openDialog,
-		 closeDialog,
+         closeDialog,
+         toggleDeleteDialog,
 		 openEditMode,
 		 closeEditMode,
          searchClassNameById,
          searchStudentNameById,
-    		 onClassChange,
+         onClassChange,
          onInputChange,
          handleDialogDataChange,
          handlePost,
@@ -49,7 +51,7 @@ let Present = ({ props, state, style, functions }) => {
     }
     return (
         <div className="Boards">
-            <BoardHeader title='강의관리' remove_active={remove_active} handleRemove={handleRemove}
+            <BoardHeader title='강의관리' remove_active={remove_active} handleRemove={toggleDeleteDialog.bind(undefined, true)}
                             plus_button={true} remove_button={true} search_engine={true} searchOpen={searchOpen}
                             openDialog={openDialog.bind(undefined, true, true)} handleActive={getRemoveActive}
                             onSearchEngineChange={onSearchEngineChange} 
@@ -71,6 +73,9 @@ let Present = ({ props, state, style, functions }) => {
                            searchClassNameById={searchClassNameById} searchStudentNameById={searchStudentNameById}
             			   onClassChange={onClassChange} onInputChange={onInputChange} handleChange={handleDialogDataChange}
                            handlePost={handlePost} handleEdit={handleEdit}/>
+
+            <DeleteDialog dialogOn={deleteDialogOpen} objNum={clicked.length} closeDialog={toggleDeleteDialog.bind(undefined, false)}
+                          deleteFunction={removeLectures}  />
         </div>
     )
 	

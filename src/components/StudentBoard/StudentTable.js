@@ -14,6 +14,38 @@ import {
 } from 'material-ui/Table';
 
 class StudentTable extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            loadIndex: 0,
+            loadedArray: [],
+        }
+        this.loadData = this.loadData.bind(this);
+    }
+    componentDidMount(){
+        let loadedArray = this.props.studentsData.slice(0, 20);
+        this.setState({loadedArray: loadedArray, loadIndex: 20});
+
+        let tble = $('.boardTable div:nth-child(1) div:nth-child(2) table');
+        let win = $('.boardTable div:nth-child(1)')
+        let containerBottom = win.offset().top + win.height();
+        $('.boardTable div:nth-child(1) div:nth-child(2)').scroll(() => {
+            let tableBottom = tble.offset().top + tble.height();
+            // console.log(containerBottom, tableBottom)
+
+            // WHEN HEIGHT UNDER SCROLLBOTTOM IS LESS THEN 250
+            if(containerBottom > tableBottom){
+                // console.log(containerBottom, tableBottom)
+                this.loadData();
+            }
+        });
+    }
+    loadData(){
+        let loadIndex = this.state.loadIndex;
+        let loadedArray = [...this.state.loadedArray, ...this.props.studentsData.slice(loadIndex, loadIndex+10)];
+        loadIndex += 10;
+        this.setState({loadIndex: loadIndex, loadedArray: loadedArray});
+    }
 	render(){
         const tableHeader = (
             <TableRow>
@@ -42,14 +74,14 @@ class StudentTable extends React.Component{
         };
 
 		return (
-            <Table style={styles.table} 
+            <Table style={styles.table} id="highest"
                     onCellClick={this.props.searchStart ? this.props.handleFilteredRowClick : this.props.handleRowClick} 
                     fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
                 <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
                     { tableHeader }
                 </TableHeader>
                     <TableBody displayRowCheckbox={true} deselectOnClickaway={false} showRowHover={true} stripedRows={false}>
-                       { tableBody(this.props.searchStart ? (this.props.searchText == '' ? this.props.studentsData : this.props.filteredData) : this.props.studentsData) }
+                       { tableBody(this.props.searchStart ? (this.props.searchText == '' ? this.state.loadedArray : this.props.filteredData) : this.state.loadedArray) }
                     </TableBody>
             </Table>
 		)

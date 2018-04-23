@@ -109,9 +109,6 @@ export default function memolist(state, action) {
             return update(state, {
                 remove:{
                     status: { $set: 'SUCCESS' }
-                },
-                get: {
-                    data: { $splice: [[action.index, 1]] }
                 }
             });
         case types.MEMO_LIST_REMOVE_FAILURE:

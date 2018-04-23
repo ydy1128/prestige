@@ -6,6 +6,7 @@ import FontAwesome from 'react-fontawesome';
 import ClassList from './ClassList';
 import ClassDialog from './ClassDialog';
 import BoardHeader from 'components/commons/BoardHeader';
+import DeleteDialog from './DeleteDialog';
 
 class ClassBoard extends React.Component{
 	constructor(props){
@@ -15,6 +16,7 @@ class ClassBoard extends React.Component{
             remove_active: false,
             newClass: true,
             dialogOpen: false,
+            deleteDialogOpen: false,
             dialogMode: true,
             editClass: {
                 _id: '',
@@ -49,6 +51,7 @@ class ClassBoard extends React.Component{
         this.toggleDialogMode = this.toggleDialogMode.bind(this);
         this.openDialog = this.openDialog.bind(this);
         this.closeDialog = this.closeDialog.bind(this);
+        this.toggleDeleteDialog = this.toggleDeleteDialog.bind(this);
         //Handling Dialog Data
         this.processData = this.processData.bind(this);
         this.processStudentData = this.processStudentData.bind(this);
@@ -85,6 +88,9 @@ class ClassBoard extends React.Component{
         this.setState({ allStudents: [], selectedStudents: [], clickedInAllStudents: [], clickedInSelectedStudents: [], newClass: true,
                         editClass: {_id: '',name: '',days: {'월': false,'화': false,'수': false,'목': false,'금': false,'토': false,'일': false  },
                         startTime: '00:00 AM',endTime: '00:00 PM',teacher: '',students: []}})
+    }
+    toggleDeleteDialog(open){
+        this.setState({deleteDialogOpen: open})
     }
     //Handling Dialog Data
     processData(index, event){
@@ -376,7 +382,7 @@ class ClassBoard extends React.Component{
 	render(){
 		return(
             <div className="Boards">
-                <BoardHeader title='수업관리' remove_active={this.state.remove_active} handleRemove={this.handleRemove}
+                <BoardHeader title='수업관리' remove_active={this.state.remove_active} handleRemove={this.toggleDeleteDialog.bind(undefined, true)}
                                 plus_button={true} remove_button={true} search_engine={true} searchOpen={this.state.searchOpen}
                                 openDialog={this.openDialog.bind(true)} handleActive={this.removeActive}
                                 onSearchEngineChange={this.onSearchEngineChange} 
@@ -396,6 +402,8 @@ class ClassBoard extends React.Component{
                              handleDataChange={this.handleDialogDataChange} onCellClick={this.onCellClick}
                              handlePost={this.handlePost} handleEdit={this.handleEdit}
                              addToClass={this.addToClass} removeFromClass={this.removeFromClass} handleClose={this.closeDialog} />
+                <DeleteDialog dialogOn={this.state.deleteDialogOpen} objNum={this.state.clicked.length} closeDialog={this.toggleDeleteDialog.bind(undefined, false)}
+                                deleteFunction={this.handleRemove} />    
             </div>
 		)
 	}
