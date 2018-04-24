@@ -106,7 +106,8 @@ export default function authentication(state, action) {
         case types.AUTH_UPDATE_FAILURE:
             return update(state, {
                 update: {
-                    status: { $set: 'FAILURE' }
+                    status: { $set: 'FAILURE' },
+                    error: { $set: action.error }
                 }
             });
         case types.AUTH_LOGOUT:

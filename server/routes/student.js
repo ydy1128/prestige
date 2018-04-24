@@ -133,7 +133,7 @@ const updateUser = (req, res) =>{
     if(typeof req.session.loginInfo === "undefined")
         return throwerror(res, 401, 'User not logged in.');
     console.log(req.session.loginInfo.user._id)
-    Teacher.findById(req.session.loginInfo.user._id , (err, account) => {
+    Student.findById(req.session.loginInfo.user._id , (err, account) => {
         if(req.body.obj.password != ''){
             if(req.body.password.length < 4 || typeof req.body.password !== "string")
                 return throwerror(res, 400, 'Bad password.');
@@ -141,6 +141,8 @@ const updateUser = (req, res) =>{
         }
         for (let key in req.body.obj){
             if(key != 'password' && account.hasOwnProperty(key)){
+                if(req.body.obj[key] == undefined || req.body.obj[key] == '')
+                    return throwerror(res, 400, 'Bad contents.');
                 account[key] = req.body.obj[key];
             }
         }
@@ -184,7 +186,7 @@ const deleteUser = (req, res) =>{
     });
 }
 
-let verifyList = ['username', 'password', 'name', 'school', 'class'];
+let verifyList = ['username', 'password', 'name', 'school'];
 let validateContents = (contents) =>{
     for(let i = 0; i < verifyList.length; i++){
         let key = verifyList[i];
