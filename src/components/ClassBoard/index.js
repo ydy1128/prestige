@@ -238,30 +238,31 @@ class ClassBoard extends React.Component{
             remove_active: remove_active
         })
     }
-    handleFilteredListClick(event, rowNumber){
-        // let filteredClick = [...this.state.filteredClick];
-        // let index = filteredClick.indexOf(rowNumber);
-        // let push = false;
-        // if(index == -1){
-        //     filteredClick.push(rowNumber);
-        //     index = rowNumber;
-        //     push = true;
-        // }
-        // else
-        //     filteredClick.splice(index, 1);
-        // let clicked = [...this.state.clicked];
-        // let origIndex = this.state.searchResult[index].index;
+    handleFilteredListClick(rowNumber, event, clicked){
+        let filteredClick = [...this.state.filteredClick];
+        console.log(event, clicked, rowNumber)
+        let index = filteredClick.indexOf(rowNumber);
+        let push = false;
+        if(index == -1){
+            filteredClick.push(rowNumber);
+            index = rowNumber;
+            push = true;
+        }
+        else
+            filteredClick.splice(index, 1);
+        let clickedArray = [...this.state.clicked];
+        let origIndex = this.state.searchResult[index].index;
 
 
-        // if(push){
-        //     clicked.push(origIndex);
-        // }
-        // else{
-        //     origIndex = clicked.indexOf(origIndex);
-        //     clicked.splice(origIndex, 1);
-        // }
-        // // console.log(clicked, filteredClick)
-        // this.setState({clicked: clicked, filteredClick: filteredClick, remove_active: (filteredClick == 0 || clicked == 0)? false : true})
+        if(push){
+            clickedArray.push(origIndex);
+        }
+        else{
+            origIndex = clickedArray.indexOf(origIndex);
+            clickedArray.splice(origIndex, 1);
+        }
+        // console.log(clicked, filteredClick)
+        this.setState({clicked: clickedArray, filteredClick: filteredClick, remove_active: (filteredClick.length == 0 || clickedArray.length == 0)? false : true})
     }
     removeActive(remove_button){
         if(remove_button){
@@ -361,6 +362,8 @@ class ClassBoard extends React.Component{
 
             if(obj.name.includes(value)) push = true;
             if(obj.days.includes(value)) push = true;
+            if(obj.startTime.includes(value)) push = true;
+            if(obj.endTime.includes(value)) push = true;
             if(push) data.push(obj);
             console.log(data)
         })

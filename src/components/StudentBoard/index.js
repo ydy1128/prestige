@@ -165,7 +165,7 @@ class StudentBoard extends React.Component{
             origIndex = clicked.indexOf(origIndex);
             clicked.splice(origIndex, 1);
         }
-        this.setState({clicked: clicked, filteredClick: filteredClick, remove_active: (filteredClick == 0 || clicked == 0)? false : true})
+        this.setState({clicked: clicked, filteredClick: filteredClick, remove_active: (filteredClick.length == 0 || clicked.length == 0)? false : true})
     }
     handleActive(){
         return this.state.remove_active ? '' : 'inactive';
