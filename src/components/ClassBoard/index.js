@@ -40,6 +40,14 @@ class ClassBoard extends React.Component{
             clickedInAllStudents: [],
             clickedInSelectedStudents: [],
 
+            studentSearchOpen: false,
+            studentSearchStart: false,
+            studentSearchText: '',
+            filteredAllStudents: [],
+            filteredSelectedStudents: [],
+            filteredClickInAllStudents: [],
+            filteredClickInSelectedStudents: [],
+
             filteredClick: [],
             searchStart: false,
             searchOpen: false,
@@ -70,6 +78,9 @@ class ClassBoard extends React.Component{
         this.focusSearchInput = this.focusSearchInput.bind(this);
         this.blurSearchInput = this.blurSearchInput.bind(this);
         this.onSearchEngineChange = this.onSearchEngineChange.bind(this);
+        this.focusStudentSearchInput = this.focusStudentSearchInput.bind(this);
+        this.blurStudentSearchInput = this.blurStudentSearchInput.bind(this);
+        this.onStudentSearchChange = this.onStudentSearchChange.bind(this);
 
 	}
     //Dialog Mode and Open state
@@ -365,7 +376,6 @@ class ClassBoard extends React.Component{
             if(obj.startTime.includes(value)) push = true;
             if(obj.endTime.includes(value)) push = true;
             if(push) data.push(obj);
-            console.log(data)
         })
         if(value == ''){
             this.setState({searchOpen: true, searchStart: false, searchResult: [], filteredClick: [], searchText: ''});
@@ -380,6 +390,59 @@ class ClassBoard extends React.Component{
                 }
             }
             this.setState({searchOpen: true, searchStart: true, searchResult: data, filteredClick: filteredClick, searchText: value});
+        }
+    }
+    focusStudentSearchInput(){
+        this.setState({studentSearchOpen: true});
+    }
+    blurStudentSearchInput(){
+        this.setState({studentSearchOpen: false})
+        if(this.state.studentSearchText == '')
+            this.setState({studentSearchStart: false, studentSearchText: '', filteredAllStudents: [], filteredSelectedStudents: []});
+    }
+    onStudentSearchChange(event, value){
+        let studentData = [];
+        let selectedStudentData = [];
+        let filteredClickInAllStudents = [];
+        let filteredClickInSelectedStudents = [];
+        this.state.allStudents.map((std, i) => {
+            let push = false;
+            std.index = i;
+            console.log(std)
+            if(std.name.includes(value)) push = true;
+            if(std.school.includes(value)) push = true;
+            if((''+std.level).includes(value)) push = true;
+            if(push) studentData.push(std);
+        })
+        this.state.selectedStudents.map((std, i) => {
+            let push = false;
+            std.index = i;
+            if(std.name.includes(value)) push = true;
+            if(std.school.includes(value)) push = true;
+            if((''+std.level).includes(value)) push = true;
+            if(push) selectedStudentData.push(std);
+        })
+        console.log(studentData, selectedStudentData)
+        if(value == '')
+            this.setState({studentSearchOpen: true, studentSearchStart: false, filteredClickInAllStudents: [], filteredClickInSelectedStudents: [], 
+                            filteredAllStudents: [], filteredSelectedStudents: [], studentSearchText: ''})
+        else{
+            if(this.state.clickedInAllStudents != []){
+                for(let i = 0; i < this.state.clickedInAllStudents.length; i++){
+                    let filteredIndex = studentData.indexOf(this.state.allStudents[this.state.clickedInAllStudents[i]]);
+                    if(filteredIndex != -1)
+                        filteredClickInAllStudents.push(filteredIndex);
+                }
+            }
+            if(this.state.clickedInSelectedStudents != []){
+                for(let i = 0; i < this.state.clickedInSelectedStudents.length; i++){
+                    let filteredIndex = selectedStudentData.indexOf(this.state.selectedStudents[this.state.clickedInSelectedStudents[i]]);
+                    if(filteredIndex != -1)
+                        filteredClickInSelectedStudents.push(filteredIndex);
+                }
+            }
+            this.setState({studentSearchOpen: true, studentSearchStart: true, filteredClickInAllStudents: filteredClickInAllStudents, filteredClickInSelectedStudents: filteredClickInSelectedStudents, 
+                            filteredAllStudents: studentData, filteredSelectedStudents: selectedStudentData, studentSearchText: value});
         }
     }
 	render(){
@@ -397,14 +460,18 @@ class ClassBoard extends React.Component{
                                     clicked={this.state.clicked} filteredClick={this.state.filteredClick}
                                     processData={this.processData}
                                     handleClick={this.handleListClick}  handleFilteredClick={this.handleFilteredListClick}
-                                    openClassMode={this.openDialog.bind(true)} openStudentMode={this.openDialog.bind(false)} />
+                                    openClassMode={this.openDialog.bind(undefined, true)} openStudentMode={this.openDialog.bind(undefined, false)} />
                     </div>
 	            </div>
                 <ClassDialog mode={this.state.dialogMode} newClass={this.state.newClass} open={this.state.dialogOpen} data={this.state.editClass}
                              allStudents={this.state.allStudents} selectedStudents={this.state.selectedStudents} clickedInSelectedStudents={this.state.clickedInSelectedStudents} clickedInAllStudents={this.state.clickedInAllStudents}
+                             filteredAllStudents={this.state.filteredAllStudents} filteredSelectedStudents={this.state.filteredSelectedStudents}  
+                             filteredClickInAllStudents={this.state.filteredClickInAllStudents} filteredClickInSelectedStudents={this.state.filteredClickInSelectedStudents}
+                             searchStart={this.state.studentSearchStart}
                              handleDataChange={this.handleDialogDataChange} onCellClick={this.onCellClick}
                              handlePost={this.handlePost} handleEdit={this.handleEdit}
-                             addToClass={this.addToClass} removeFromClass={this.removeFromClass} handleClose={this.closeDialog} />
+                             addToClass={this.addToClass} removeFromClass={this.removeFromClass} handleClose={this.closeDialog} 
+                             focusSearchInput={this.focusStudentSearchInput} blurSearchInput={this.blurStudentSearchInput} onSearchEngineChange={this.onStudentSearchChange}/>
                 <DeleteDialog dialogOn={this.state.deleteDialogOpen} objNum={this.state.clicked.length} closeDialog={this.toggleDeleteDialog.bind(undefined, false)}
                                 deleteFunction={this.handleRemove} />    
             </div>
