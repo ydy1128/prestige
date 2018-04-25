@@ -204,7 +204,7 @@ class ClassBoard extends React.Component{
             let removingindex = students.findIndex(x=>x._id == removingIds[i]);
             students.splice(removingindex, 1);
         }
-        this.setState({selectedStudents: selectedStudents,allStudents: students,clickedInAllStudents: []})
+        this.setState({selectedStudents: selectedStudents,allStudents: students,clickedInAllStudents: [], studentSearchText: '', studentSearchStart: false, studentSearchOpen: false})
     }
     removeFromClass(){
         let students = [...this.state.allStudents], selectedStudents = [...this.state.selectedStudents];
@@ -220,7 +220,7 @@ class ClassBoard extends React.Component{
             let removingindex = selectedStudents.findIndex(x=>x._id == removingIds[i]);
             selectedStudents.splice(removingindex, 1);
         }
-        this.setState({selectedStudents: selectedStudents,allStudents: students,clickedInSelectedStudents: []})
+        this.setState({selectedStudents: selectedStudents,allStudents: students,clickedInSelectedStudents: [], studentSearchText: '', studentSearchStart: false, studentSearchOpen: false})
     }
 
 
