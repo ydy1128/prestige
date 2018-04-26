@@ -104,7 +104,11 @@ class Home extends React.Component {
                 return true;
             }
             else {
-                return throwError(false, '수업', this.props.classPostStatus.error, '');
+                let errorMessage = {
+                    'Empty contents.':'모든 정보를 채워주세요',
+                    'Class name already exists.':'존재하는 수업 이름입니다'
+                };
+                return throwError(false, '수업', this.props.classPostStatus.error, errorMessage[this.props.classPostStatus.error.message]);
             }
         });
     }
@@ -115,7 +119,11 @@ class Home extends React.Component {
                     return true;
                 }
                 else {
-                    return throwError(false, '수업', this.props.classEditStatus.error, '');
+                    let errorMessage = {
+                        'Empty contents.':'모든 정보를 채워주세요',
+                        'Class name already exists.':'존재하는 수업 이름입니다',
+                    };
+                    return throwError(false, '수업', this.props.classEditStatus.error, errorMessage[this.props.classEditStatus.error.message]);
                 }
             }
         );

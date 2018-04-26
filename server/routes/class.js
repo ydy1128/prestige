@@ -46,11 +46,7 @@ const createClass = (req, res) => {
          return throwerror(res, 401, 'User not logged in.');
 
     // Check if content is valid
-    if(req.body.contents.name === "" || req.body.contents.startTime === "" ||
-        req.body.contents.endTime === "" || req.body.contents.days === "" ||
-        req.body.contents.name == undefined || req.body.contents.startTime == undefined ||
-        req.body.contents.endTime == undefined || req.body.contents.days == undefined
-    )
+    if(!validateContents(req.body.contents))
         return throwerror(res, 400, 'Empty contents.');
 
     let cls = new Class({
@@ -61,10 +57,15 @@ const createClass = (req, res) => {
         endTime: req.body.contents.endTime,
         days: req.body.contents.days
     })
-    cls.save( err => {
-        if(err) return throwerror(res, 409, 'DB error.');
-        return res.json({ success: true, data: cls });
-    });
+    Class.findOne({ name: req.body.contents.name }, (err, exists) => {
+        if (err) return throwerror(res, 409, 'DB error.');
+        if(exists)
+            return throwerror(res, 409, 'Class name already exists.');
+        cls.save( err => {
+            if(err) return throwerror(res, 409, 'DB error.');
+            return res.json({ success: true, data: cls });
+        });
+    })
 }
 
 const updateClass = (req, res) => {
@@ -73,39 +74,40 @@ const updateClass = (req, res) => {
         return throwerror(res, 401, 'User not logged in.');
 
     // Check if content is valid
-    if(req.body.contents.name === "" || req.body.contents.startTime === "" ||
-        req.body.contents.endTime === "" || req.body.contents.days === "" ||
-        req.body.contents.name == undefined || req.body.contents.startTime == undefined ||
-        req.body.contents.endTime == undefined || req.body.contents.days == undefined
-    )
+    if(!validateContents(req.body.contents))
         return throwerror(res, 400, 'Empty contents.');
-
-    // Find Class
-    Class.findById(req.params.id, (err, cls) => {
-        if(err) return throwerror(res, 409, 'DB error.');
-        // IF Class does not exist
-        if(cls == undefined) return throwerror(res, 409);
-
-        // If exists, check teacher
-        if(cls.teacher != req.session.loginInfo.user._id)
-            return throwerror(res, 401, 'Unauthorized user.');
-
-        // Modify class contents
-        cls.name = req.body.contents.name;
-        cls.days = req.body.contents.days;
-        cls.startTime = req.body.contents.startTime;
-        cls.endTime = req.body.contents.endTime;
-        cls.students = req.body.contents.students;
-
-        cls.save((err, cls) => {
+    Class.findOne({ name: req.body.contents.name }, (err, exists) => {
+        if (err) return throwerror(res, 409, 'DB error.');
+        if(exists)
+            return throwerror(res, 409, 'Class name already exists.');
+            // Find Class
+        Class.findById(req.params.id, (err, cls) => {
             if(err) return throwerror(res, 409, 'DB error.');
-            return res.json({
-                success: true,
-                cls
-            });
-        });
+            // IF Class does not exist
+            if(cls == undefined) return throwerror(res, 409);
 
-    });
+            // If exists, check teacher
+            if(cls.teacher != req.session.loginInfo.user._id)
+                return throwerror(res, 403, 'Unauthorized user.');
+
+            // Modify class contents
+            cls.name = req.body.contents.name;
+            cls.days = req.body.contents.days;
+            cls.startTime = req.body.contents.startTime;
+            cls.endTime = req.body.contents.endTime;
+            cls.students = req.body.contents.students;
+
+            cls.save((err, cls) => {
+                if(err) return throwerror(res, 409, 'DB error.');
+                return res.json({
+                    success: true,
+                    cls
+                });
+            });
+
+        });
+    })
+
 }
 
 const deleteClass = (req, res) => {
@@ -122,7 +124,7 @@ const deleteClass = (req, res) => {
         if(!cls) return throwerror(res, 409);
         //check if teacher is valid
         if(cls.teacher != req.session.loginInfo.user._id)
-            return throwerror(res, 401, 'Unauthorized user.');
+            return throwerror(res, 403, 'Unauthorized user.');
 
         // Remove class
         Class.remove({ _id: req.params.id }, err => {
@@ -140,5 +142,15 @@ const getAllClasses = (req, res)  => {
     });
 } 
 
-
+let verifyList = ['name', 'startTime', 'endTime', 'days'];
+let validateContents = (contents, vfList = verifyList) =>{
+    for(let i = 0; i < vfList.length; i++){
+        let key = vfList[i];
+        if(contents[key] == undefined || contents[key] == ''){
+            console.error('value not found: ', key, contents[key]);
+            return false;
+        }
+    }
+    return true;
+}
 export default router;

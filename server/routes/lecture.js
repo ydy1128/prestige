@@ -61,7 +61,9 @@ const updateLecture = (id, req, res) =>{
         if(err) return throwerror(res, 409, 'DB error.');
         // IF Class does not exist
         if(lecture == undefined) return throwerror(res, 409);
-
+        
+        if(lecture.teacher != req.session.loginInfo.user._id)
+            return throwerror(res, 403, 'Unauthorized user.');
         // Modify class contents
         lecture.name = req.body.contents.name;
         lecture.link = req.body.contents.link;
@@ -93,7 +95,7 @@ const deleteLecture = (id, req, res) =>{
         if(!lecture) return throwerror(res, 409);
         //check if teacher is valid
         if(lecture.teacher != req.session.loginInfo.user._id)
-            return throwerror(res, 401, 'Unauthorized user.');
+            return throwerror(res, 403, 'Unauthorized user.');
         // Remove class
         Lecture.remove({ _id: id }, err => {
             if(err) return throwerror(res, 409, 'DB error.');
