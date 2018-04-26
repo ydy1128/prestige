@@ -6,6 +6,7 @@ import FontAwesome from 'react-fontawesome';
 import ClassList from './ClassList';
 import ClassDialog from './ClassDialog';
 import BoardHeader from 'components/commons/BoardHeader';
+import DeleteDialog from './DeleteDialog';
 
 class ClassBoard extends React.Component{
 	constructor(props){
@@ -15,6 +16,7 @@ class ClassBoard extends React.Component{
             remove_active: false,
             newClass: true,
             dialogOpen: false,
+            deleteDialogOpen: false,
             dialogMode: true,
             editClass: {
                 _id: '',
@@ -38,6 +40,14 @@ class ClassBoard extends React.Component{
             clickedInAllStudents: [],
             clickedInSelectedStudents: [],
 
+            studentSearchOpen: false,
+            studentSearchStart: false,
+            studentSearchText: '',
+            filteredAllStudents: [],
+            filteredSelectedStudents: [],
+            filteredClickInAllStudents: [],
+            filteredClickInSelectedStudents: [],
+
             filteredClick: [],
             searchStart: false,
             searchOpen: false,
@@ -49,6 +59,7 @@ class ClassBoard extends React.Component{
         this.toggleDialogMode = this.toggleDialogMode.bind(this);
         this.openDialog = this.openDialog.bind(this);
         this.closeDialog = this.closeDialog.bind(this);
+        this.toggleDeleteDialog = this.toggleDeleteDialog.bind(this);
         //Handling Dialog Data
         this.processData = this.processData.bind(this);
         this.processStudentData = this.processStudentData.bind(this);
@@ -67,6 +78,9 @@ class ClassBoard extends React.Component{
         this.focusSearchInput = this.focusSearchInput.bind(this);
         this.blurSearchInput = this.blurSearchInput.bind(this);
         this.onSearchEngineChange = this.onSearchEngineChange.bind(this);
+        this.focusStudentSearchInput = this.focusStudentSearchInput.bind(this);
+        this.blurStudentSearchInput = this.blurStudentSearchInput.bind(this);
+        this.onStudentSearchChange = this.onStudentSearchChange.bind(this);
 
 	}
     //Dialog Mode and Open state
@@ -86,6 +100,9 @@ class ClassBoard extends React.Component{
         this.setState({ allStudents: [], selectedStudents: [], clickedInAllStudents: [], clickedInSelectedStudents: [], newClass: true,
                         editClass: {_id: '',name: '',days: {'월': false,'화': false,'수': false,'목': false,'금': false,'토': false,'일': false  },
                         startTime: '00:00 AM',endTime: '00:00 PM',teacher: '',students: []}})
+    }
+    toggleDeleteDialog(open){
+        this.setState({deleteDialogOpen: open})
     }
     //Handling Dialog Data
     processData(index, event){
@@ -188,7 +205,7 @@ class ClassBoard extends React.Component{
             let removingindex = students.findIndex(x=>x._id == removingIds[i]);
             students.splice(removingindex, 1);
         }
-        this.setState({selectedStudents: selectedStudents,allStudents: students,clickedInAllStudents: []})
+        this.setState({selectedStudents: selectedStudents,allStudents: students,clickedInAllStudents: [], studentSearchText: '', studentSearchStart: false, studentSearchOpen: false})
     }
     removeFromClass(){
         let students = [...this.state.allStudents], selectedStudents = [...this.state.selectedStudents];
@@ -204,7 +221,7 @@ class ClassBoard extends React.Component{
             let removingindex = selectedStudents.findIndex(x=>x._id == removingIds[i]);
             selectedStudents.splice(removingindex, 1);
         }
-        this.setState({selectedStudents: selectedStudents,allStudents: students,clickedInSelectedStudents: []})
+        this.setState({selectedStudents: selectedStudents,allStudents: students,clickedInSelectedStudents: [], studentSearchText: '', studentSearchStart: false, studentSearchOpen: false})
     }
 
 
@@ -233,30 +250,31 @@ class ClassBoard extends React.Component{
             remove_active: remove_active
         })
     }
-    handleFilteredListClick(event, rowNumber){
-        // let filteredClick = [...this.state.filteredClick];
-        // let index = filteredClick.indexOf(rowNumber);
-        // let push = false;
-        // if(index == -1){
-        //     filteredClick.push(rowNumber);
-        //     index = rowNumber;
-        //     push = true;
-        // }
-        // else
-        //     filteredClick.splice(index, 1);
-        // let clicked = [...this.state.clicked];
-        // let origIndex = this.state.searchResult[index].index;
+    handleFilteredListClick(rowNumber, event, clicked){
+        let filteredClick = [...this.state.filteredClick];
+        console.log(event, clicked, rowNumber)
+        let index = filteredClick.indexOf(rowNumber);
+        let push = false;
+        if(index == -1){
+            filteredClick.push(rowNumber);
+            index = rowNumber;
+            push = true;
+        }
+        else
+            filteredClick.splice(index, 1);
+        let clickedArray = [...this.state.clicked];
+        let origIndex = this.state.searchResult[index].index;
 
 
-        // if(push){
-        //     clicked.push(origIndex);
-        // }
-        // else{
-        //     origIndex = clicked.indexOf(origIndex);
-        //     clicked.splice(origIndex, 1);
-        // }
-        // // console.log(clicked, filteredClick)
-        // this.setState({clicked: clicked, filteredClick: filteredClick, remove_active: (filteredClick == 0 || clicked == 0)? false : true})
+        if(push){
+            clickedArray.push(origIndex);
+        }
+        else{
+            origIndex = clickedArray.indexOf(origIndex);
+            clickedArray.splice(origIndex, 1);
+        }
+        // console.log(clicked, filteredClick)
+        this.setState({clicked: clickedArray, filteredClick: filteredClick, remove_active: (filteredClick.length == 0 || clickedArray.length == 0)? false : true})
     }
     removeActive(remove_button){
         if(remove_button){
@@ -352,8 +370,9 @@ class ClassBoard extends React.Component{
 
             if(obj.name.includes(value)) push = true;
             if(obj.days.includes(value)) push = true;
+            if(obj.startTime.includes(value)) push = true;
+            if(obj.endTime.includes(value)) push = true;
             if(push) data.push(obj);
-            console.log(data)
         })
         if(value == ''){
             this.setState({searchOpen: true, searchStart: false, searchResult: [], filteredClick: [], searchText: ''});
@@ -370,10 +389,63 @@ class ClassBoard extends React.Component{
             this.setState({searchOpen: true, searchStart: true, searchResult: data, filteredClick: filteredClick, searchText: value});
         }
     }
+    focusStudentSearchInput(){
+        this.setState({studentSearchOpen: true});
+    }
+    blurStudentSearchInput(){
+        this.setState({studentSearchOpen: false})
+        if(this.state.studentSearchText == '')
+            this.setState({studentSearchStart: false, studentSearchText: '', filteredAllStudents: [], filteredSelectedStudents: []});
+    }
+    onStudentSearchChange(event, value){
+        let studentData = [];
+        let selectedStudentData = [];
+        let filteredClickInAllStudents = [];
+        let filteredClickInSelectedStudents = [];
+        this.state.allStudents.map((std, i) => {
+            let push = false;
+            std.index = i;
+            console.log(std)
+            if(std.name.includes(value)) push = true;
+            if(std.school.includes(value)) push = true;
+            if((''+std.level).includes(value)) push = true;
+            if(push) studentData.push(std);
+        })
+        this.state.selectedStudents.map((std, i) => {
+            let push = false;
+            std.index = i;
+            if(std.name.includes(value)) push = true;
+            if(std.school.includes(value)) push = true;
+            if((''+std.level).includes(value)) push = true;
+            if(push) selectedStudentData.push(std);
+        })
+        console.log(studentData, selectedStudentData)
+        if(value == '')
+            this.setState({studentSearchOpen: true, studentSearchStart: false, filteredClickInAllStudents: [], filteredClickInSelectedStudents: [], 
+                            filteredAllStudents: [], filteredSelectedStudents: [], studentSearchText: ''})
+        else{
+            if(this.state.clickedInAllStudents != []){
+                for(let i = 0; i < this.state.clickedInAllStudents.length; i++){
+                    let filteredIndex = studentData.indexOf(this.state.allStudents[this.state.clickedInAllStudents[i]]);
+                    if(filteredIndex != -1)
+                        filteredClickInAllStudents.push(filteredIndex);
+                }
+            }
+            if(this.state.clickedInSelectedStudents != []){
+                for(let i = 0; i < this.state.clickedInSelectedStudents.length; i++){
+                    let filteredIndex = selectedStudentData.indexOf(this.state.selectedStudents[this.state.clickedInSelectedStudents[i]]);
+                    if(filteredIndex != -1)
+                        filteredClickInSelectedStudents.push(filteredIndex);
+                }
+            }
+            this.setState({studentSearchOpen: true, studentSearchStart: true, filteredClickInAllStudents: filteredClickInAllStudents, filteredClickInSelectedStudents: filteredClickInSelectedStudents, 
+                            filteredAllStudents: studentData, filteredSelectedStudents: selectedStudentData, studentSearchText: value});
+        }
+    }
 	render(){
 		return(
             <div className="Boards">
-                <BoardHeader title='수업관리' remove_active={this.state.remove_active} handleRemove={this.handleRemove}
+                <BoardHeader title='수업관리' remove_active={this.state.remove_active} handleRemove={this.toggleDeleteDialog.bind(undefined, true)}
                                 plus_button={true} remove_button={true} search_engine={true} searchOpen={this.state.searchOpen}
                                 openDialog={this.openDialog.bind(undefined, true)} handleActive={this.removeActive}
                                 onSearchEngineChange={this.onSearchEngineChange} 
@@ -390,9 +462,15 @@ class ClassBoard extends React.Component{
 	            </div>
                 <ClassDialog mode={this.state.dialogMode} newClass={this.state.newClass} open={this.state.dialogOpen} data={this.state.editClass}
                              allStudents={this.state.allStudents} selectedStudents={this.state.selectedStudents} clickedInSelectedStudents={this.state.clickedInSelectedStudents} clickedInAllStudents={this.state.clickedInAllStudents}
+                             filteredAllStudents={this.state.filteredAllStudents} filteredSelectedStudents={this.state.filteredSelectedStudents}  
+                             filteredClickInAllStudents={this.state.filteredClickInAllStudents} filteredClickInSelectedStudents={this.state.filteredClickInSelectedStudents}
+                             searchStart={this.state.studentSearchStart}
                              handleDataChange={this.handleDialogDataChange} onCellClick={this.onCellClick}
                              handlePost={this.handlePost} handleEdit={this.handleEdit}
-                             addToClass={this.addToClass} removeFromClass={this.removeFromClass} handleClose={this.closeDialog} />
+                             addToClass={this.addToClass} removeFromClass={this.removeFromClass} handleClose={this.closeDialog} 
+                             focusSearchInput={this.focusStudentSearchInput} blurSearchInput={this.blurStudentSearchInput} onSearchEngineChange={this.onStudentSearchChange}/>
+                <DeleteDialog dialogOn={this.state.deleteDialogOpen} objNum={this.state.clicked.length} closeDialog={this.toggleDeleteDialog.bind(undefined, false)}
+                                deleteFunction={this.handleRemove} />    
             </div>
 		)
 	}

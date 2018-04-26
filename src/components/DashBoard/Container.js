@@ -12,6 +12,7 @@ var container = (Present) =>{
             super(props);
             this.state = {
                 dialogOpen: false,
+                deleteDialogOpen: false,
                 dialogMode: 0,
                 dialogEditMode: false,
                 remove_active: false,
@@ -29,10 +30,17 @@ var container = (Present) =>{
                     text: '',
                     memoGroup: -1,
                 },
+                removingSet: {
+                    id: -1,
+                    index: -1
+                }
             }
             this.getMemoGroup = this.getMemoGroup.bind(this);
             this.openDialog = this.openDialog.bind(this);
+            this.toggleDeleteDialog = this.toggleDeleteDialog.bind(this);
+            this.openDeleteDialog = this.openDeleteDialog.bind(this);
             this.closeDialog = this.closeDialog.bind(this);
+            this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
             this.toggleDialog = this.toggleDialog.bind(this);
             this.toggleMode = this.toggleMode.bind(this);
             this.toggleEditMode = this.toggleEditMode.bind(this);
@@ -44,7 +52,7 @@ var container = (Present) =>{
             this.handleListClick = this.handleListClick.bind(this);
         }
         render(){
-            let presentState = ['dialogOpen', 'dialogMode', 'dialogEditMode', 'remove_active', 'clicked', 'currList', 'currGroup', 'currMemo'];
+            let presentState = ['dialogOpen', 'deleteDialogOpen', 'dialogMode', 'dialogEditMode', 'remove_active', 'clicked', 'currList', 'currGroup', 'currMemo', 'removingSet'];
             let presentProps = [];
             let customProps = {
                 memoListData: this.props.memoListData,
@@ -54,7 +62,9 @@ var container = (Present) =>{
             let presentFunctions = {
                 getMemoGroup: this.getMemoGroup, 
                 openDialog: this.openDialog, 
+                openDeleteDialog: this.openDeleteDialog,
                 closeDialog: this.closeDialog, 
+                closeDeleteDialog: this.closeDeleteDialog,
                 toggleMode: this.toggleMode,
                 backAction: this.backAction,
                 handleDialogDataChange: this.handleDialogDataChange, 
@@ -82,6 +92,18 @@ var container = (Present) =>{
             this.toggleDialog(true);
             this.toggleMode(mode, index);
             this.toggleEditMode(editmode);  
+        }
+        openDeleteDialog(id, index){
+            console.log(id, index);
+            this.toggleDeleteDialog(true);
+            this.setState({removingSet: {id: id, index: index}});
+        }
+        closeDeleteDialog(id, index){
+            this.toggleDeleteDialog(false);
+            this.setState({removingSet: {id: -1, index: -1}});
+        }
+        toggleDeleteDialog(open){
+            this.setState({deleteDialogOpen: open});
         }
         closeDialog(){
             this.toggleDialog(false);

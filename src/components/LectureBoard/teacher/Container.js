@@ -9,6 +9,7 @@ var container = (Present) =>{
             super(props);
             this.state = {
                 dialogOpen: false,
+                deleteDialogOpen: false,
                 dialogEditMode: true,
                 newOne: true,
                 clicked: [],
@@ -35,6 +36,7 @@ var container = (Present) =>{
             this.toggleDialog = this.toggleDialog.bind(this);
             this.openDialog = this.openDialog.bind(this);
             this.closeDialog = this.closeDialog.bind(this);
+            this.toggleDeleteDialog = this.toggleDeleteDialog.bind(this);
             this.toggleEditMode = this.toggleEditMode.bind(this);
             this.openEditMode = this.openEditMode.bind(this);
             this.closeEditMode = this.closeEditMode.bind(this);
@@ -58,7 +60,7 @@ var container = (Present) =>{
 
         }
 	    render() {
-	        let presentState = ['dialogOpen', 'dialogEditMode', 'clicked', 'currObj', 'newOne', 'editlec', 'remove_active', 'filteredClick', 'searchStart', 'searchOpen', 'searchText', 'searchResult'];
+	        let presentState = ['dialogOpen', 'deleteDialogOpen', 'dialogEditMode', 'clicked', 'currObj', 'newOne', 'editlec', 'remove_active', 'filteredClick', 'searchStart', 'searchOpen', 'searchText', 'searchResult'];
 	        let presentProps = [];
 	        let customProps = {
 	        	classData: this.state.classData,
@@ -67,6 +69,7 @@ var container = (Present) =>{
 	        let presentFunctions = {
 	        	openDialog: this.openDialog, 
 	        	closeDialog: this.closeDialog,
+	        	toggleDeleteDialog: this.toggleDeleteDialog,
 	        	openEditMode: this.openEditMode, 
 	        	closeEditMode: this.closeEditMode,
 	        	searchClassNameById: this.searchClassNameById,
@@ -114,6 +117,9 @@ var container = (Present) =>{
 	    closeDialog(){
 	    	this.setState({currObj:{ _id: '',name: '',link: '', className: '', class: '',accomplishments: []}, editlec: -1, clicked: [], remove_active: false})
 	    	this.toggleDialog(false);
+	    }
+	    toggleDeleteDialog(open){
+	    	this.setState({deleteDialogOpen: open});
 	    }
 	    toggleDialog(openState){
 	    	this.setState({dialogOpen: openState});

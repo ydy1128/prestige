@@ -4,6 +4,7 @@ import container from './Container';
 import FontAwesome from 'react-fontawesome';
 
 import BoardHeader from 'components/commons/BoardHeader';
+import DeleteDialog from './DeleteDialog';
 
 import MemoList from './MemoList';
 import MemoDialog from './MemoDialog';
@@ -12,11 +13,13 @@ import MemoGroups from './MemoGroups';
 
 let Present = ({ props, state, style, functions }) => {
 	let { memoListData, memoGroupData } = props;
-	let { dialogOpen, dialogMode, dialogEditMode, remove_active, clicked, currList, currGroup, currMemo } = state;
+	let { dialogOpen, deleteDialogOpen, dialogMode, dialogEditMode, remove_active, clicked, currList, currGroup, currMemo, removingSet } = state;
 	let {
 		getMemoGroup,
 		openDialog,
+		openDeleteDialog,
 		closeDialog,
+		closeDeleteDialog,
 		toggleMode,
 		backAction,
 		handleDialogDataChange,
@@ -33,7 +36,7 @@ let Present = ({ props, state, style, functions }) => {
 		                	currList={currList} currGroup={currGroup}
                 			clicked={clicked}
                 			handleClick={handleListClick} 
-                			openDialog={openDialog} toggleMode={toggleMode} handleRemove={handleRemove}
+                			openDialog={openDialog} toggleMode={toggleMode} handleRemove={openDeleteDialog}
                 	/>
 				)
 			case 1:
@@ -41,7 +44,7 @@ let Present = ({ props, state, style, functions }) => {
 				return(
 					<MemoGroups currList={currList} currGroup={currGroup} currMemo={currMemo}
 							getMemoGroup={getMemoGroup} memoGroupData={memoGroupData}
-							openDialog={openDialog} toggleMode={toggleMode} handleRemove={handleRemove}
+							openDialog={openDialog} toggleMode={toggleMode} handleRemove={openDeleteDialog}
 					 />
 					
 					
@@ -63,20 +66,33 @@ let Present = ({ props, state, style, functions }) => {
 			case 2:
 				break;
 		}
-
+	}
+	let getName = () => {
+		switch (dialogMode){
+			case 0:
+				return '보드를'
+			case 1:
+				return '메모그룹을';
+			case 2:
+				return '메모를';
+		}
 	}
 	let handleRemoveRequest = () => {
 		switch(dialogMode){
 			case 0:
-			
 				for(let i = 0; i < clicked.length; i++){
 					let index = clicked[i];
-					// console.log(clicked[i], memoListData[clicked[i]]);
 					handleRemove(memoListData[index]._id, index);
+		            memoListData.splice(clicked[i], 1);
+		            for(let j = i; j < clicked.length; j++){
+		                if(clicked[j] > clicked[i])
+	                    clicked[j]--;
+		            }
 					setTimeout(() => {
 						for(let j = 0; j < memoGroupData.lenght; j++)
-							if(memoGroupData[j].memoList == memoListData[index]._id)
+							if(memoGroupData[j].memoList == memoListData[index]._id){
 								handleRemove(memoGroupData[j]._id, j);
+							}
 					}, 100)
 
 						
@@ -89,7 +105,7 @@ let Present = ({ props, state, style, functions }) => {
             <BoardHeader title='대시보드' remove_active={remove_active} 
                             plus_button={true} back_button={dialogMode == 0 ? false : true} remove_button={dialogMode == 0 ? true : false}
                             openDialog={openDialog.bind(undefined, dialogMode, undefined, false)} backAction={backAction} handleActive={getRemoveActive}
-                            handleRemove={handleRemoveRequest}
+                            handleRemove={openDeleteDialog}
                             />
 
 			<div className="Board-contents row">
@@ -102,6 +118,8 @@ let Present = ({ props, state, style, functions }) => {
             			handleDialogDataChange={handleDialogDataChange.bind('text')} 
             			handlePost={handlePost} handleEdit={handleEdit}
             			/>
+            <DeleteDialog dialogOn={deleteDialogOpen} objName={getName()} objNum={clicked.length} closeDialog={closeDeleteDialog} 
+            	deleteFunction={clicked.length == 0 ? handleRemove.bind(undefined, removingSet.id, removingSet.index) : handleRemoveRequest} />
 		</div>
 	);
 }
