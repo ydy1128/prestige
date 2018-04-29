@@ -8,78 +8,36 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import DatePicker from 'material-ui/DatePicker';
-import {Editor, EditorState, ContentState, RichUtils, Modifier} from 'draft-js';
 import Dropzone from 'react-dropzone';
 import { log } from 'util';
-
-let style = {
-  containerStyle: {
-    padding: '16px',
-    boxSizing: 'border-box',
-    height: '518px'
-  },
-  hwBoardHeadStyle: {
-    position: 'relative',
-    display: 'flex',
-    justifyContent: 'space-between',
-    height: '86px'
-  },
-  datePickerContainerStyle: {
-    flex: '0 0 100px'
-  },
-  datePickerStyle: {
-    width: '120px',
-    fontSize: '16px',
-    // marginTop: '24px',
-  },
-  titleStyle: {
-    flex: '0 0 300px',
-  },
-  editorStyle: {
-    position: 'relative',
-    width: '100%',
-    height: '300px',
-    cursor: 'text',
-    backgroundColor: '#fefefe'
-
-  }
-};
 
 class HomeworkBoard extends React.Component {
   constructor(props) {
     super(props)
-    let { hw, selectedHwIndex} = props;
-    var xhr = new XMLHttpRequest();
-    let hwId = hw._id;
-    // file path를 바탕으로 File object를 만듦
-    let contents = Object.assign({}, hw, {files: hw.files.length ? hw.files.map((fileName) => {
-      let path = "uploads/" + hw._id + '/' + fileName;
-      xhr.open("GET", path, false);  // true 면 async
-      xhr.send(null)
-      return new File([xhr.response], fileName)
-    }) : [] });
+    let {hw, selectedHwIndex} = props;
+
+    let hwFileNames = hw.files;
+    let hwFiles = this.getHwFilesWithHwFileNames(hwFileNames);
+    let contents = Object.assign({}, hw, { files: hwFiles });
 
     this.state = {
+      isStudent: this.props.userRole == 'teacher' ? false : true,
       index: selectedHwIndex,
       contents,
-      hwId,
-      editorState: EditorState.createWithContent(ContentState.createFromText(contents.content)),
       dropzoneActive: false,
-      isFileChanged: false,
-      dialog: {
-        title: '',
-        status: false,
-        content: '',
-      }
+      isFileChanged: false
     };
+  }
 
-    this._handleHomeworkEdit = this._handleHomeworkEdit.bind(this);
-    this._dateOnChange = this._dateOnChange.bind(this);
-    this._onChangeTextArea = this._onChangeTextArea.bind(this);
-    this._handleTab = this._handleTab.bind(this);
-    this._showUpload = this._showUpload.bind(this);
-    this._onDrop = this._onDrop.bind(this);
-    this._onDelete = this._onDelete.bind(this);
+  getHwFilesWithHwFileNames(fileNames) {
+    var xhr = new XMLHttpRequest();
+
+    return fileNames.map((fileName) => {
+      let path = "uploads/" + this.props.hw._id + '/' + fileName;
+      xhr.open("GET", path, false);  // true 면 async
+      xhr.send(null)
+      return new File([xhr.response], fileName, {type: 'image/jpg'});
+    });
   }
 
   componentDidMount() {
@@ -91,147 +49,166 @@ class HomeworkBoard extends React.Component {
   }
 
   render() {
-    let {contents, editorState} = this.state;
-    let {title} = contents; 
-    let dueDate = contents.dueDate ? new Date(parseInt(contents.dueDate)) : new Date();
+    var style = {
+      containerStyle: { padding: '16px', boxSizing: 'border-box', height: '548px' },
+      editorStyle: {
+        position: 'relative',
+        width: '100%',
+        height: '300px',
+        cursor: 'text',
+        backgroundColor: '#fefefe',
+        resize: 'none',
+        border: 'none',
+        outline: 'none',
+        WebkitBoxShadow: 'none',
+        MozBoxShadow: 'none',
+        boxShadow: 'none'
+      }
+    };
 
     return (
       <Paper style={style.containerStyle}> 
-        <div id="hw-board-head" style={style.hwBoardHeadStyle}>
-          <TextField id="homework-title"
-            style={style.titleStyle}
-            hintText="제목"
-            floatingLabelText="제목"
-            value={contents.title}
-            onChange={
-              (e) => {
-                this.setState({
-                  contents: Object.assign({}, contents, {title: e.target.value})
-                });
-              }
-            }
-          />
-          <div style={style.datePickerContainerStyle}>
-            <DatePicker id="due-date"
-              floatingLabelText="제출 기한"
-              textFieldStyle={style.datePickerStyle}
-              hintText="Landscape Dialog"
-              mode="landscape"
-              defaultDate={dueDate}
-              onChange={this._dateOnChange}
-            />
-          </div>
-        </div>
-
-        <div
+        {this.showBoardHeaderWith(this.state.contents)}
+        <textarea 
           style={style.editorStyle}
-          onClick= {(e) => {
-            this.domEditor.focus()
-          }}
-        >
-          <Editor
-            editorState={editorState}
-            onChange={this._onChangeTextArea}
-            placeholder="숙제 내용을 입력하세요..."
-            onTab={this._handleTab}
-            ref={ref => this.domEditor = ref}
-          />
-        </div>
-
+          onKeyDown={this.handleTapOnWritingContent}
+          placeholder="숙제 내용을 입력하세요."
+          onChange={this.changeContent.bind(this)}
+          value={this.state.contents.content}
+          disabled={this.state.isStudent ? "disabled" : ""}
+        />
         <div id="accomplishments" > </div>
-        <div id="upload" style={{height: '100px', display: 'flex', flexDirection: "column"}}>
-          <div id="upload-header" style={{display: 'flex', flex:'0 0 36px', justifyContent:'space-between'}}>
-            <div style={{color: "gray"}} >첨부</div>
-            <div>
-              <FlatButton
-                label="파일선택"
-                onClick={(e) => {
-                  this.dropzoneRef.onClick(e);
-                }}
-              />
-              <FlatButton
-                label="파일등록"
-                primary={this.state.isFileChanged}
-                onClick={this._uploadFile.bind(this)}
-              />
-            </div>
-          </div>
-          {this._showUpload()}
-          {this._showDialog()}
-        </div>
+        {this.showFileUploadSection()}
       </Paper>
     );
   }
 
-  _onChangeTextArea(editorState) {
-    this.setState({editorState});
-  };
+  openFileSelectionWindowByClickDropzone(e) {
+    this.dropzoneRef.onClick(e);
+  }
 
-  _handleTab(e) {
-    e.preventDefault();
-    const tabCharacter = "    ";
-    let currentState = this.state.editorState;
-    let newContentState = Modifier.replaceText(
-      currentState.getCurrentContent(),
-      currentState.getSelection(),
-      tabCharacter
+  showBoardHeaderWith(contents) {
+    var style = {
+      hwBoardHeadStyle: { 
+        position: 'relative', display: 'flex', 
+        justifyContent: 'space-between', height: '86px' },
+      titleStyle : { 
+        flex: '0 0 300px' , 
+        cursor: this.state.isStudent ? '' : 'inherit'
+      },
+      datePickerContainerStyle : { flex: '0 0 100px' },
+      datePickerStyle: { 
+        width: '120px', 
+        fontSize: '16px', 
+        cursor: this.state.isStudent ? '' : 'inherit'
+      },
+    };
+    console.log('isStudent', this.props.isStudent);
+    return (
+      <div id="hw-board-head" style={style.hwBoardHeadStyle}>
+        <TextField id="homework-title"
+          style={style.titleStyle}
+          hintText="제목"
+          floatingLabelText="제목"
+          value={contents.title}
+          onChange={this.changeTitle.bind(this)}
+          disabled={this.state.isStudent ? true : false}
+          underlineShow={this.state.isStudent ? false : true}
+        />
+        <div style={style.datePickerContainerStyle}>
+          <DatePicker id="due-date"
+            floatingLabelText="제출 기한"
+            textFieldStyle={style.datePickerStyle}
+            hintText="Landscape Dialog"
+            mode="landscape"
+            defaultDate={contents.dueDate ? new Date(parseInt(contents.dueDate)) : new Date()}
+            onChange={this.changeDate.bind(this)}
+            disabled={this.state.isStudent ? true : false}
+            underlineShow={this.state.isStudent ? false : true}
+          />
+        </div>
+      </div>
     );
+  }
 
+  changeTitle(e) {
     this.setState({
-      editorState: EditorState.push(currentState, newContentState, 'insert-characters')
+      contents: Object.assign({}, this.state.contents, { title: e.target.value })
     });
   }
 
-  _dateOnChange(e, date){
+  changeContent(e) {
+    this.setState({
+      contents : Object.assign({}, this.state.contents, { content : e.target.value })
+    });
+  }
+
+  handleTapOnWritingContent(e) {
+    var TABKEY = 9;
+    if(e.keyCode == TABKEY) {
+      e.preventDefault();
+      const tabCharacter = "    ";
+      this.setState({
+        contents : Object.assign({}, this.state.contents, {
+          content : this.state.contents.content + tabCharacter
+        })
+      });
+      e.target.focus();
+    }
+  }
+
+  changeDate(e, date){
     let digitDate = Date.parse(date);
     this.setState({
       contents: Object.assign({}, this.state.contents, {dueDate: digitDate})
     });
   }
 
-  _uploadFile() {
+  uploadSelectedFilesOnServer(e) {
     let files = this.state.contents.files;
-    // Fileupload
     let data = new FormData();
+    
     for (let file of files) {
       data.append('file', file, file.name);
     }
 
-    const config = {
+    let config = {
       headers: { 'content-type': 'multipart/form-data' }
     }
 
-    this.setState({
-      isFileChanged : false
+    axios.post('/api/upload?hwId=' + this.props.hw._id, data, config).then(() => {
+      Materialize.toast('첨부파일이 갱신되었습니다!', 2000);
+      this.setState({
+        isFileChanged : false
+      });  
     });
-
-    return axios.post('/api/upload?hwId=' + this.props.hw._id , data, config);
   }
 
-  updateHomework(index) {
-    let {contents, editorState} = this.state;
-    let content = editorState.getCurrentContent().getPlainText();
-    console.log('t', content);
-    let requestContent = Object.assign({}, contents, { content });
+  updateHomeworkByIndex(index) {
+    if (this.state.isFileChanged) {
+      var $toastContent = $('<span style="color: #FFB4BA">첨부파일 구성이 변경되었습니다. <br />파일등록 버튼을 눌러주세요.</span>');
+      Materialize.toast($toastContent, 2000);
+      return;
+    }
+    let requestContent = Object.assign({}, this.state.contents);
     delete requestContent.files;
-    this._handleHomeworkEdit(contents._id, index, requestContent);
-  }
-
-  _handleHomeworkEdit(id, index, content){
-    let result = this.props.homeworkEditRequest(id, index, content).then(() => {
-      if(this.props.homeworkEditStatus == "SUCCESS") {
+    
+    this.props.homeworkEditRequest(requestContent._id, index, requestContent).then((status) => {
+      this.props.closeBoard();
+      if(status == "SUCCESS") {
         if(this.props.isNewHomework) {
           Materialize.toast('숙제가 추가되었습니다!', 2000);
         } else {
           Materialize.toast('숙제가 갱신되었습니다!', 2000);
         }
-      } else { this._handleError(this.props.homeworkEditStatus.error) }
+      } else { 
+        this._handleError(this.props.homeworkEditState.error); 
+      }
     });
   }
 
   _handleError(error) {
-    let $toastContent;
-
+    let $toastContent = null;
     switch(error) {
       case 1:
         $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
@@ -249,56 +226,68 @@ class HomeworkBoard extends React.Component {
     }
   }
 
-  _showUpload(props) {
-    return(
-      <div className="dropzone" style={{position: "relative", flex: '1'}}>
-        <Dropzone ref={(node) => { this.dropzoneRef = node; }}
-          style={{width:"100%", height:"100%"}}
-          onDrop={this._onDrop.bind(this)}
-          onDragEnter={this._onEnter.bind(this)}
-          onDragLeave={this._onDragLeave.bind(this)}
-          >
-          <div style={{position: 'absolute', left: 0, top:0, width:"100%", height:"100%",overflow: "scroll", backgroundColor: this.state.dropzoneActive ? "#aaaaaa" : "#f1f1f1"}}>
-            {
-              this.state.contents.files.map( (f, idx) => <div key={f.name}>{f.name} - {f.size} bytes <a onClick={this._onDelete(idx)}> x </a> </div>)
-            }
-          </div>
-        </Dropzone>
-      </div>
-    )
-  }
+  showFileUploadSection(props) {
+    let style = {
+      uploadSection : { height: '100px', display: 'flex', flexDirection : "column" },
+      uploadSectionHeader : {display: 'flex', flex:'0 0 36px', justifyContent:'space-between'},
+      uploadSectionTitle : {color: "gray"},
+      uploadSectionButtons: {display: this.state.isStudent ? 'none' : ''},
+      fileDropZoneContainer : {position: "relative", flex: '1'},
+      fileDropZone : {width:"100%", height:"100%"},
+      deleteButton : {display: this.state.isStudent ? 'none' : ''},
+    };
 
-  _showDialog(dialog) {
-    
     return (
-      <Dialog
-        title="Dialog With Actions"
-        // actions={actions}
-        modal={false}
-        open={this.state.dialog.status}
-        onRequestClose={(e) => {
-          this.setState({dialog: {status:false}});
-        }}
-      >
-        The actions in this window were passed in as an array of React objects.
-      </Dialog>
-    )
+      <div id="upload-section" style={style.uploadSection}>
+        <div id="upload-section-header" style={style.uploadSectionHeader}>
+          <div id="upload-section-title" style={style.uploadSectionTitle} >첨부 파일</div>
+          <div style={style.uploadSectionButtons}>
+            <FlatButton label="파일선택"
+              onClick={this.openFileSelectionWindowByClickDropzone.bind(this)} />
+            <FlatButton label="파일등록" primary={this.state.isFileChanged}
+              onClick={this.uploadSelectedFilesOnServer.bind(this)} />
+          </div>
+        </div>
+        <div className="dropzone" style={style.fileDropZoneContainer}>
+          <Dropzone ref={(node) => { this.dropzoneRef = node; }}
+            disable={this.state.isStudent ? true : false}
+            style={style.fileDropZone}
+            onDrop={this.appendFiles.bind(this)}
+            onDragEnter={this.activateDropzone.bind(this)}
+            onDragLeave={this.deactivateDropzone.bind(this)} >
+            <div style={{position: 'absolute', left: 0, top:0, width:"100%", height:"100%",overflow: "scroll", backgroundColor: this.state.dropzoneActive ? "#aaaaaa" : "#f1f1f1"}}>
+              { this.state.contents.files.map((f, idx) => {
+                  var href = f.preview ? f.preview : "uploads/" + this.props.hw._id + '/' + f.name; 
+                  return (
+                    <div key={f.name}> 
+                      <a download target="_blank" 
+                        href={href} onClick={(e) => {e.stopPropagation();}} >{f.name} - {f.size} bytes </a>
+                      <a style={style.deleteButton}onClick={this.deleteFile(idx).bind(this)}> x </a> 
+                    </div>
+                  )
+                })
+              } 
+            </div>
+          </Dropzone>
+        </div>
+      </div>
+    );
   }
 
-  _onDrop(accepted, rejected) {
+  appendFiles(accepted, rejected) {
     let files = accepted;
     let newFiles = [...this.state.contents.files];
     for (let file of files) {
-        let hasSameName = false;
-        this.state.contents.files.map((stateFile, index) => {
-            if(stateFile.name == file.name) {
-                newFiles[index] = file;
-                hasSameName = true;
-            }
-        });
-        if(!hasSameName){
-            newFiles.push(file);
-        }
+      let hasSameName = false;
+      this.state.contents.files.map((stateFile, index) => {
+          if(stateFile.name == file.name) {
+              newFiles[index] = file;
+              hasSameName = true;
+          }
+      });
+      if(!hasSameName){
+          newFiles.push(file);
+      }
     }
     this.setState({ 
       contents: Object.assign({}, this.state.contents, {files: newFiles}), 
@@ -307,19 +296,19 @@ class HomeworkBoard extends React.Component {
     });
   }
 
-  _onEnter(e) {
+  activateDropzone(e) {
       this.setState({
           dropzoneActive: true
       });
   }
 
-  _onDragLeave(e) {      
+  deactivateDropzone(e) {      
       this.setState({
           dropzoneActive: false
       });
   }
 
-  _onDelete(index) {
+  deleteFile(index) {
     return (e) => {
       e.stopPropagation()
       let files = this.state.contents.files;
@@ -330,14 +319,13 @@ class HomeworkBoard extends React.Component {
     })
     }
   }
-
 }
 
 const mapStateToProps = (state) => {
   let homework = state.homework;
   return {
-    homeworkPostStatus: homework.post.status,
-    homeworkEditStatus: homework.edit.status,
+    homeworkPostState: homework.post,
+    homeworkEditState: homework.edit
   };
 };
 

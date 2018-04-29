@@ -73,7 +73,8 @@ import {
           "isNewHomework"
         ];
         let presentProps = [
-          "hwData"
+          "hwData",
+          "userInfo"
         ];
         let customProps = {
         };
