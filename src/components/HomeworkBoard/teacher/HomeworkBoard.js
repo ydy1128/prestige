@@ -289,10 +289,11 @@ class HomeworkBoard extends React.Component {
           newFiles.push(file);
       }
     }
+
     this.setState({ 
       contents: Object.assign({}, this.state.contents, {files: newFiles}), 
       dropzoneActive: false,
-      isFileChanged: newFiles.length != this.state.contents.files.length
+      isFileChanged: true
     });
   }
 
