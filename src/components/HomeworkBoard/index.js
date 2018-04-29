@@ -9,7 +9,7 @@ import HomeworkBoard from './HomeworkBoard';
 import DeleteDialog from './DeleteDialog';
 import BoardHeader from 'components/commons/BoardHeader';
 
-import Comments from '../Comments';
+import Comments from './Comments';
 import { log } from "util";
 
 let homeworkBoard = null;

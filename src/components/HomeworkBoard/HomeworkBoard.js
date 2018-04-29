@@ -103,7 +103,7 @@ class HomeworkBoard extends React.Component {
         cursor: this.state.isStudent ? '' : 'inherit'
       },
     };
-    console.log('isStudent', this.props.isStudent);
+    
     return (
       <div id="hw-board-head" style={style.hwBoardHeadStyle}>
         <TextField id="homework-title"
