@@ -10,6 +10,7 @@ import { createStore, applyMiddleware } from 'redux';
 import reducers from 'reducers';
 import thunk from 'redux-thunk';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import { composeWithDevTools } from 'redux-devtools-extension';
 
 const routes = {
   path: '/',
@@ -22,23 +23,22 @@ const routes = {
   ]
 }
 
-const store = createStore(reducers, applyMiddleware(thunk));
+const store = createStore(reducers, composeWithDevTools(applyMiddleware(thunk)));
 
 const render = Component => {
     ReactDOM.render(
-		<AppContainer>
-			<MuiThemeProvider>
-				<Provider store={store}>
-				    <Router history={browserHistory}routes={routes} key={Math.random()}/>
-			    </Provider>
-			</MuiThemeProvider>
+			<AppContainer>
+				<MuiThemeProvider>
+					<Provider store={store}>
+							<Router history={browserHistory}routes={routes} key={Math.random()}/>
+						</Provider>
+				</MuiThemeProvider>
 	    </AppContainer>,
-        document.getElementById('root')
-    )
+			document.getElementById('root')
+    );
 }
 
 render(App);
-
 
 if(module.hot) {
 	module.hot.accept();
