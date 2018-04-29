@@ -30,7 +30,6 @@ class MemoDialog extends React.Component{
         this.getTitle = this.getTitle.bind(this);
     }
     componentWillReceiveProps(nextProps){
-        console.log(nextProps.open)
         let dataName = '';
         let pass = false;
         switch(this.props.mode){
@@ -50,7 +49,6 @@ class MemoDialog extends React.Component{
         if(!pass){
             if(!this.state.initialState.hasOwnProperty('_id') || this.props.mode != this.state.currentMode ){
                 let obj = Object.assign({}, nextProps[dataName]);
-                console.log(obj)
                 this.setState({initialState: obj, currentMode: this.props.mode});
             }
             else{
@@ -85,13 +83,17 @@ class MemoDialog extends React.Component{
                 name: name
             }
         }
-        if(date.getDate() < (new Date()).getDate()){
-            Materialize.toast('제출일이 현재 날짜보다 이르기 때문에,<br/>오늘로 자동 변경됩니다.', 2000);
-            date = new Date();
-        }
+        date = this.checkPastDueDate(date);
 
         date = this.convertToDateString(date);
         this.props.handleDialogDataChange(event, date, 'currMemo');
+    }
+    checkPastDueDate(date){
+        if(date != '' && date.getDate() < (new Date()).getDate()){
+            Materialize.toast('제출일이 현재 날짜보다 이르기 때문에,<br/>오늘로 자동 변경됩니다.', 2000);
+            return new Date();
+        }
+        return date;
     }
     handlePost(){
         let dataName = '';
@@ -184,28 +186,28 @@ class MemoDialog extends React.Component{
                         <label style={styles.inputLabelFocusSmall}>라벨</label>
                         <RadioButtonGroup name="label" defaultSelected="-1" valueSelected={this.props.currMemo.label} onChange={this.handleDataChange} style={styles.rbGroup}>
                             <RadioButton value="-1" style={styles.rbStyle} iconStyle={styles.rbIcon}
-                                        checkedIcon={<FontAwesome name="times" style={{color: '#939393', backgroundColor: '#d3d3d3'}} /> }
-                                        uncheckedIcon={<FontAwesome name="times" style={{color: '#939393'}} />}
+                                        checkedIcon={<FontAwesome name="times" style={{color: '#939393', backgroundColor: '#d3d3d3', margin: 5, padding: '5px 10px'}} /> }
+                                        uncheckedIcon={<FontAwesome name="times" style={{color: '#939393', margin: 5, padding: '5px 10px'}} />}
                                         />
                             <RadioButton value="0" style={styles.rbStyle} iconStyle={styles.rbIcon}
-                                        checkedIcon={<FontAwesome name="stop" style={{color: ColorStock[0], backgroundColor: '#d3d3d3'}} /> }
-                                        uncheckedIcon={<FontAwesome name="stop" style={{color: ColorStock[0]}} />}
+                                        checkedIcon={<FontAwesome name="stop" style={{color: ColorStock[0], backgroundColor: '#d3d3d3', margin: 5, padding: '5px 10px'}} /> }
+                                        uncheckedIcon={<FontAwesome name="stop" style={{color: ColorStock[0], margin: 5, padding: '5px 10px'}} />}
                                         />
                             <RadioButton value="1" style={styles.rbStyle} iconStyle={styles.rbIcon}
-                                        checkedIcon={<FontAwesome name="stop" style={{color: ColorStock[1], backgroundColor: '#d3d3d3'}} /> }
-                                        uncheckedIcon={<FontAwesome name="stop" style={{color: ColorStock[1]}} />}
+                                        checkedIcon={<FontAwesome name="stop" style={{color: ColorStock[1], backgroundColor: '#d3d3d3', margin: 5, padding: '5px 10px'}} /> }
+                                        uncheckedIcon={<FontAwesome name="stop" style={{color: ColorStock[1], margin: 5, padding: '5px 10px'}} />}
                                         />
                             <RadioButton value="2" style={styles.rbStyle} iconStyle={styles.rbIcon}
-                                        checkedIcon={<FontAwesome name="stop" style={{color: ColorStock[2], backgroundColor: '#d3d3d3'}} /> }
-                                        uncheckedIcon={<FontAwesome name="stop" style={{color: ColorStock[2]}} />}
+                                        checkedIcon={<FontAwesome name="stop" style={{color: ColorStock[2], backgroundColor: '#d3d3d3', margin: 5, padding: '5px 10px'}} /> }
+                                        uncheckedIcon={<FontAwesome name="stop" style={{color: ColorStock[2], margin: 5, padding: '5px 10px'}} />}
                                         />
                             <RadioButton value="3" style={styles.rbStyle} iconStyle={styles.rbIcon}
-                                        checkedIcon={<FontAwesome name="stop" style={{color: ColorStock[3], backgroundColor: '#d3d3d3'}} /> }
-                                        uncheckedIcon={<FontAwesome name="stop" style={{color: ColorStock[3]}} />}
+                                        checkedIcon={<FontAwesome name="stop" style={{color: ColorStock[3], backgroundColor: '#d3d3d3', margin: 5, padding: '5px 10px'}} /> }
+                                        uncheckedIcon={<FontAwesome name="stop" style={{color: ColorStock[3], margin: 5, padding: '5px 10px'}} />}
                                         />
                             <RadioButton value="4" style={styles.rbStyle} iconStyle={styles.rbIcon}
-                                        checkedIcon={<FontAwesome name="stop" style={{color: ColorStock[4], backgroundColor: '#d3d3d3'}} /> }
-                                        uncheckedIcon={<FontAwesome name="stop" style={{color: ColorStock[4]}} />}
+                                        checkedIcon={<FontAwesome name="stop" style={{color: ColorStock[4], backgroundColor: '#d3d3d3', margin: 5, padding: '5px 10px'}} /> }
+                                        uncheckedIcon={<FontAwesome name="stop" style={{color: ColorStock[4], margin: 5, padding: '5px 10px'}} />}
                                         />
                         </RadioButtonGroup>
                         <CustomDatePicker name="dueDate" label={"제출일"} labelStyle={styles.inputLabelFocusSmall} checkBox={true} onDataChange={this.handleTimeChange} value={this.props.currMemo.dueDate}/>
@@ -280,8 +282,6 @@ let styles = {
         width: 50, 
         height: 45, 
         fontSize: 35, 
-        padding: '5px 10px', 
-        margin: 5
     },
     rbFA: {
 

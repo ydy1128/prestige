@@ -62,8 +62,7 @@ class StudentBoard extends React.Component{
         e.stopPropagation();
         let target_id = e.currentTarget.parentNode.parentNode.childNodes[3].innerHTML;
         let target_idx = this.props.studentsData.findIndex(x => { return x.username == target_id; });
-        let target_obj = this.props.studentsData[target_idx];
-        console.log(target_obj)
+        let target_obj = Object.assign({}, this.props.studentsData[target_idx]);
         this.setState({open: true, editidx: target_idx, editstd: target_obj, modal_state: true})
     }
     handlePassOpen(e){
@@ -83,8 +82,12 @@ class StudentBoard extends React.Component{
         this.setState(nextState);
     }
     handleEdit(){
-        this.props.onStudentEdit(this.state.editstd, this.state.editidx, false);
-        this.handleClose();
+        this.props.onStudentEdit(this.state.editstd, this.state.editidx, false).then(() => {
+            if(studentEditStatus.status != "SUCCESS"){
+                this.handleClose();
+            }
+        });
+        
     }
     handlePwChange(){
         this.props.onStudentPwChange(this.state.editstd._id, this.state.editstd.password, this.state.editstd.check_password);
@@ -242,11 +245,20 @@ class StudentBoard extends React.Component{
         )
     }
 }
+const mapStateToProps = (state) => {
+    return {
+        studentEditStatus: state.studentinfo.editStudents,
 
+    };
+};
+
+const mapDispatchToProps = (dispatch) => {
+
+}
 StudentBoard.propTypes = {
     studentsData: React.PropTypes.array,
 }
 StudentBoard.defaultProps = {
     studentsData: [],
 }
-export default StudentBoard;
+export default connect(mapStateToProps, mapDispatchToProps)(StudentBoard);

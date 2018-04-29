@@ -90,7 +90,8 @@ class ClassBoard extends React.Component{
     toggleDialogMode(setMode){
         this.setState({dialogMode: setMode})
     }
-    openDialog(mode){
+    openDialog(mode, event){
+        console.log(event, mode)
         this.toggleDialogMode(mode);
         this.toggleDialog(true);
     }
@@ -303,7 +304,6 @@ class ClassBoard extends React.Component{
     handlePost(){
         let contents = Object.assign({}, this.state.editClass);
         contents.days = this.processDays(this.state.editClass.days);
-        console.log(contents)
         this.props.onClassPost(contents).then((success) =>{
             if(success) this.closeDialog();
         })
@@ -315,8 +315,6 @@ class ClassBoard extends React.Component{
         let props = this.props;
         this.state.selectedStudents.map(function(obj, i){
             let index = props.studentsData.findIndex(x => x._id==obj._id);
-            console.log(obj);
-            console.log(contents.name, props.studentsData[index].class, obj.class)
             if(props.studentsData[index].class != obj.class){
                 props.onStudentEdit(obj, index, true);
                 contents.students.push(obj._id);
@@ -326,7 +324,6 @@ class ClassBoard extends React.Component{
             let index = props.studentsData.findIndex(x => x._id==obj._id);
             let indexInClass = contents.students.findIndex(x => x == obj._id);
             if(props.studentsData[index].class != obj.class){
-                console.log(contents.students);
                 props.onStudentEdit(obj, index, true);
                 contents.students.splice(indexInClass, 1);
             }
@@ -450,7 +447,7 @@ class ClassBoard extends React.Component{
             <div className="Boards">
                 <BoardHeader title='수업관리' remove_active={this.state.remove_active} handleRemove={this.toggleDeleteDialog.bind(undefined, true)}
                                 plus_button={true} remove_button={true} search_engine={true} searchOpen={this.state.searchOpen}
-                                openDialog={this.openDialog.bind(true)} handleActive={this.removeActive}
+                                openDialog={this.openDialog.bind(undefined, true)} handleActive={this.removeActive}
                                 onSearchEngineChange={this.onSearchEngineChange} 
                                 focusSearchInput={this.focusSearchInput} blurSearchInput={this.blurSearchInput} />
 	            <div className="Board-contents row">
