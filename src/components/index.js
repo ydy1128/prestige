@@ -3,7 +3,7 @@ import Authentication from './Authentication';
 import DashBoard from 'components/DashBoard';
 import ClassBoard from 'components/ClassBoard';
 import StudentBoard from 'components/StudentBoard';
-import HomeworkBoard from 'components/HomeworkBoard/teacher';
+import HomeworkBoard from 'components/HomeworkBoard';
 import TeacherLectureBoard from 'components/LectureBoard/teacher';
 import StudentLectureBoard from 'components/LectureBoard/student';
 export {
