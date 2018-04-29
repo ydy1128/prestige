@@ -184,7 +184,7 @@ const deleteUser = (req, res) =>{
     });
 }
 
-let verifyList = ['username', 'password', 'name', 'school', 'class'];
+let verifyList = ['username', 'password', 'name', 'school'];
 let validateContents = (contents) =>{
     for(let i = 0; i < verifyList.length; i++){
         let key = verifyList[i];
