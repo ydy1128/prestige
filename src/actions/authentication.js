@@ -149,7 +149,7 @@ export function updateUserRequest(obj, url_ref) {
             dispatch(updateUserSuccess(response.data.account));
         })
         .catch((error) => {
-            dispatch(updateUserFailure());
+            dispatch(updateUserFailure(error.response.data));
         });
     };
 
@@ -168,9 +168,10 @@ export function updateUserSuccess(user) {
     };
 }
 
-export function updateUserFailure() {
+export function updateUserFailure(error) {
     return {
-        type: AUTH_UPDATE_FAILURE
+        type: AUTH_UPDATE_FAILURE,
+        error: error
     };
 }
 

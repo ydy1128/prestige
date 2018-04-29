@@ -57,7 +57,7 @@ class ClassList extends React.Component{
                                     	name={cls._id + '-' + i}
                                         label={<h5 style={{margin: '0'}}>{cls.name}</h5>} 
                                         checked={this.props.searchStart ? this.props.filteredClick.includes(i) : this.props.clicked.includes(i)} 
-                                        onCheck={this.props.searchStart ? this.props.handleFilteredClick : this.props.handleClick}
+                                        onCheck={this.props.searchStart ? this.props.handleFilteredClick.bind(undefined, i) : this.props.handleClick}
                                         style={{verticalAlignment:'middle'}}/>
                                     
                                 </h5>

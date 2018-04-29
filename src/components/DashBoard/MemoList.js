@@ -66,7 +66,7 @@ class MemoList extends React.Component{
                 			<IconMenu className="right" style={styles.menuButton} onClick={this.clickEvent}
 								iconButtonElement={
 									<div style={styles.menuButtonDiv}>
-										<FontAwesome name="ellipsis-v" class="right" style={styles.infoMenu} />
+										<FontAwesome name="ellipsis-v" className="right" style={styles.infoMenu} />
 									</div>}
 								anchorOrigin={{horizontal: 'left', vertical: 'top'}}
 								targetOrigin={{horizontal: 'left', vertical: 'top'}}

@@ -23,7 +23,7 @@ class StudentDialog extends React.Component{
         ];
         const infoDialog = (
             <div>
-                <TextField floatingLabelText="아이디" fullWidth={true} 
+                <TextField floatingLabelText="아이디" fullWidth={true}  disabled
                 			name="username" value={this.props.editstd.username} 
                 			onChange={this.props.handleChange} 
                 			floatingLabelStyle={styles.inputLabel} floatingLabelFocusStyle={styles.inputLabelFocus} 

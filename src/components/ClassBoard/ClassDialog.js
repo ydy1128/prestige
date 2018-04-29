@@ -72,6 +72,12 @@ class ClassDialog extends React.Component{
 
 		const studentMode = (
         		<div className="row Students-list">
+                    <div className="col s6" style={{position: 'absolute', marginTop: -55, marginLeft: 120}}>
+                        <FontAwesome style={{fontSize: 28}} name="search" />
+                        <TextField name="searchEngine" 
+                                style={{marginLeft: 10}}
+                                onChange={this.props.onSearchEngineChange } onFocus={this.props.focusSearchInput} onBlur={this.props.blurSearchInput} />
+                    </div>
                     <div className="col s6">
                         <Table style={styles.studentTable} height={'300px'} onCellClick={this.onCellClick.bind(this, 'clickedInAllStudents')} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
                             <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
@@ -87,7 +93,9 @@ class ClassDialog extends React.Component{
                                 </TableRow>
                             </TableHeader>
                             <TableBody displayRowCheckbox={true} deselectOnClickaway={false} showRowHover={true} stripedRows={false}>
-                               {mapToComponents(this.props.allStudents, 'clickedInAllStudents')}
+                               {mapToComponents(
+                                    this.props.searchStart ? this.props.filteredAllStudents : this.props.allStudents, 
+                                    this.props.searchStart ? 'filteredClickInAllStudents' : 'clickedInAllStudents')}
                             </TableBody>
                             <TableFooter>
                                 <TableRow>
@@ -113,7 +121,9 @@ class ClassDialog extends React.Component{
                                 </TableRow>
                             </TableHeader>
                             <TableBody displayRowCheckbox={true} deselectOnClickaway={false} showRowHover={true} stripedRows={false}>
-                               {mapToComponents(this.props.selectedStudents, 'clickedInSelectedStudents')}
+                               {mapToComponents(
+                                    this.props.searchStart ? this.props.filteredSelectedStudents : this.props.selectedStudents, 
+                                    this.props.searchStart ? 'filteredClickInSelectedStudents' : 'clickedInSelectedStudents')}
                             </TableBody>
                             <TableFooter>
                                 <TableRow>

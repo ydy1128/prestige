@@ -76,7 +76,11 @@ class Home extends React.Component {
                 Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
                 return true;
             } else {
-                return throwError(false, '학생', this.props.classEditStatus.error, '');
+                let errorMessage = {
+                    'Bad password.':'비밀번호는 4자  이상이어야 합니다',
+                    'Passwords do not match.': '입력하신 비밀번호가 틀립니다'
+                };
+                return throwError(false, '학생', this.props.classEditStatus.error, errorMessage[this.props.status.error.message]);
             }
         });
     }
@@ -99,7 +103,11 @@ class Home extends React.Component {
                 return true;
             }
             else {
-                return throwError(false, '수업', this.props.classPostStatus.error, '');
+                let errorMessage = {
+                    'Empty contents.':'모든 정보를 채워주세요',
+                    'Class name already exists.':'존재하는 수업 이름입니다'
+                };
+                return throwError(false, '수업', this.props.classPostStatus.error, errorMessage[this.props.classPostStatus.error.message]);
             }
         });
     }
@@ -110,7 +118,11 @@ class Home extends React.Component {
                     return true;
                 }
                 else {
-                    return throwError(false, '수업', this.props.classEditStatus.error, '');
+                    let errorMessage = {
+                        'Empty contents.':'모든 정보를 채워주세요',
+                        'Class name already exists.':'존재하는 수업 이름입니다',
+                    };
+                    return throwError(false, '수업', this.props.classEditStatus.error, errorMessage[this.props.classEditStatus.error.message]);
                 }
             }
         );

@@ -9,6 +9,9 @@ import axios from 'axios';
 import { connect } from 'react-redux';
 import {studentsInfoEditRequest, studentsInfoPwChangeRequest} from 'actions/studentinfo';
 import {updateUserRequest} from 'actions/authentication';
+
+import throwError from 'components/commons/throwError';
+
 import './style.scss';
 
 class Header extends React.Component {
@@ -37,7 +40,6 @@ class Header extends React.Component {
             this.props.loginStatus().then(()=>{
                 let userInfo = Object.assign({}, this.props.userInfo.user);
                 userInfo.role = this.props.userInfo.role;
-                console.log(userInfo)
                 this.setState({userInfo: userInfo});
             })
     }
@@ -49,17 +51,22 @@ class Header extends React.Component {
         });
     }
     handleClose(){
-        this.setState({accountOpen: false, editMode: false});
+        let userInfo = this.state.userInfo;
+        userInfo.password = '';
+        this.setState({accountOpen: false, editMode: false, userInfo: userInfo});
     }
     handleClick(){
         if(this.state.editMode){
             this.props.updateUserRequest(this.state.userInfo, this.state.userInfo.role).then(()=>{
-                if(this.props.status == 'SUCCESS'){
+                if(this.props.status.status == 'SUCCESS'){
                     this.setState({editMode: false});
                     Materialize.toast('계정 정보가 수정 되었습니다.', 2000);
                 }
                 else{
-                    console.error('update user failed');
+                    let errorMessage = {
+                        'Bad password.':'비밀번호는 4자  이상이어야 합니다',
+                    };
+                    return throwError(false, '계정', this.props.status.error, errorMessage[this.props.status.error.message]);
                 }
             })
             
@@ -72,7 +79,6 @@ class Header extends React.Component {
         let nextState = {};
         nextState.userInfo = this.state.userInfo;
         nextState.userInfo[event.target.name] = data;
-        console.log(event.target.name, data)
         this.setState(nextState);
     }
     render() {
@@ -201,7 +207,7 @@ Header.defaultProps = {
 
 const mapStateToProps = (state) => {
     return {
-        status: state.authentication.update.status
+        status: state.authentication.update
     };
 };
 const mapDispatchToProps = (dispatch) => {

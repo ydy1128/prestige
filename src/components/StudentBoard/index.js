@@ -8,12 +8,14 @@ import TextField from 'material-ui/TextField';
 import BoardHeader from '../commons/BoardHeader';
 import StudentDialog from './StudentDialog';
 import StudentTable from './StudentTable';
+import DeleteDialog from './DeleteDialog';
 
 class StudentBoard extends React.Component{
 	constructor(props){
 		super(props);
         this.state = {
             open: false,
+            deleteDialogOpen: false,
             editidx: -1,
             editstd: {
                 _id: '',
@@ -33,6 +35,7 @@ class StudentBoard extends React.Component{
             searchText: '',
             searchResult: []
         }
+        this.toggleDeleteDialog = this.toggleDeleteDialog.bind(this);
         //handle modal open
         this.handleInfoOpen = this.handleInfoOpen.bind(this);
         this.handlePassOpen = this.handlePassOpen.bind(this);
@@ -52,13 +55,14 @@ class StudentBoard extends React.Component{
         this.blurSearchInput = this.blurSearchInput.bind(this);
         this.onSearchEngineChange = this.onSearchEngineChange.bind(this);
 	}
-
+    toggleDeleteDialog(open){
+        this.setState({deleteDialogOpen: open});
+    }
     handleInfoOpen(e){
         e.stopPropagation();
         let target_id = e.currentTarget.parentNode.parentNode.childNodes[3].innerHTML;
         let target_idx = this.props.studentsData.findIndex(x => { return x.username == target_id; });
-        let target_obj = this.props.studentsData[target_idx];
-        console.log(target_obj)
+        let target_obj = Object.assign({}, this.props.studentsData[target_idx]);
         this.setState({open: true, editidx: target_idx, editstd: target_obj, modal_state: true})
     }
     handlePassOpen(e){
@@ -78,8 +82,12 @@ class StudentBoard extends React.Component{
         this.setState(nextState);
     }
     handleEdit(){
-        this.props.onStudentEdit(this.state.editstd, this.state.editidx, false);
-        this.handleClose();
+        this.props.onStudentEdit(this.state.editstd, this.state.editidx, false).then(() => {
+            if(studentEditStatus.status != "SUCCESS"){
+                this.handleClose();
+            }
+        });
+        
     }
     handlePwChange(){
         this.props.onStudentPwChange(this.state.editstd._id, this.state.editstd.password, this.state.editstd.check_password);
@@ -120,6 +128,7 @@ class StudentBoard extends React.Component{
             let classidx = this.props.classData.findIndex(x => { return x.name == key; });
             let class_obj = this.props.classData[classidx];
             for(let i = 0; i < editting_classes[key].length; i++){
+                console.log(class_obj);
                 let std_list_in_class = class_obj.students;
                 let std_class_idx = std_list_in_class.indexOf(editting_classes[key][i]);
                 std_list_in_class.splice(std_class_idx, 1);
@@ -129,8 +138,8 @@ class StudentBoard extends React.Component{
     }
     handleRowClick(rowNumber, columnId){
         let clicked = [...this.state.clicked];
+        console.log(rowNumber)
         let index = clicked.indexOf(rowNumber);
-
         if(index == -1)
             clicked.push(rowNumber);
         else
@@ -159,7 +168,7 @@ class StudentBoard extends React.Component{
             origIndex = clicked.indexOf(origIndex);
             clicked.splice(origIndex, 1);
         }
-        this.setState({clicked: clicked, filteredClick: filteredClick, remove_active: (filteredClick == 0 || clicked == 0)? false : true})
+        this.setState({clicked: clicked, filteredClick: filteredClick, remove_active: (filteredClick.length == 0 || clicked.length == 0)? false : true})
     }
     handleActive(){
         return this.state.remove_active ? '' : 'inactive';
@@ -211,7 +220,7 @@ class StudentBoard extends React.Component{
     render(){
         return(
             <div className="Boards">
-                <BoardHeader title='학생관리' remove_active={this.state.remove_active} handleRemove={this.handleRemove}
+                <BoardHeader title='학생관리' remove_active={this.state.remove_active} handleRemove={this.toggleDeleteDialog.bind(undefined, true)}
                             plus_button={false} remove_button={true} search_engine={true} searchOpen={this.state.searchOpen}
                             openDialog={null} handleActive={this.handleActive}
                             onSearchEngineChange={this.onSearchEngineChange} 
@@ -229,16 +238,27 @@ class StudentBoard extends React.Component{
                 </div>
                 <StudentDialog modal_state={this.state.modal_state} open={this.state.open} editstd={this.state.editstd} 
                 				handleChange={this.handleChange} handleClose={this.handleClose} handleEdit={this.handleEdit} handlePwChange={this.handlePwChange}
-                				/>                
+                				/>  
+                <DeleteDialog dialogOn={this.state.deleteDialogOpen} objNum={this.state.clicked.length} closeDialog={this.toggleDeleteDialog.bind(undefined, false)}
+                                deleteFunction={this.handleRemove} />              
             </div>
         )
     }
 }
+const mapStateToProps = (state) => {
+    return {
+        studentEditStatus: state.studentinfo.editStudents,
 
+    };
+};
+
+const mapDispatchToProps = (dispatch) => {
+
+}
 StudentBoard.propTypes = {
     studentsData: React.PropTypes.array,
 }
 StudentBoard.defaultProps = {
     studentsData: [],
 }
-export default StudentBoard;
+export default connect(mapStateToProps, mapDispatchToProps)(StudentBoard);

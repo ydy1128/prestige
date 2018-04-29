@@ -104,6 +104,8 @@ const updateUser = (req, res) =>{
         }
         for (let key in req.body.obj){
             if(key != 'password' && account.hasOwnProperty(key)){
+                if(req.body.obj[key] == undefined || req.body.obj[key] == '')
+                    return throwerror(res, 400, 'Bad contents.');
                 account[key] = req.body.obj[key];
             }
         }
@@ -137,7 +139,7 @@ const getAllStudents = (req, res) => {
 const changeStudentPW = (req, res) => {
     // CHECK PASS LENGTH
     if(req.body.pw.length < 4 || typeof req.body.pw !== "string")
-        return throwerror(res, 401, 'Update failed: password format not valid.');
+        return throwerror(res, 401, 'Bad password.');
 
     Student.findById(req.params.id, (err, std) => {
         if(err) return throwerror(res, 409, 'DB error.');
@@ -145,7 +147,7 @@ const changeStudentPW = (req, res) => {
         if(!std) return throwerror(res, 409);
 
         if(req.body.pw != req.body.check_pw)
-            return throwerror(res, 401, 'Password does not match.');
+            return throwerror(res, 401, 'Passwords do not match.');
 
         std.password = req.body.pw;
         std.password = std.generateHash(std.password);
@@ -164,14 +166,17 @@ const changeStudentInfo = (req, res) => {
     Student.findById(req.params.id, (err, std) => {
         if(err) return throwerror(res, 409, 'DB error.');
         // IF MEMO DOES NOT EXIST
-        if(!std) return throwerror(res, 409);
+        if(!std) return throwerror(res, 409, 'DB error.');
+
+
+        if(!validateContents(req.body.obj, stdVerifyList)){
+            return throwerror(res, 400, 'Bad contents.');
+        }
 
         std.class = req.body.obj.class;
         std.name = req.body.obj.name;
         std.school = req.body.obj.school;
         std.level = req.body.obj.level;
-        console.log(req.body.class);
-        console.log(std);
 
         std.save((err, std) => {
             if(err) return throwerror(res, 409, 'DB error.');
@@ -191,9 +196,10 @@ const userLogOut = (req, res) => {
 }
 
 let verifyList = ['username', 'password', 'name'];
-let validateContents = (contents) =>{
-    for(let i = 0; i < verifyList.length; i++){
-        let key = verifyList[i];
+let stdVerifyList = ['name', 'school', 'level'];
+let validateContents = (contents, vfList = verifyList) =>{
+    for(let i = 0; i < vfList.length; i++){
+        let key = vfList[i];
         if(contents[key] == undefined || contents[key] == ''){
             console.error('value not found: ', key, contents[key]);
             return false;
