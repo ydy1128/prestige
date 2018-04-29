@@ -12,8 +12,7 @@ import { getMemoListRequest } from 'actions/memolist';
 import { ClassBoard,
           DashBoard,
           StudentBoard,
-          TeacherHomeworkBoard,
-          StudentHomeworkBoard,
+          HomeworkBoard,
           TeacherLectureBoard,
           StudentLectureBoard
 } from 'components';
@@ -166,9 +165,9 @@ class Home extends React.Component {
                                 studentsData={this.props.studentsData}
                                 lectureData={this.props.lectureData} />);
             case 'TEACHER_HOMEWORKBOARD':
-                return (<TeacherHomeworkBoard />);
+                return (<HomeworkBoard userType='teacher'/>);
             case 'STUDENT_HOMEWORKBOARD':
-                return (<StudentHomeworkBoard />);
+                return (<HomeworkBoard userType='student'/>);
             case 'STUDENT_DASHBOARD':
                 return (<div>DASHBOARD</div>);
             case 'STUDENT_LECTUREBOARD':
