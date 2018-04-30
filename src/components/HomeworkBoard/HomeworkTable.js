@@ -110,14 +110,13 @@ export default class TableExampleComplex extends Component {
     let tableRows = [];
 
     hwData.map((rowData, index) => {
-      console.log(rowData);
       let {
         _id, title, content, dueDate, writtenDate, modifiedDate, teacherId
       } = rowData;
       let readableDate = new Date(parseInt(dueDate));
       let readableWrittenDate = new Date(parseInt(writtenDate));
 
-      tableRows.push(
+      tableRows.unshift(
         <TableRow selected={this.props.clickedRowIndexes.includes(index)} key={index}>
           <TableRowColumn>
             <FontAwesome

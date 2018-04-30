@@ -31,10 +31,7 @@ const initialState = {
     }
 };
 
-export default function makeclass(state, action) {
-
-    if(typeof state === "undefined")
-        state = initialState;
+export default function makeclass(state = initialState, action) {
     switch(action.type) {
         case types.HOMEWORK_BOARD:
             return update(state, {

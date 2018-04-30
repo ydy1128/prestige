@@ -26,7 +26,6 @@ export function homeworkBoardRequest(isInitial, listType, id, username) {
 
         return axios.get(url)
         .then((response) => {
-            console.log("response",response);
             dispatch(homeworkBoardSuccess(response.data, isInitial, listType));
         }).catch((error) => {
             dispatch(homeworkBoardFailure());
@@ -62,7 +61,6 @@ export function homeworkPostRequest(contents) {
 
         return axios.post('/api/homework', { contents })
         .then((response) => {
-            console.log(response.data.homework)
             dispatch(homeworkPostSuccess(response.data.homework));
         }).catch((error) => {
             dispatch(homeworkPostFailure(error.response.data.homework));
@@ -108,7 +106,6 @@ export function homeworkPostFailure(error) {
 export function homeworkEditRequest(id, index, contents) {
     return (dispatch) => {
         dispatch(homeworkEdit());
-
         return axios.put('/api/homework/' + id, { contents })
         .then((response) => {
             dispatch(homeworkEditSuccess(index, response.data.homework));

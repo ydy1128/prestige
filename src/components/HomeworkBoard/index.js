@@ -9,18 +9,17 @@ import HomeworkBoard from './HomeworkBoard';
 import DeleteDialog from './DeleteDialog';
 import BoardHeader from 'components/commons/BoardHeader';
 
-import Comments from '../Comments';
+import Comments from './Comments';
 import { log } from "util";
 
 let homeworkBoard = null;
 
 var Present = ({ props, state, style, functions }) => {
-    let { hwData } = props;
+    let { hwData, userInfo } = props;
     let { 
             boardOn,
             deleteDialogOn, 
-            selectedHwIndex,
-            
+            selectedHwIndex,            
             searchOpen,
             searchText,
             searchResult,
@@ -40,33 +39,34 @@ var Present = ({ props, state, style, functions }) => {
             blurSearchInput,
             onSearchEngineChange
         } = functions;
-    
-    const tableButtons = [
-        <a onClick={toggleDeleteDialog(true)} style={{float: 'right'}}>
-            <FontAwesome className={'right ' +( filteredClick.length ? '' : 'inactive')} name="trash-o" />
-        </a>,
-        <a onClick={onClickCreateHomework} style={{float: 'right'}}>
-            <FontAwesome className={'right '} name="plus" />
+    let isTeacher = userInfo.role == 'teacher' ? true : false; 
+    let tableButtons = [];
+    let boardButtons = [
+        <a onClick={closeBoard} style={{float: 'right'}}>
+            <FontAwesome className={'right'} name="arrow-left" />
         </a>
     ];
 
-    const boardButtons = [
-        <a onClick={closeBoard} style={{float: 'right'}}>
-            <FontAwesome className={'right '} name="arrow-left" />
-        </a>,
-        <a onClick={(e) => {homeworkBoard.updateHomework(selectedHwIndex); closeBoard();}} style={{float: 'right'}}>
-            <FontAwesome className={'right '} name="upload" />
-        </a>    
-    ];
+    if (isTeacher) {
+        tableButtons = [
+            <a onClick={toggleDeleteDialog(true)} style={{float: 'right'}}>
+                <FontAwesome className={'right ' +( filteredClick.length ? '' : 'inactive')} name="trash-o" />
+            </a>,
+            <a onClick={onClickCreateHomework} style={{float: 'right'}}>
+                <FontAwesome className={'right '} name="plus" />
+            </a>    
+        ];
+        boardButtons.push(
+            <a onClick={(e) => {homeworkBoard.updateHomeworkByIndex(selectedHwIndex);}} style={{float: 'right'}}>
+                <FontAwesome className={'right'} name="upload" />
+            </a>
+        );
+    }
+
     let selectedHw = hwData[selectedHwIndex] ? hwData[selectedHwIndex] : null ;
-
-    if(selectedHw) console.log(selectedHw , selectedHw.comments)
-
-    console.log(filteredClick);
-    
     return (
         <div className="Boards" id='homework-section'>
-            <BoardHeader title='숙제관리' 
+            <BoardHeader title={isTeacher ? '숙제관리' : '숙제공지'} 
                 homeworkButtons={boardOn ? boardButtons : tableButtons}
                 search_engine={boardOn ? false : true}
                 searchOpen={searchOpen}
@@ -83,20 +83,23 @@ var Present = ({ props, state, style, functions }) => {
                             hw={selectedHw}
                             selectedHwIndex={selectedHwIndex}
                             homeworkEditRequest={homeworkEditRequest}
-                            isNewHomework= {isNewHomework}
-                        />
-                        <Comments key={selectedHw._id} hwId={selectedHw._id} comments={selectedHw ? selectedHw.comments : null}/>
-                    </div>
+                            isNewHomework={isNewHomework}
+                            closeBoard={closeBoard}
+                            userRole={userInfo.role}/>
+                        <Comments 
+                            key={selectedHw._id} 
+                            hwId={selectedHw._id} 
+                            comments={selectedHw ? selectedHw.comments : null}/>
+                    </div> 
                     :
                     <div className="col m12">
                         <HomeworkTable 
-                        hwData={searchResult.length || searchText? searchResult : hwData}
+                            hwData={searchResult.length || searchText? searchResult : hwData}
                             clickedRowIndexes={filteredClick}
                             handleRowSelection={handleRowSelection}
                             onClickEditHomework={onClickEditHomework}
-                        />
+                            userRole={userInfo.role}/>
                     </div>
-                    
                 }
             </div>
             <DeleteDialog key={Math.random()*1000000}

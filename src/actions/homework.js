@@ -26,7 +26,6 @@ export function homeworkBoardRequest(id) {
 
         return axios.get(url)
         .then((response) => {
-            console.log("response",response);
             dispatch(homeworkBoardSuccess(response.data));
             return response
         }).catch((error) => {
@@ -112,8 +111,10 @@ export function homeworkEditRequest(id, index, contents) {
         return axios.put('/api/homework/' + id, { contents })
         .then((response) => {
             dispatch(homeworkEditSuccess(index, response.data.homework));
+            return 'SUCCESS';
         }).catch((error) => {
             dispatch(homeworkEditFailure(error.response.data.code));
+            return 'FAIL';
         });
     };
 }
