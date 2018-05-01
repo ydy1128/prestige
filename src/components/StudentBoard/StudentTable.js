@@ -31,19 +31,21 @@ class StudentTable extends React.Component{
         let containerBottom = win.offset().top + win.height();
         $('.boardTable div:nth-child(1) div:nth-child(2)').scroll(() => {
             let tableBottom = tble.offset().top + tble.height();
-            // console.log(containerBottom, tableBottom)
-
-            // WHEN HEIGHT UNDER SCROLLBOTTOM IS LESS THEN 250
-            if(containerBottom > tableBottom){
-                // console.log(containerBottom, tableBottom)
+            if(containerBottom > tableBottom && this.state.loadedArray.length > 19){
                 this.loadData();
             }
         });
     }
+    componentWillReceiveProps(nextProps){
+        if(nextProps.studentsData != undefined && this.state.loadedArray != undefined)
+            this.setState({loadedIndex: 20, loadedArray: this.props.studentsData.slice(0, 20)})
+    }
     loadData(){
         let loadIndex = this.state.loadIndex;
-        let loadedArray = [...this.state.loadedArray, ...this.props.studentsData.slice(loadIndex, loadIndex+10)];
-        loadIndex += 10;
+        let lastIndex = (loadIndex+10) > this.props.studentsData.length ? this.props.studentsData.length : loadIndex+10;
+        let loadedArray = [...this.state.loadedArray, ...this.props.studentsData.slice(loadIndex, lastIndex)];
+        loadIndex = (loadIndex+10) > this.props.studentsData.length ? this.props.studentsData.length : loadIndex += 10;
+        if(loadIndex - 1 < this.props.studentsData.length)
         this.setState({loadIndex: loadIndex, loadedArray: loadedArray});
     }
 	render(){
