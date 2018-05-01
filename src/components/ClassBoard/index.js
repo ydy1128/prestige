@@ -318,6 +318,16 @@ class ClassBoard extends React.Component{
             if(props.studentsData[index].class != obj.class){
                 props.onStudentEdit(obj, index, true);
                 contents.students.push(obj._id);
+                props.lectureData.map((lec, j) => {
+                    if(lec.class == contents._id){
+                        let accs = [...lec.accomplishments];
+                        if(!lec.accomplishments.includes(obj._id)){
+                            accs.push({_id: obj._id, accomplishments: 0, startTime: '', endTime: ''})
+                        }
+                        lec.accomplishments = accs;
+                        props.onLectureEdit(j, lec);
+                    }
+                })
             }
         });
         this.state.allStudents.map(function(obj, i){
@@ -326,6 +336,17 @@ class ClassBoard extends React.Component{
             if(props.studentsData[index].class != obj.class){
                 props.onStudentEdit(obj, index, true);
                 contents.students.splice(indexInClass, 1);
+                props.lectureData.map((lec, j) => {
+                    if(lec.class == contents._id){
+                        let accs = [...lec.accomplishments];
+                        lec.accomplishments.map((acc, k) => {
+                            if(acc._id == obj._id)
+                                accs.splice(k, 1);
+                        })
+                        lec.accomplishments = accs;
+                        props.onLectureEdit(j, lec);
+                    }
+                })
             }
         });
         this.props.onClassEdit(contents._id, classindex, contents).then((success) => {

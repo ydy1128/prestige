@@ -1,5 +1,6 @@
 import express from 'express';
 import Class from '../models/Class';
+import Lecture from '../models/Lecture';
 import mongoose from 'mongoose';
 
 import iconv from 'iconv-lite';
@@ -90,10 +91,6 @@ const updateClass = (req, res) => {
             if(cls.teacher != req.session.loginInfo.user._id)
                 return throwerror(res, 403, 'Unauthorized user.');
 
-            if(!cls.students.equals(req.body.contents.students)){
-                console.log(cls.students.diff())
-            }
-
             // Modify class contents
             cls.name = req.body.contents.name;
             cls.days = req.body.contents.days;
@@ -166,10 +163,9 @@ Array.prototype.equals = function (array) {
     }       
     return true;
 }
-Array.prototype.diff = function(a) {
-    let first = this.filter(function(i) {return a.indexOf(i) < 0;});
-    let second = a.filter(function(i) {return this.indexOf(i) < 0;});
-    return [...first, ...second];
+Array.prototype.diff = function(b) {
+    let first = this.filter(function(i) {return b.indexOf(i) < 0;});
+    return first;
 };
 Object.defineProperty(Array.prototype, "equals", {enumerable: false});
 
