@@ -91,7 +91,6 @@ class ClassBoard extends React.Component{
         this.setState({dialogMode: setMode})
     }
     openDialog(mode, event){
-        console.log(event, mode)
         this.toggleDialogMode(mode);
         this.toggleDialog(true);
     }
@@ -186,7 +185,6 @@ class ClassBoard extends React.Component{
             clicked.push(rowNumber);
         else
             clicked.splice(index, 1);
-        console.log(clicked);
         nextState[type] = clicked;
         nextState.newClass = false;
         this.setState(nextState);
@@ -237,7 +235,6 @@ class ClassBoard extends React.Component{
         else{
             clicked_array.splice(index_in_clicked, 1);
         }
-        console.log(clicked_array);
 
         if(clicked_array.length > 0){
             remove_active = true;
@@ -252,7 +249,6 @@ class ClassBoard extends React.Component{
     }
     handleFilteredListClick(rowNumber, event, clicked){
         let filteredClick = [...this.state.filteredClick];
-        console.log(event, clicked, rowNumber)
         let index = filteredClick.indexOf(rowNumber);
         let push = false;
         if(index == -1){
@@ -273,7 +269,6 @@ class ClassBoard extends React.Component{
             origIndex = clickedArray.indexOf(origIndex);
             clickedArray.splice(origIndex, 1);
         }
-        // console.log(clicked, filteredClick)
         this.setState({clicked: clickedArray, filteredClick: filteredClick, remove_active: (filteredClick.length == 0 || clickedArray.length == 0)? false : true})
     }
     removeActive(remove_button){
@@ -298,7 +293,6 @@ class ClassBoard extends React.Component{
                 daystring += key;
             }
         }
-        console.log(daystring);
         return daystring;
     }
     handlePost(){
@@ -318,6 +312,16 @@ class ClassBoard extends React.Component{
             if(props.studentsData[index].class != obj.class){
                 props.onStudentEdit(obj, index, true);
                 contents.students.push(obj._id);
+                props.lectureData.map((lec, j) => {
+                    if(lec.class == contents._id){
+                        let accs = [...lec.accomplishments];
+                        if(!lec.accomplishments.includes(obj._id)){
+                            accs.push({_id: obj._id, accomplishments: 0, startTime: '', endTime: ''})
+                        }
+                        lec.accomplishments = accs;
+                        props.onLectureEdit(j, lec);
+                    }
+                })
             }
         });
         this.state.allStudents.map(function(obj, i){
@@ -326,6 +330,17 @@ class ClassBoard extends React.Component{
             if(props.studentsData[index].class != obj.class){
                 props.onStudentEdit(obj, index, true);
                 contents.students.splice(indexInClass, 1);
+                props.lectureData.map((lec, j) => {
+                    if(lec.class == contents._id){
+                        let accs = [...lec.accomplishments];
+                        lec.accomplishments.map((acc, k) => {
+                            if(acc._id == obj._id)
+                                accs.splice(k, 1);
+                        })
+                        lec.accomplishments = accs;
+                        props.onLectureEdit(j, lec);
+                    }
+                })
             }
         });
         this.props.onClassEdit(contents._id, classindex, contents).then((success) => {
@@ -336,7 +351,6 @@ class ClassBoard extends React.Component{
         let props = this.props;
         let clicked = [...this.state.clicked];
         let student_ids = [];
-        // console.log(clicked)
         this.state.clicked.map(function(index, i){
             student_ids = [...student_ids, ...props.data[index].students];
             props.onRemove(props.data[index]._id, index);
@@ -405,7 +419,6 @@ class ClassBoard extends React.Component{
         this.state.allStudents.map((std, i) => {
             let push = false;
             std.index = i;
-            console.log(std)
             if(std.name.includes(value)) push = true;
             if(std.school.includes(value)) push = true;
             if((''+std.level).includes(value)) push = true;
@@ -419,7 +432,6 @@ class ClassBoard extends React.Component{
             if((''+std.level).includes(value)) push = true;
             if(push) selectedStudentData.push(std);
         })
-        console.log(studentData, selectedStudentData)
         if(value == '')
             this.setState({studentSearchOpen: true, studentSearchStart: false, filteredClickInAllStudents: [], filteredClickInSelectedStudents: [], 
                             filteredAllStudents: [], filteredSelectedStudents: [], studentSearchText: ''})

@@ -22,10 +22,8 @@ import ipaddress from './ipconfig'
 export function lecturePostRequest(contents) {
     return (dispatch) => {
         dispatch(lecturePost());
-        console.log(contents)
         return axios.post('/api/lecture', { contents })
         .then((response) => {
-            console.log(response.data.lecture)
             dispatch(lecturePostSuccess(response.data.lecture));
         }).catch((error) => {
             if(error.response == undefined) console.error(error);

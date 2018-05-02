@@ -48,7 +48,7 @@ const readLecture = (req, res) =>{
         else
             condition = {class: req.session.loginInfo.user.class};
     }
-    Lecture.find(condition)
+    Lecture.find(condition).sort({$natural:-1})
     .exec((err, lectures) => {
         if(err) return throwerror(res, 409, 'DB error.');
         res.json({success: true, lectures: lectures});

@@ -253,7 +253,9 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-
+    return {
+        
+    }
 }
 StudentBoard.propTypes = {
     studentsData: React.PropTypes.array,

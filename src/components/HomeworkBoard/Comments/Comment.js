@@ -49,22 +49,28 @@ class Comment extends React.Component {
     }
 
     render() {
-        if (!this.state.comment) return null 
+        if (!this.state.comment) {
+            return null;
+        }
+
         let {editedDate, writer, _id, content} = this.state.comment;
         let onEdit = this.state.onEdit;
         let buttons = [
             <a className="edit-comment-button comment-button"
-                onClick={onEdit?  
+                key={"edit-comment-button-"+this.state.commentId}
+                onClick={
+                    onEdit ?  
                     (e) => { 
                         this.props.update(_id, this.state.comment);
                         this.setState({onEdit:false});
-                    }:
+                    } :
                     (e) =>{ this.setState({onEdit:true})}
                 }
             >
                 <FontAwesome className={'comment-button-icon '} name={this.state.onEdit ? "upload" : "pencil"} />
             </a>,
             <a className="delete-comment-button comment-button"
+                key={"delete-comment-button-"+this.state.commentId}
                 onClick={this.props.delete(_id)}
             >   
                 <FontAwesome className={'comment-button-icon '} name="trash-o" />
@@ -101,14 +107,12 @@ class Comment extends React.Component {
 
     async componentWillMount() {
         let commentId = this.props.commentId;
-        if(commentId){
-            
+        if(commentId){            
             let commentIds = JSON.stringify([commentId]);
             let comments = await axios.get('/api/comments?comments='+ commentIds ).then((res)=>{
                 return res.data.comments
-            })
-            console.log(comments);
-            this.setState({ comment: comments.length ? comments[0] : null  })    
+            });
+            this.setState({ comment: comments.length ? comments[0] : null  });
         }
     }
 
@@ -116,8 +120,8 @@ class Comment extends React.Component {
         let commentIds = JSON.stringify([this.props.commentId]);
         let comments = await axios.get('/api/comments?comments='+ commentIds).then((res)=>{
             return res.data.comments
-        })
-        this.setState({ comment: comments.length ? comments[0] : null })
+        });
+        this.setState({ comment: comments.length ? comments[0] : null });
     }
 }
 

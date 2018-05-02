@@ -38,6 +38,9 @@ const style = {
       width: "124px",
 
     },
+  },
+  table: {
+    border: '1px solid #d3d3d3'
   }
 };
 
@@ -71,13 +74,13 @@ export default class TableExampleComplex extends Component {
   render() {
     return (
       <div>
-        <Paper zDepth={1} rounded={false}>
           <Table
             height={this.state.height}
             fixedHeader={this.state.fixedHeader}
             selectable={this.state.selectable}
             multiSelectable={this.state.multiSelectable}
             onRowSelection={this.props.handleRowSelection}
+            style={style.table}
           >
             <TableHeader
               displaySelectAll={this.state.showCheckboxes}
@@ -100,7 +103,6 @@ export default class TableExampleComplex extends Component {
               {this._makeRows()}
             </TableBody>
           </Table>
-        </Paper>
       </div>
     );
   }
@@ -110,14 +112,13 @@ export default class TableExampleComplex extends Component {
     let tableRows = [];
 
     hwData.map((rowData, index) => {
-      console.log(rowData);
       let {
         _id, title, content, dueDate, writtenDate, modifiedDate, teacherId
       } = rowData;
       let readableDate = new Date(parseInt(dueDate));
       let readableWrittenDate = new Date(parseInt(writtenDate));
 
-      tableRows.push(
+      tableRows.unshift(
         <TableRow selected={this.props.clickedRowIndexes.includes(index)} key={index}>
           <TableRowColumn>
             <FontAwesome
