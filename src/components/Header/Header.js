@@ -34,6 +34,7 @@ class Header extends React.Component {
         this.handleClose = this.handleClose.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.findClassById = this.findClassById.bind(this);
     }
     componentDidMount(){
         if(this.props.loginStatus() != undefined)
@@ -80,6 +81,16 @@ class Header extends React.Component {
         nextState.userInfo = this.state.userInfo;
         nextState.userInfo[event.target.name] = data;
         this.setState(nextState);
+    }
+    findClassById(id){
+        for(let i = 0; i < this.props.classData.length; i++){
+            let cls = this.props.classData[i];
+            if(cls._id == id){
+                console.log(cls.name)
+                return cls.name;
+            }
+        }
+        return '';
     }
     render() {
         const accountButton = (
@@ -141,7 +152,7 @@ class Header extends React.Component {
                     </div>
                     {this.state.editMode ? null :
                     <div className="col m12" style={{marginTop: -10}}>
-                        <TextField floatingLabelText="반" name="class" value={this.state.userInfo.class}
+                        <TextField floatingLabelText="반" name="class" value={this.findClassById(this.state.userInfo.class)}
                             style={{width: 190, cursor: this.state.editMode? 'text' :'default'}}
                             disabled={!this.state.editMode}
                             inputStyle={{margin: 0, padding: '20px 0 0 0', color: 'black'}}
@@ -207,7 +218,8 @@ Header.defaultProps = {
 
 const mapStateToProps = (state) => {
     return {
-        status: state.authentication.update
+        status: state.authentication.update,
+        classData: state.makeclass.board.data,
     };
 };
 const mapDispatchToProps = (dispatch) => {

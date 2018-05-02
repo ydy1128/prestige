@@ -135,7 +135,7 @@ const updateUser = (req, res) =>{
     console.log(req.session.loginInfo.user._id)
     Student.findById(req.session.loginInfo.user._id , (err, account) => {
         if(req.body.obj.password != ''){
-            if(req.body.password.length < 4 || typeof req.body.password !== "string")
+            if(req.body.obj.password.length < 4 || typeof req.body.obj.password !== "string")
                 return throwerror(res, 400, 'Bad password.');
             account.password = account.generateHash(req.body.obj.password);
         }
@@ -151,10 +151,8 @@ const updateUser = (req, res) =>{
             // ALTER SESSION
             let session = req.session;
             account.password = '';
-            session.loginInfo = {
-                user: account,
-                role: 'teacher'
-            };
+            console.log(session)
+            session.loginInfo.user = account;
             // RETURN SUCCESS
             return res.json({
                 success: true,

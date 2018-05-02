@@ -17,7 +17,8 @@ const saveLoginData = (category, data) =>{
 	document.cookie='key=' + btoa(JSON.stringify(loginData));
 }
 const changeLoginData = (loginData) => {
+    console.log(loginData)
 	document.cookie='key=' + btoa(JSON.stringify(loginData));
 }
 
-export { getLoginData, saveLoginData };
+export { getLoginData, saveLoginData, changeLoginData };

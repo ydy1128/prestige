@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
 import { loginRequest } from 'actions/authentication';
+import { getLoginData, changeLoginData } from 'components/commons/SessionData';
 
 class Login extends React.Component {
 	constructor(props){
@@ -15,20 +16,19 @@ class Login extends React.Component {
 			() => {
 				if(this.props.status === "SUCCESS"){
 					// create session data
-                    console.log(this.props.user)
 					let loginData = {
                         isLoggedIn: true,
-                        id: this.props.user._id,
+                        id: this.props.user.user._id,
                         username: username,
                         role: url_ref
                     };
-                    console.log(loginData)
-                    console.log(this.props.user.user.name, url_ref)
-                    document.cookie = 'key=' + btoa(JSON.stringify(loginData));
+                    changeLoginData(loginData)
+                    // document.cookie = 'key=' + btoa(JSON.stringify(loginData));
                     let msg = '환영합니다,\n' + this.props.user.user.name + 
                         (url_ref == 'teacher' ? ' 선생님' : ' 학생') + ' !';
                     Materialize.toast(msg, 2000);
                     browserHistory.push('/');
+                    console.log(getLoginData())
                     return true;
 				}
 				else {

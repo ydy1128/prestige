@@ -63,20 +63,22 @@ class LectureTable extends React.Component{
         const tableBody = data => {
             return data.map((lecture, i) => {
                 let acc = 0;
+                if(lecture.accomplishments != undefined && lecture.accomplishments.length > 0){
                     lecture.accomplishments.map((a, i) =>{
                         acc += a.accomplishments;
                     })
                     acc /= lecture.accomplishments.length;
                     acc = acc.toFixed(2);
-                    return(
-                        <TableRow selected={this.props.searchStart ? this.props.filteredClick.includes(i) : this.props.clicked.includes(i)} key={lecture._id}>
-                            <TableRowColumn style={styles.tableButtonCol}><FontAwesome onClick={this.props.handleDialogOpen.bind(undefined, false, false, i)} className={'edit-button'} name="pencil" /></TableRowColumn>
-                            <TableRowColumn>{lecture.name}</TableRowColumn>
-                            <TableRowColumn>{this.props.searchClassNameById(lecture.class)}</TableRowColumn>
-                            <TableRowColumn><CircularProgress style={styles.progress} mode="determinate" value={parseFloat(acc)} size={20} thickness={4} />{acc + '%'}</TableRowColumn>
-                            <TableRowColumn><DatePicker id={'tp'+lecture._id} value={new Date(lecture.date)} textFieldStyle={styles.datePickerStyle} disabled={true} /></TableRowColumn>
-                        </TableRow>
-                    );
+                }
+                return(
+                    <TableRow selected={this.props.searchStart ? this.props.filteredClick.includes(i) : this.props.clicked.includes(i)} key={lecture._id}>
+                        <TableRowColumn style={styles.tableButtonCol}><FontAwesome onClick={this.props.handleDialogOpen.bind(undefined, false, false, i)} className={'edit-button'} name="pencil" /></TableRowColumn>
+                        <TableRowColumn>{lecture.name}</TableRowColumn>
+                        <TableRowColumn>{this.props.searchClassNameById(lecture.class)}</TableRowColumn>
+                        <TableRowColumn><CircularProgress style={styles.progress} mode="determinate" value={parseFloat(acc)} size={20} thickness={4} />{acc + '%'}</TableRowColumn>
+                        <TableRowColumn><DatePicker id={'tp'+lecture._id} value={new Date(lecture.date)} textFieldStyle={styles.datePickerStyle} disabled={true} /></TableRowColumn>
+                    </TableRow>
+                );
             });
         };
 

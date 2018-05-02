@@ -10,7 +10,8 @@ import { lectureBoardRequest, lectureEditRequest } from 'actions/lecture';
 import { getMemoListRequest } from 'actions/memolist';
 
 import { ClassBoard,
-          DashBoard,
+          TeacherDashBoard,
+          StudentDashBoard,
           StudentBoard,
           HomeworkBoard,
           TeacherLectureBoard,
@@ -56,9 +57,6 @@ class Home extends React.Component {
         this.props.lectureBoardRequest().then(() =>{
             console.log('lectureData', this.props.lectureData)
         });
-    }
-    componentDidMount(){
-
     }
     handleStudentEdit(stdobj, index, silent){
         return this.props.studentsInfoEditRequest(stdobj._id, index, stdobj).then(() =>{
@@ -153,7 +151,7 @@ class Home extends React.Component {
         switch(this.state.view_type){
             case 'TEACHER_DASHBOARD':
                 return (
-                            <DashBoard memoListData={this.props.memoListData} />
+                            <TeacherDashBoard memoListData={this.props.memoListData} />
                             /*<button onClick={this.loadCsvClassData}>load classes</button>
                             <button onClick={this.loadCsvStudentsData}>load students</button>*/
                         );
@@ -183,7 +181,7 @@ class Home extends React.Component {
             case 'STUDENT_HOMEWORKBOARD':
                 return (<HomeworkBoard userType='student'/>);
             case 'STUDENT_DASHBOARD':
-                return (<div>DASHBOARD</div>);
+                return (<StudentDashBoard />);
             case 'STUDENT_LECTUREBOARD':
                 return (<StudentLectureBoard classData={this.props.classData}
                                 lectureData={this.props.lectureData} />);
