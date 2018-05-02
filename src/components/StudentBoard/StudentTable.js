@@ -79,7 +79,7 @@ class StudentTable extends React.Component{
             <Table style={styles.table} id="highest"
                     onCellClick={this.props.searchStart ? this.props.handleFilteredRowClick : this.props.handleRowClick} 
                     fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
-                <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
+                <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={false}>
                     { tableHeader }
                 </TableHeader>
                     <TableBody displayRowCheckbox={true} deselectOnClickaway={false} showRowHover={true} stripedRows={false}>
