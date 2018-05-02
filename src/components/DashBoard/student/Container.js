@@ -8,7 +8,13 @@ var container = (Present) =>{
         constructor(props) {
             super(props);
             this.state = {
+                update: true,
             }
+            this.forceToUpdate = this.forceToUpdate.bind(this);
+        }
+
+        forceToUpdate(){
+            this.setState({update: !this.state.update})
         }
         render(){
             let presentState = [];
@@ -19,7 +25,7 @@ var container = (Present) =>{
                 homeworkData: this.props.homeworkData,
             };
             let presentFunctions = {
-
+                forceToUpdate: this.forceToUpdate
             }
 
         	return(

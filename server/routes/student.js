@@ -15,6 +15,7 @@ router.get('/getinfo', (req, res) => { getSessionData(req, res) });
 router.put('/updateinfo', (req, res) =>{ updateUser(req, res) });
 router.post('/logout', (req, res) => { userLogOut(req, res) });
 router.delete('/:id', (req, res) => { deleteUser(req, res) });
+router.get('/inclass', (req, res) => { getStudentsByClassId(req, res)})
 
 const createData = (req, res) =>{
     console.log('test uri called');
@@ -182,6 +183,21 @@ const deleteUser = (req, res) =>{
             res.json({ success: true });
         });
     });
+}
+
+const getStudentsByClassId = (req, res) =>{
+    console.log(req.session.loginInfo.user.class)
+    if(typeof req.session.loginInfo === 'undefined')
+        return throwerror(res, 401, 'User not logged in.');
+    Student.find({class: req.session.loginInfo.user.class}, (err, std) => {
+        if(err) return throwerror(res, 409, 'DB error.');
+        if(!std) return throwerror(res, 409);
+        console.log(std)
+            return res.json({
+                success: true,
+                std,
+            });
+    })
 }
 
 let verifyList = ['username', 'password', 'name', 'school'];

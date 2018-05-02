@@ -11,6 +11,9 @@ import {
     STUDENT_INFO_PW_CHANGE,
     STUDENT_INFO_PW_CHANGE_SUCCESS,
     STUDENT_INFO_PW_CHANGE_FAILURE,
+    STUDENTS_IN_CLASS_GET,
+    STUDENTS_IN_CLASS_GET_SUCCESS,
+    STUDENTS_IN_CLASS_GET_FAILURE,
 } from './ActionTypes';
 
 import axios from 'axios';
@@ -149,6 +152,42 @@ export function studentsInfoRemoveSuccess(index) {
 export function studentsInfoRemoveFailure(error) {
     return {
         type: STUDENT_INFO_REMOVE_FAILURE,
+        error
+    };
+}
+
+export function getStudentsInClassRequest() {
+    return (dispatch) => {
+        // inform Get Status API is starting
+        dispatch(getStudentsInClass());
+
+        let url = '/api/student/inclass';
+        return axios.get(url)
+        .then((response) => {
+            dispatch(getStudentsInClassSuccess(response.data.std));
+        })
+        .catch((error) => {
+            dispatch(getStudentsInClassFailure());
+        });
+    };
+}
+
+export function getStudentsInClass() {
+    return {
+        type: STUDENTS_IN_CLASS_GET
+    };
+}
+
+export function getStudentsInClassSuccess(data) {
+    return {
+        type: STUDENTS_IN_CLASS_GET_SUCCESS,
+        data
+    };
+}
+
+export function getStudentsInClassFailure(error) {
+    return {
+        type: STUDENTS_IN_CLASS_GET_FAILURE,
         error
     };
 }

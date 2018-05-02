@@ -39,7 +39,7 @@ class LectureTable extends React.Component{
     }
     componentWillReceiveProps(nextProps){
         if(nextProps.lectureData != undefined && this.state.loadedArray != undefined)
-            this.setState({loadedIndex: 20, loadedArray: this.props.lectureData.slice(0, 20)})
+            this.setState({loadIndex: 20, loadedArray: this.props.lectureData.slice(0, 20)})
     }
     loadData(){
         let loadIndex = this.state.loadIndex;

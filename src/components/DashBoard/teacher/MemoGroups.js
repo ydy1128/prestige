@@ -149,7 +149,7 @@ let styles = {
 		backgroundColor: '#FFFFFF',
 		borderRadius: 3,
 		marginRight: 20,
-		verticalAligh: 'top'
+		verticalAlign: 'top'
 	},
 	memogroupTitle: {
 		paddingLeft: 15,

@@ -36,13 +36,15 @@ class Header extends React.Component {
         this.dataChange = this.dataChange.bind(this);
         this.findClassById = this.findClassById.bind(this);
     }
-    componentDidMount(){
-        if(this.props.loginStatus() != undefined)
-            this.props.loginStatus().then(()=>{
+    componentDidMount(){        
+        this.props.loginStatus().then(()=>{
+            console.log(this.props.userinfo)
+            if(this.props.userinfo != undefined){
                 let userInfo = Object.assign({}, this.props.userInfo.user);
                 userInfo.role = this.props.userInfo.role;
                 this.setState({userInfo: userInfo});
-            })
+            }
+        })
     }
     handlePopover(event){
         event.preventDefault();

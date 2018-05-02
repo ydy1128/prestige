@@ -18,6 +18,10 @@ const initialState = {
         status: 'INIT',
         error: -1,
     },
+    getInClassStudents: {
+        status: 'INIT',
+        data: []
+    }
 }
 
 
@@ -117,6 +121,26 @@ export default function studentinfo(state, action) {
                     error: { $set: action.error }
                 }
             });
+        case types.STUDENTS_IN_CLASS_GET:
+            return update(state, {
+                getInClassStudents: {
+                    status: { $set: 'WAITING' },
+                }
+            });
+        case types.STUDENTS_IN_CLASS_GET_SUCCESS: 
+            console.log(action.data)
+            return update(state, {
+                getInClassStudents: {
+                    status: { $set: 'SUCCESS' },
+                    data: { $set: action.data }
+                }
+            })
+        case types.STUDENTS_IN_CLASS_GET_FAILURE:
+            return update(state, {
+                getInClassStudents: {
+                    status: { $set: 'FAILURE' }
+                }
+            })
         default:
             return state;
     }
