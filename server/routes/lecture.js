@@ -17,6 +17,8 @@ const createLecture = (req, res) => {
 
     if(req.session.loginInfo == undefined)
         return throwerror(res, 401, 'User not logged in.');
+    if(!validateContents(lecture_obj))
+        return throwerror(res, 400, 'Empty contents.');
 
     let lecture = new Lecture({
         name: lecture_obj.name,
@@ -56,14 +58,25 @@ const readLecture = (req, res) =>{
 const updateLecture = (id, req, res) =>{
     if(req.session.loginInfo == undefined)
         return throwerror(res, 401, 'User not logged in.');
+    if(!validateContents(req.body.contents))
+        return throwerror(res, 400, 'Empty contents.');
+    if(req.body.contents.accomplishments == undefined)
+        return throwerror(res, 400, 'Client data error.');
 
     Lecture.findById(id, (err, lecture) => {
         if(err) return throwerror(res, 409, 'DB error.');
         // IF Class does not exist
         if(lecture == undefined) return throwerror(res, 409);
-        
-        if(lecture.teacher != req.session.loginInfo.user._id)
-            return throwerror(res, 403, 'Unauthorized user.');
+        if(req.session.loginInfo.role == 'teacher'){
+            if(lecture.teacher != req.session.loginInfo.user._id)
+                return throwerror(res, 403, 'Unauthorized user.');
+        }
+        else{
+            // console.log(req)
+            if(req.session.loginInfo.user.class != lecture.class)
+
+                return throwerror(res, 403, 'Unauthorized user.');
+        }
         // Modify class contents
         lecture.name = req.body.contents.name;
         lecture.link = req.body.contents.link;
