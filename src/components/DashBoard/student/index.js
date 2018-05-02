@@ -19,7 +19,7 @@ let Present = ({ props, state, style, functions }) => {
             <BoardHeader title='대시보드' />
             <div className="Board-contents row">
                 <div className="col m12 boardTable">
-                	<NotiCard />
+                	<NotiCard lectureData={lectureData} />
                 	<ClassCard />
                 </div>
             </div>

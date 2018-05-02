@@ -26,8 +26,24 @@ class ClassCard extends React.Component{
     }
     render(){
     	return(
-    		<div style={{display: 'inline-block', width: '50%'}}>
-    			ClassCard
+    		<div style={{display: 'inline-block', width: 'calc(50% - 10px)', marginLeft: 10}}>
+				<Card>
+				    <CardTitle title="우리반" style={{paddingBottom: 0}}/>
+				    <CardText style={{padding: 0}}>
+			            <Table  
+			                    fixedHeader={true} fixedFooter={true} selectable={false} multiSelectable={false}>
+			                <TableHeader displaySelectAll={false} adjustForCheckbox={false} enableSelectAll={false}>
+					            <TableRow>
+					                <TableHeaderColumn>이름</TableHeaderColumn>
+					                <TableHeaderColumn>학교</TableHeaderColumn>
+					                <TableHeaderColumn>학년</TableHeaderColumn>
+					            </TableRow>
+			                </TableHeader>
+			                <TableBody displayRowCheckbox={false} deselectOnClickaway={false} showRowHover={true} stripedRows={false}>
+			                </TableBody>
+			            </Table>
+				    </CardText>
+				</Card>
     		</div>
     	)
     }
