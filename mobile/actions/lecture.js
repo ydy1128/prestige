@@ -99,8 +99,7 @@ export function passLecture(lecture){
 export function lectureEditRequest(index, contents) {
     return (dispatch) => {
         dispatch(lectureEdit());
-
-        return axios.put('/api/lecture/' + contents._id, { contents })
+        return axios.put(ipaddress + '/api/lecture/' + contents._id, { contents })
         .then((response) => {
             dispatch(lectureEditSuccess(index, response.data.lecture));
         }).catch((error) => {

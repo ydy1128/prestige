@@ -9,15 +9,21 @@ import {
 	TouchableHighlight
 } from 'react-native';
 
-const navigaionOptions = (left, right) => {
+const navigaionOptions = (left, right, title) => {
 	let options = {
-		headerTitle: 'Prestige',
+		headerTitle: title == undefined ? 'Prestige' : title,
 		headerStyle: {
 		    backgroundColor: '#86272d',
+
+		},
+		headerTextStyle:{
+			textAlign: 'center',
 		},
 		headerTitleStyle: {
 			color: 'white',
-		    alignSelf: 'center',
+		    flex: 1,
+		    textAlign: 'center'
+
 		},
 	}
 	if(right != undefined){
