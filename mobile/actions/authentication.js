@@ -27,13 +27,10 @@ export function loginRequest(username, password) {
         return axios.post(post_url, { username, password })
         .then((response) => {
             // Success
-            console.log(response.data)
             dispatch(loginSuccess(response.data.id));
         })
         .catch((error) => {
             // Fail
-            console.log(error);
-            Toast.show(''+error);
             dispatch(loginFailure());
 
         });
@@ -64,9 +61,8 @@ export function registerRequest(username, password, name, school, level, url_ref
     return (dispatch) => {
         // inform that Login API is initiating
         dispatch(register());
-        console.log(url_ref, '3')
 
-        let post_url = '/api/' + url_ref + '/signup'
+        let post_url = ipaddress + '/api/' + url_ref + '/signup'
 
         return axios.post(post_url, { username, password, name, school, level })
         .then((response) => {

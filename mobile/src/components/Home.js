@@ -124,6 +124,7 @@ class Home extends Component<{}> {
 						/>
 					<TextInput
 						style={styles.textBox}
+            secureTextEntry={true}
 						placeholder="패스워드"
 						value={this.state.password}
 						onChangeText={(text) => this.setState({password:text})}
@@ -160,7 +161,7 @@ class Home extends Component<{}> {
                 <Text style={styles.mainButtonText}>강의게시판</Text>
               </View>
             </TouchableHighlight>
-            <TouchableHighlight style={{flex: 1, backgroundColor: '#ef5350'}} onPress={()=>{}} underlayColor="#d32f2f">
+            <TouchableHighlight style={{flex: 1, backgroundColor: '#ef5350'}} onPress={()=>navigate('Account')} underlayColor="#d32f2f">
               <View style={styles.mainButtons}>
                 <Icon name="user-circle-o" size={45} color="#FFFFFF" />
                 <Text style={styles.mainButtonText}>계정관리</Text>
