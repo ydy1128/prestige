@@ -35,7 +35,7 @@ const createHomework = (req, res) => {
 
 const readHomework = (req, res) => {
     let hwId = req.params.id;
-    Homework.find(hwId ? { _id: hwId } : null).exec((err, hws) => {
+    Homework.find(hwId ? { _id: hwId } : null).sort({$natural:-1}).exec((err, hws) => {
         if(err) return throwError(res, 409, 'DB error.');
         res.json(hws);
     })
