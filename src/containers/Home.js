@@ -6,11 +6,12 @@ import axios from 'axios';
 
 import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest } from 'actions/makeclass';
 import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest, studentsInfoPwChangeRequest } from 'actions/studentinfo';
-import { lectureBoardRequest } from 'actions/lecture';
+import { lectureBoardRequest, lectureEditRequest } from 'actions/lecture';
 import { getMemoListRequest } from 'actions/memolist';
 
 import { ClassBoard,
-          DashBoard,
+          TeacherDashBoard,
+          StudentDashBoard,
           StudentBoard,
           HomeworkBoard,
           TeacherLectureBoard,
@@ -57,13 +58,10 @@ class Home extends React.Component {
             console.log('lectureData', this.props.lectureData)
         });
     }
-    componentDidMount(){
-
-    }
     handleStudentEdit(stdobj, index, silent){
         return this.props.studentsInfoEditRequest(stdobj._id, index, stdobj).then(() =>{
             if(this.props.studentEditStatus.status === "SUCCESS") {
-                if(silent) { Materialize.toast('학생 정보가 수정 되었습니다!', 2000); return true; }
+                if(!silent) { Materialize.toast('학생 정보가 수정 되었습니다!', 2000); return true; }
             }
             else {
                 return throwError(silent, '학생', this.props.classEditStatus.error, '');
@@ -153,7 +151,7 @@ class Home extends React.Component {
         switch(this.state.view_type){
             case 'TEACHER_DASHBOARD':
                 return (
-                            <DashBoard memoListData={this.props.memoListData} />
+                            <TeacherDashBoard memoListData={this.props.memoListData} />
                             /*<button onClick={this.loadCsvClassData}>load classes</button>
                             <button onClick={this.loadCsvStudentsData}>load students</button>*/
                         );
@@ -169,8 +167,10 @@ class Home extends React.Component {
                                 onClassPost={this.handleClassPost}
                                 onClassEdit={this.handleClassEdit}
                                 studentsData={this.props.studentsData}
+                                lectureData={this.props.lectureData}
                                 onRemove={this.handleClassRemove}
                                 onStudentEdit={this.handleStudentEdit}
+                                onLectureEdit={this.props.lectureEditRequest}
                                 />);
             case 'TEACHER_LECTUREBOARD':
                 return (<TeacherLectureBoard classData={this.props.classData}
@@ -181,7 +181,7 @@ class Home extends React.Component {
             case 'STUDENT_HOMEWORKBOARD':
                 return (<HomeworkBoard userType='student'/>);
             case 'STUDENT_DASHBOARD':
-                return (<div>DASHBOARD</div>);
+                return (<StudentDashBoard />);
             case 'STUDENT_LECTUREBOARD':
                 return (<StudentLectureBoard classData={this.props.classData}
                                 lectureData={this.props.lectureData} />);
@@ -290,6 +290,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         lectureBoardRequest: () => {
             return dispatch(lectureBoardRequest());
+        },
+        lectureEditRequest: (index, contents) =>{
+            return dispatch(lectureEditRequest(index, contents));
         }
     };
 };

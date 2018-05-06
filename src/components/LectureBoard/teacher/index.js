@@ -11,7 +11,7 @@ import DeleteDialog from './DeleteDialog';
 
 let Present = ({ props, state, style, functions }) => {
 	let { classData, lectureData } = props;
-	let { dialogOpen, deleteDialogOpen, dialogEditMode, clicked, currObj, newOne, editlec, remove_active, filteredClick, searchOpen, searchText, searchResult } = state;
+	let { dialogOpen, deleteDialogOpen, dialogEditMode, clicked, currObj, newOne, editlec, remove_active, filteredClick, searchOpen, searchStart, searchText, searchResult } = state;
 	let {openDialog,
          closeDialog,
          toggleDeleteDialog,
@@ -59,7 +59,7 @@ let Present = ({ props, state, style, functions }) => {
             <div className="Board-contents row">
                 <div className="col m12 boardTable">
                 	<LectureTable lectureData={lectureData} filteredData={searchResult} 
-                              searchOpen={searchOpen} searchText={searchText} 
+                              searchOpen={searchOpen} searchStart={searchStart} searchText={searchText} 
                               clicked={clicked} filteredClick={filteredClick}
                               handleDialogOpen={openDialog} searchClassNameById={searchClassNameById}
                               handleRowClick={handleRowClick} handleFilteredRowClick={handleFilteredRowClick}

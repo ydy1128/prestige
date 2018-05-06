@@ -77,7 +77,7 @@ var Present = ({ props, state, style, functions }) => {
             <div className="Board-contents row">
                 {   
                     boardOn ?
-                    <div className="col m12">
+                    <div className="col m12" style={{marginTop: 20}}>
                         <HomeworkBoard key={Math.random()*1000000}
                             onRef={(ref) => {homeworkBoard = ref}}
                             hw={selectedHw}
@@ -91,7 +91,7 @@ var Present = ({ props, state, style, functions }) => {
                             homeworkId={selectedHw._id} />
                     </div> 
                     :
-                    <div className="col m12">
+                    <div className="col m12"  style={{marginTop: 20}}>
                         <HomeworkTable 
                             hwData={searchResult.length || searchText? searchResult : hwData}
                             clickedRowIndexes={filteredClick}

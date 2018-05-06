@@ -96,6 +96,7 @@ BoardHeader.defaultProps = {
 	openDialog: null,
     buttonCount: 0,
 
+    openDialog: () => {console.log('openDialog action not defined.')},
     handleRemove: () => {console.log('remove action not defined.')},
     backAction: () => {console.log('back action not defined.')},
     onSearchEngineChange: () => {console.log('searchEngine change not defiend.')},

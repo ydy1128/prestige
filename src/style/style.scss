@@ -22,7 +22,9 @@ a{
 	height: 100%;
 	width: 100%;
 }
-
+#toast-container{
+	top: 4% !important;
+}
 .App{
 	background-color: #d3d3d3;
 	-webkit-transition: 0.4s;

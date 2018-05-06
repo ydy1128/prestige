@@ -20,20 +20,23 @@ import navOptions from './navigator';
 class LectureList extends Component<{}> {
     constructor(props) {
         super(props);
+        this.state = {
 
+        }
         this.displayLecture = this.displayLecture.bind(this);
 
     }
-    static navigationOptions = navOptions(undefined, (<View></View>));
+    static navigationOptions = navOptions(undefined, (<View></View>), '강의게시판');
 
     componentDidMount(){
         this.props.lectureBoardRequest().then(() => {
         })  
     }
     displayLecture(i){
-        let lecture = this.props.lectureData[i];
+        let lecture = Object.assign({}, this.props.lectureData[i]);
+        
         this.props.passLecture(lecture);
-        this.props.navigation.navigate('Lecture');
+        this.props.navigation.navigate('Lecture', {title: lecture.name});
     }
     render(){
         const { navigate } = this.props.navigation;
@@ -53,7 +56,6 @@ class LectureList extends Component<{}> {
     	}
     	return(
     		<View style={{flex: 1}}>
-                <View style={styles.boardTitle}><Text style={styles.boardTitleText}>강의게시판</Text></View>
                 <ScrollView>
         			<List containerStyle={{marginTop: 0}}>
         				{listBody()}

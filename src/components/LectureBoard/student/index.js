@@ -5,16 +5,20 @@ import FontAwesome from 'react-fontawesome';
 
 import LectureTable from './LectureTable';
 import LectureDialog from './LectureDialog';
+import BoardHeader from 'components/commons/BoardHeader';
 
 let Present = ({ props, state, style, functions }) => {
 	let { classData, lectureData } = props;
-	let { dialogOpen, currObj } = state;
+	let { dialogOpen, currObj, searchOpen, searchStart, searchText, searchResult } = state;
 	let {
 		searchClassNameById,
 		openDialog,
 		closeDialog,
         handleEdit,
         onAccChange,
+        focusSearchInput,
+        blurSearchInput,
+        onSearchEngineChange,
 	} = functions;
 
 
@@ -27,10 +31,13 @@ let Present = ({ props, state, style, functions }) => {
     )
 	return(
         <div className="Boards">
-            { boardHeader }
+            <BoardHeader title='강의게시판' search_engine={true} searchOpen={searchOpen}
+                            onSearchEngineChange={onSearchEngineChange} 
+                            focusSearchInput={focusSearchInput} blurSearchInput={blurSearchInput} />
             <div className="Board-contents row">
                 <div className="col m12 boardTable">
-                	<LectureTable lectureData={lectureData} 
+                	<LectureTable lectureData={lectureData}  filteredData={searchResult} 
+                                  searchOpen={searchOpen} searchStart={searchStart} searchText={searchText} 
                                   handleDialogOpen={openDialog} searchClassNameById={searchClassNameById}
                                   handleRowClick={null}
                                   />

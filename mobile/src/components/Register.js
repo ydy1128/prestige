@@ -8,41 +8,88 @@ import {
 	Image,
 	TouchableHighlight
 } from 'react-native';
+import Toast from 'react-native-simple-toast';
+
 import navOptions from './navigator';
+import { connect } from 'react-redux';
+import { registerRequest } from '../../actions/authentication';
 
 
 class Register extends Component<{}> {
   static navigationOptions = navOptions(undefined, (<View></View>));
-
+    constructor(props) {
+        super(props);
+        this.state = {
+          username: '',
+          password: '',
+          name: '',
+          school: '',
+          level: '',
+        }
+        this.handleTextChange = this.handleTextChange.bind(this);
+    }
+  handleTextChange(text, target){
+    let nextState = {}
+    nextState[target] = text;
+    this.setState(nextState)
+  }
 	render(){
 		const { navigate } = this.props.navigation;
+    let {username, password, name, school, level} = this.state;
 		return(
 			<View style={styles.container}>
-		        <View style={styles.main}>
+        <View style={styles.main}>
 					<Text style={styles.mainTitle}>프레스티지 수시영어 전문학원</Text>
 					<Text style={styles.mainSubtitle}>학생 회원가입</Text>
 					<TextInput
 						style={styles.textBox}
 						placeholder="아이디"
 						underlineColorAndroid='white'
+            onChangeText={(text) => {this.handleTextChange(text, 'username')}}
+            value={username}
 						/>
 					<TextInput
 						style={styles.textBox}
 						placeholder="패스워드"
+            secureTextEntry={true}
 						underlineColorAndroid='white'
+            onChangeText={(text) => {this.handleTextChange(text, 'password')}}
+            value={password}
 						/>
+          <TextInput
+            style={styles.textBox}
+            placeholder="이름"
+            underlineColorAndroid='white'
+            onChangeText={(text) => {this.handleTextChange(text, 'name')}}
+            value={name}
+            />
 					<TextInput
 						style={styles.textBox}
 						placeholder="학교"
 						underlineColorAndroid='white'
+            onChangeText={(text) => {this.handleTextChange(text, 'school')}}
+            value={school}
 						/>
 					<TextInput
 						style={styles.textBox}
 						placeholder="학년"
 						underlineColorAndroid='white'
+            onChangeText={(text) => {this.handleTextChange(text, 'level')}}
+            value={level}
 						/>
 
-					<TouchableHighlight onPress={()=>navigate('Home')} style={styles.buttonRegister} underlayColor='#d6a50b'>
+					<TouchableHighlight onPress={()=>{ 
+              this.props.registerRequest(username, password, name, school, level).then(() =>{
+                if(this.props.status == 'SUCCESS'){
+                  Toast.show('계정 생성 완료! 로그인하세요');
+                  navigate('Home');
+                }
+                else{
+                  // error handling
+                }
+              }).done();
+              
+            }} style={styles.buttonRegister} underlayColor='#d6a50b'>
 						<Text style={styles.buttonText}>회원가입</Text>
 					</TouchableHighlight>
 		        </View>
@@ -98,4 +145,19 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Register;
+const mapStateToProps = (state) => {
+    return {
+        status: state.authentication.register.status,
+    };
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        registerRequest: (username, password, name, school, level) => { 
+            return dispatch(registerRequest(username, password, name, school, level, 'student')); 
+        },
+
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Register);

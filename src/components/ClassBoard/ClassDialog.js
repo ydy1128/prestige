@@ -79,7 +79,7 @@ class ClassDialog extends React.Component{
                                 onChange={this.props.onSearchEngineChange } onFocus={this.props.focusSearchInput} onBlur={this.props.blurSearchInput} />
                     </div>
                     <div className="col s6">
-                        <Table style={styles.studentTable} height={'300px'} onCellClick={this.onCellClick.bind(this, 'clickedInAllStudents')} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
+                        <Table style={styles.studentTable} height={'300px'} onCellClick={this.onCellClick.bind(this, 'clickedInAllStudents')} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={false}>
                             <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
                                 <TableRow>
                                     <TableHeaderColumn colSpan="3" style={{textAlign: 'center'}}>
@@ -107,7 +107,7 @@ class ClassDialog extends React.Component{
                         </Table>
                     </div>
                     <div className="col s6">
-                        <Table style={styles.studentTable} height={'300px'} onCellClick={this.onCellClick.bind(this, 'clickedInSelectedStudents')} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
+                        <Table style={styles.studentTable} height={'300px'} onCellClick={this.onCellClick.bind(this, 'clickedInSelectedStudents')} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={false}>
                             <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
                                 <TableRow>
                                     <TableHeaderColumn colSpan="3" style={{textAlign: 'center'}}>

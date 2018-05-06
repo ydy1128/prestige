@@ -18,6 +18,10 @@ var container = (Present) =>{
                 	class: '',
                 	accomplishments: [],
                 },
+                searchOpen: false,
+                searchStart: false,
+				searchText: '',
+				searchResult: [],
             };
             this.filterAutocompleteData = this.filterAutocompleteData.bind(this);
 	        this.searchClassNameById = this.searchClassNameById.bind(this);
@@ -26,10 +30,12 @@ var container = (Present) =>{
 	        this.closeDialog = this.closeDialog.bind(this);
 	        this.onAccChange = this.onAccChange.bind(this);
 	        this.handleEdit = this.handleEdit.bind(this);
-
+            this.focusSearchInput = this.focusSearchInput.bind(this);
+            this.blurSearchInput = this.blurSearchInput.bind(this);
+            this.onSearchEngineChange = this.onSearchEngineChange.bind(this);
         }
         render(){
-	        let presentState = ['dialogOpen', 'currObj'];
+	        let presentState = ['dialogOpen', 'currObj', 'searchStart', 'searchOpen', 'searchText', 'searchResult'];
 	        let presentProps = [];
 	        let customProps = {
 	        	classData: this.state.classData,
@@ -41,6 +47,10 @@ var container = (Present) =>{
 	        	closeDialog: this.closeDialog,
 	        	handleEdit: this.handleEdit,
 	        	onAccChange: this.onAccChange,
+	        	handleRemove: this.handleRemove,
+	        	focusSearchInput: this.focusSearchInput,
+	        	blurSearchInput: this.blurSearchInput,
+	        	onSearchEngineChange: this.onSearchEngineChange,
 	        }
 	        return (
 	            <Present  
@@ -88,13 +98,16 @@ var container = (Present) =>{
 	    		currObj: this.state.currObj
 	    	}
 	    	let acc = nextState.currObj.accomplishments;
+	    	console.log(time)
 	    	for(let i = 0; i < acc.length; i++){
+	    		console.log(id, acc[i]._id)
 	    		if(id == acc[i]._id){
 	    			acc[i].accomplishments = time;
 	    			let date = new Date();
 	    			acc[i].endTime = date;
 	    		}
 	    	}
+	    	console.log(nextState.currObj.accomplishments, acc)
 	    	this.setState(nextState);
 	    }
 	    handleEdit(silent, index, contents){
@@ -107,6 +120,33 @@ var container = (Present) =>{
                     return throwError(silent, '강의', this.props.lectureEditStatus.error, '');
 	    		}	    		
 	    	})
+	    }
+	    focusSearchInput(){
+	        this.setState({searchOpen: true});
+	    }
+	    blurSearchInput(){
+	    	this.setState({searchOpen: false})
+	        if(this.state.searchText == '')
+	            this.setState({searchStart: false, searchText: ''});
+	    }
+	    onSearchEngineChange(event, value){
+	        let data = [];
+	        this.props.lectureData.map((lec, i) =>{
+	            let push=false;
+	            let obj = lec;
+	            obj.index = i;
+
+	            if(obj.name.includes(value)) push = true;
+	            if(this.searchClassNameById(obj.class).includes(value)) push = true;
+	            if(push) data.push(obj);
+
+	        })
+	        if(value == ''){
+	            this.setState({searchOpen: true, searchStart: false, searchResult: [], searchText: ''});
+	        }
+	        else{
+	            this.setState({searchOpen: true, searchStart: true, searchResult: data, searchText: value});
+	        }
 	    }
     }
 	return connect(mapStateToProps, mapDispatchToProps)(Container);

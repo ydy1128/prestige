@@ -39,7 +39,7 @@ export default function lecture(state, action) {
                 },
                 board: {
                     data: {
-                        $push: [action.data]
+                        $unshift: [action.data]
                     }
                 }
             });

@@ -23,12 +23,12 @@ class DeleteDialog extends React.Component {
 
         const actions = [
             <FlatButton
-                label="Delete"
+                label="삭제"
                 primary={true}
                 onClick={this._deleteOnClick}
             />,
             <FlatButton
-                label="Cancel"
+                label="취소"
                 primary={true}
                 onClick={this._cancleOnClick}
             />,

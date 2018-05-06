@@ -7,6 +7,8 @@ import YouTube from 'react-youtube';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
+import { getLoginData } from 'components/commons/SessionData';
+
 class LectureDialog extends React.Component{
     constructor(props){
         super(props);
@@ -46,8 +48,11 @@ class LectureDialog extends React.Component{
                 time = acc.accomplishments;
         })
         event.target.playVideo();
-        if(time > 0)
-            event.target.seekTo(time, true);
+        console.log(time)
+        if(time > 0){
+            let fulltime = event.target.getDuration();
+            event.target.seekTo((time / 100) * fulltime, true);
+        }
         this.setState({videoPlayer: event.target, zindex: 1500});
     }
     getVideoId(link){
@@ -66,7 +71,9 @@ class LectureDialog extends React.Component{
         let fulltime = this.state.videoPlayer.getDuration();
         time = time / fulltime * 100;
         time = time.toFixed(2);
+        console.log(time)
         let index = -1;
+        console.log(getLoginData())
         this.props.onAccChange(this.getLoginData().id, time);
 
         this.props.lectureData.map((lec, i) =>{
@@ -94,7 +101,6 @@ class LectureDialog extends React.Component{
                 modal={false}
                 actions={actions}
                 open={this.props.open}
-                onRequestClose={this.closeModal}
                 repositionOnUpdate={true}
                 style={{zIndex: this.state.zindex, textAlign: 'center'}}
                 >

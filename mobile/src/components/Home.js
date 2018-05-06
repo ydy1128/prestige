@@ -34,7 +34,7 @@ class Home extends Component<{}> {
     this.onLogin = this.onLogin.bind(this);
     this.onOpenUrl = this.onOpenUrl.bind(this);
 	}
-  static navigationOptions = navOptions(undefined, undefined);
+  static navigationOptions = navOptions(undefined, undefined, undefined);
   componentWillMount(){
     //add loading screen
     AsyncStorage.getItem('loginData').then((token) =>{
@@ -42,12 +42,13 @@ class Home extends Component<{}> {
       let loginData = JSON.parse(token);
       if(loginData != null){
         this.props.getStatusRequest().then(() =>{
-          // if(!this.props.sessionStatus.valid){
+          //success fail
+          if(this.props.sessionStatus.valid){
+            this.props.extendSession(loginData.user);
+            Toast.show(''+JSON.stringify(loginData.user))
+            this.setState({loggedIn: true, loginData: loginData.user});
+          }
 
-          // }
-          this.props.extendSession(loginData.user);
-          this.setState({loggedIn: true});
-          Toast.show(''+this.props.sessionStatus.currentUser);
         })
         .done();
       }
@@ -65,11 +66,11 @@ class Home extends Component<{}> {
 				this.setState({loggedIn: true});
 				// create session data
 				let loginData = {
-            user: this.props.user,
+            user: this.props.user.user,
             role: 'student'
         };
         let storageData = JSON.stringify(loginData);
-        Toast.show(''+storageData);
+        this.setState({loginData: loginData.user})
         this.addLoginData(storageData);
 			}
 			else {
@@ -123,6 +124,7 @@ class Home extends Component<{}> {
 						/>
 					<TextInput
 						style={styles.textBox}
+            secureTextEntry={true}
 						placeholder="패스워드"
 						value={this.state.password}
 						onChangeText={(text) => this.setState({password:text})}
@@ -145,7 +147,7 @@ class Home extends Component<{}> {
         <View style={styles.introSection}>
           <View style={styles.introTextDiv}>
             <Text style={{color: '#f8c709', fontSize: 20}}>안녕하세요,</Text>
-            <Text style={{color: '#f8c709', fontSize: 30}}>{this.props.user.name} 학생</Text>
+            <Text style={{color: '#f8c709', fontSize: 30}}>{this.state.loginData.name} 학생</Text>
           </View>
           <View style={styles.introAlertDiv}>
             <Icon name="envelope" size={65} color="#f8c709" />
@@ -159,7 +161,7 @@ class Home extends Component<{}> {
                 <Text style={styles.mainButtonText}>강의게시판</Text>
               </View>
             </TouchableHighlight>
-            <TouchableHighlight style={{flex: 1, backgroundColor: '#ef5350'}} onPress={()=>{}} underlayColor="#d32f2f">
+            <TouchableHighlight style={{flex: 1, backgroundColor: '#ef5350'}} onPress={()=>navigate('Account')} underlayColor="#d32f2f">
               <View style={styles.mainButtons}>
                 <Icon name="user-circle-o" size={45} color="#FFFFFF" />
                 <Text style={styles.mainButtonText}>계정관리</Text>

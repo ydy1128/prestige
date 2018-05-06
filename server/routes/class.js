@@ -1,5 +1,6 @@
 import express from 'express';
 import Class from '../models/Class';
+import Lecture from '../models/Lecture';
 import mongoose from 'mongoose';
 
 import iconv from 'iconv-lite';
@@ -78,8 +79,8 @@ const updateClass = (req, res) => {
         return throwerror(res, 400, 'Empty contents.');
     Class.findOne({ name: req.body.contents.name }, (err, exists) => {
         if (err) return throwerror(res, 409, 'DB error.');
-        if(exists)
-            return throwerror(res, 409, 'Class name already exists.');
+        // if(exists)
+            // return throwerror(res, 409, 'Class name already exists.');
             // Find Class
         Class.findById(req.params.id, (err, cls) => {
             if(err) return throwerror(res, 409, 'DB error.');
@@ -153,4 +154,19 @@ let validateContents = (contents, vfList = verifyList) =>{
     }
     return true;
 }
+
+Array.prototype.equals = function (array) {
+    if (!array) return false;
+    if (this.length != array.length) return false;
+    for (var i = 0, l=this.length; i < l; i++) {
+        if (this[i] != array[i]) return false;
+    }       
+    return true;
+}
+Array.prototype.diff = function(b) {
+    let first = this.filter(function(i) {return b.indexOf(i) < 0;});
+    return first;
+};
+Object.defineProperty(Array.prototype, "equals", {enumerable: false});
+
 export default router;

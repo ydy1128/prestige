@@ -16,6 +16,38 @@ import {
 class LectureTable extends React.Component{
     constructor(props){
         super(props);
+        this.state = {
+            loadIndex: 0,
+            loadedArray: [],
+        }
+    }
+    componentDidMount(){
+        let loadedArray = this.props.lectureData.slice(0, 20);
+        console.log(loadedArray)
+        this.setState({loadedArray: loadedArray, loadIndex: 20});
+
+        let tble = $('.boardTable div:nth-child(1) div:nth-child(2) table');
+        let win = $('.boardTable div:nth-child(1)')
+        let containerBottom = win.offset().top + win.height();
+        $('.boardTable div:nth-child(1) div:nth-child(2)').scroll(() => {
+            let tableBottom = tble.offset().top + tble.height();
+            if(containerBottom > tableBottom && this.state.loadedArray.length > 19){
+                this.loadData();
+            }
+        });
+    }
+    componentWillReceiveProps(nextProps){
+        if(nextProps.lectureData != undefined && this.state.loadedArray != undefined)
+            this.setState({loadedIndex: 20, loadedArray: this.props.lectureData.slice(0, 20)})
+    }
+    loadData(){
+        let loadIndex = this.state.loadIndex;
+        let lastIndex = (loadIndex+10) > this.props.lectureData.length ? this.props.lectureData.length : loadIndex+10;
+        console.log(loadIndex)
+        let loadedArray = [...this.state.loadedArray, ...this.props.lectureData.slice(loadIndex, lastIndex)];
+        loadIndex = (loadIndex+10) > this.props.lectureData.length ? this.props.lectureData.length : loadIndex += 10;
+        if(loadIndex - 1 < this.props.lectureData.length)
+            this.setState({loadIndex: loadIndex, loadedArray: loadedArray});
     }
 	render(){
         const tableHeader = (
@@ -32,7 +64,7 @@ class LectureTable extends React.Component{
                     <TableRow key={lecture._id + i}>
                         <TableRowColumn>{lecture.name}</TableRowColumn>
                         <TableRowColumn>{this.props.searchClassNameById(lecture.class)}</TableRowColumn>
-                        <TableRowColumn></TableRowColumn>
+                        <TableRowColumn>{lecture.accomplishments.reduce((acc, obj)=>{return obj.accomplishments;}, 0) + '%'}</TableRowColumn>
                         <TableRowColumn><DatePicker id={'tp'+lecture._id} value={new Date(lecture.date)} textFieldStyle={styles.datePickerStyle}  disabled={true} /></TableRowColumn>
                     </TableRow>
                 );
@@ -47,7 +79,7 @@ class LectureTable extends React.Component{
                     { tableHeader }
                 </TableHeader>
                 <TableBody displayRowCheckbox={false} deselectOnClickaway={false} showRowHover={true} stripedRows={false}>
-                   { tableBody(this.props.lectureData) }
+                   { tableBody(this.props.searchStart ? (this.props.searchText == '' ? this.state.loadedArray : this.props.filteredData) : this.state.loadedArray) }
                 </TableBody>
             </Table>
         )
