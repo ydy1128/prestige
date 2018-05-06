@@ -7,89 +7,54 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontAwesome from 'react-fontawesome';
 
-
-// STYLE
-let containerStyle = {
-    width: '100%',
-    height: '100%',
-    position: 'relative',
-    padding: '6px',
-    borderTop: '#dddddd solid 0.5px',
-    width: 'calc(100% - 62px)'
-};
-
-let cssStyle =
-<style jsx >{ // put CSS style here
-    `
-        .comment-header {
-            display: flex;
-            flexDirection: row;
-        }
-        .name-comment {
-            font: bold 16px HYSUPM;
-        }
-        .date-comment {
-            font: 12px HYSUPM;
-            color: gray;
-        }
-        .comment-button {
-            margin-left: 10px;
-        }
-
-    `
-}</style>
+import {
+    updateCommentByComment,
+    deleteCommentById
+} from 'actions/comment';
 
 class Comment extends React.Component {
     constructor(props) {
         super(props);
-        this.state = Object.assign({}, this.props.comment, {
-            comment: null,
+        this.state = {
+            comment: this.props.comment,
             onEdit: false
-        })
+        };
     }
 
     render() {
-        if (!this.state.comment) {
-            return null;
-        }
+        let style = {
+            container: {
+                width: '100%',
+                height: '100%',
+                position: 'relative',
+                padding: '6px',
+                borderTop: '#dddddd solid 0.5px',
+                width: 'calc(100% - 62px)'
+            },
+            commentHeader: { display: 'flex', flexDirection: 'row' },
+            nameComment: { font: 'bold 16px HYSUPM' },
+            dateComment: { font: '12px HYSUPM', color: 'gray' }
+        };
 
-        let {editedDate, writer, _id, content} = this.state.comment;
-        let onEdit = this.state.onEdit;
-        let buttons = [
-            <a className="edit-comment-button comment-button"
-                key={"edit-comment-button-"+this.state.commentId}
-                onClick={
-                    onEdit ?  
-                    (e) => { 
-                        this.props.update(_id, this.state.comment);
-                        this.setState({onEdit:false});
-                    } :
-                    (e) =>{ this.setState({onEdit:true})}
-                }
-            >
-                <FontAwesome className={'comment-button-icon '} name={this.state.onEdit ? "upload" : "pencil"} />
-            </a>,
-            <a className="delete-comment-button comment-button"
-                key={"delete-comment-button-"+this.state.commentId}
-                onClick={this.props.delete(_id)}
-            >   
-                <FontAwesome className={'comment-button-icon '} name="trash-o" />
-            </a>
-        ]
+        let { _id, editedDate, writer, content } = this.state.comment;
 
         let date = new Date(parseInt(editedDate));
 
         return (
-            <div style={containerStyle}>
-                {cssStyle}
-                <div className="comment-header"> 
-                    <div className="name-comment">{writer.user.name + "    "}
-                        <span className="date-comment">{date.toLocaleDateString() +' ' + date.toLocaleTimeString()}</span>
+            <div style={style.container}>
+                <div className="comment-header" style={style.commentHeader}> 
+                    <div className="name-comment" style={style.nameComment}>
+                        {writer.user.name + "    "}
+                        <span className="date-comment" style={style.dateComment}>{date.toLocaleDateString() +' ' + date.toLocaleTimeString()}</span>
                     </div>
-                    { this.props.userInfo.user._id == writer.user._id ? buttons : null }
+                    { 
+                        this.props.userInfo.user._id == writer.user._id ?
+                        this.showButtons() 
+                        : null 
+                    }
                 </div>
                 {
-                    onEdit ?
+                    this.state.onEdit ?
                     <textarea onChange={(e)=>{
                             this.setState({
                                 comment: Object.assign({},this.state.comment, {
@@ -105,25 +70,56 @@ class Comment extends React.Component {
         );
     }
 
-    async componentWillMount() {
-        let commentId = this.props.commentId;
-        if(commentId){            
-            let commentIds = JSON.stringify([commentId]);
-            let comments = await axios.get('/api/comments?comments='+ commentIds ).then((res)=>{
-                return res.data.comments
-            });
-            this.setState({ comment: comments.length ? comments[0] : null  });
-        }
+    showButtons() {
+        let style = {
+            commentButton: { marginLeft: '10px' }
+        };
+
+        return [
+            <a className="edit-comment-button comment-button"
+                style={style.commentButton}
+                key={"edit-comment-button-"+this.state.comment._id}
+                onClick={
+                    this.state.onEdit ?
+                    this.updateComment.bind(this) :
+                    this.turnEditOn.bind(this)
+                }>
+                <FontAwesome className={'comment-button-icon '} name={this.state.onEdit ? "upload" : "pencil"} />
+            </a>,
+            <a className="delete-comment-button comment-button"
+                style={style.commentButton}
+                key={"delete-comment-button-"+this.state.comment._id}
+                onClick={this.deleteComment.bind(this)}>   
+                <FontAwesome className={'comment-button-icon '} name="trash-o" />
+            </a>
+        ];
     }
 
-    async componentWillReceiveProps(nextProps) {
-        let commentIds = JSON.stringify([this.props.commentId]);
-        let comments = await axios.get('/api/comments?comments='+ commentIds).then((res)=>{
-            return res.data.comments
-        });
-        this.setState({ comment: comments.length ? comments[0] : null });
+    updateComment(e) {
+        this.props.updateCommentByComment(this.state.comment);
+        this.setState({onEdit:false});
+    }
+
+    deleteComment(e) {
+        this.props.deleteCommentById(this.state.comment._id);
+        this.setState({onEdit:false});
+    }
+
+    turnEditOn(e) {
+        this.setState({onEdit:true});
     }
 }
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        updateCommentByComment: (comment) => {
+            return dispatch(updateCommentByComment(comment));
+        },
+        deleteCommentById: (commentId) => {
+            return dispatch(deleteCommentById(commentId));
+        },
+    };
+};
 
 const mapStateToProps = (state) => {
     let homework = state.homework;
@@ -133,4 +129,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, undefined)(Comment);
+export default connect(mapStateToProps, mapDispatchToProps)(Comment);

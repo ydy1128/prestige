@@ -116,7 +116,7 @@ export default class TableExampleComplex extends Component {
       let readableDate = new Date(parseInt(dueDate));
       let readableWrittenDate = new Date(parseInt(writtenDate));
 
-      tableRows.unshift(
+      tableRows.push(
         <TableRow selected={this.props.clickedRowIndexes.includes(index)} key={index}>
           <TableRowColumn>
             <FontAwesome

@@ -2,134 +2,57 @@ import * as types from 'actions/ActionTypes';
 import update from 'react-addons-update';
 
 const initialState = {
-    comments: {
-        status: 'INIT',
-        data: [],
-        isLast: false
-    },
-    post: {
-        status: 'INIT',
-        error: -1
-    },
-    // editPrep: {
-    //     name: '',
-    //     days: '',
-    //     starttime: '',
-    //     endtime: '',
-    //     students: '',
-    //     index: '',
-    //     _id: '',
-    //     flag: true
-    // },
-    edit: {
-        status: 'INIT',
-        error: -1,
-    },
-    remove: {
-        status: 'INIT',
-        error: -1
-    }
+    data: [],
 };
-export default function makeclass(state, action) {
 
-    if(typeof state === "undefined")
-        state = initialState;
+export default function comment(state = initialState, action) {
     switch(action.type) {
-        case types.COMMENT:
+        case types.GET_COMMENTS:
             return update(state, {
-                comments: {
-                    status: { $set: 'WAITING' },
-                }
+                data: { $set: action.data },
             });
-        case types.COMMENT_SUCCESS:
+
+        case types.APPEND_COMMENT:
             return update(state, {
-                comments: {
-                    status: { $set: 'SUCCESS' },
-                    data: { $set: action.data },
-                }
-            })
-            return state;
-        case types.COMMENT_FAILURE:
-            return update(state, {
-                comments: {
-                    status: { $set: 'FAILURE' }
-                }
-            })
-        case types.COMMENT_POST:
-            return update(state, {
-                post: {
-                    status: { $set: 'WAITING' },
-                    error: { $set: -1 }
-                }
+                data: { $push: [action.comment] }
             });
-        case types.COMMENT_POST_SUCCESS:
+
+        case types.UPDATE_COMMENT: {
+            let targetCommentIndexInComments = getTargetIndexByCommentIdInComments(action.comment._id, state.data);
+            console.log(targetCommentIndexInComments);
+            if (targetCommentIndexInComments !== null) {
+                return update(state, {
+                    data: { $splice: [[targetCommentIndexInComments, 1, action.comment]] }
+                });    
+            }
+        }
+
+        case types.DELETE_COMMENT:{
+            let targetCommentIndexInComments = getTargetIndexByCommentIdInComments(action.commentId, state.data)
+            if (targetCommentIndexInComments !== null) {
+                return update(state, {
+                    data: { $splice: [[targetCommentIndexInComments, 1]] }
+                });
+            }
+        }
+
+        case types.FLASH_COMMENTS:
             return update(state, {
-                post: {
-                    status: { $set: 'SUCCESS' }
-                },
-                board: {
-                    data: {
-                        $push: [action.data]
-                    }
-                }
+                data: { $set: [] }
             });
-        case types.COMMENT_POST_FAILURE:
-            return update(state, {
-                post: {
-                    status: { $set: 'FAILURE' },
-                    error: { $set: action.error }
-                }
-            });
-        case types.COMMENT_EDIT:
-            return update(state, {
-                edit: {
-                    status: { $set: 'WAITING' },
-                    error: { $set: -1 },
-                    cls: { $set: undefined }
-                }
-            });
-        case types.COMMENT_EDIT_SUCCESS:
-            return update(state, {
-                edit: {
-                    status: { $set: 'SUCCESS' },
-                },
-                board: {
-                    data: {
-                        [action.index]: { $set: action.cls }
-                    }
-                }
-            });
-        case types.COMMENT_EDIT_FAILURE:
-            return update(state, {
-                edit: {
-                    status: { $set: 'FAILURE' },
-                    error: { $set: action.error }
-                }
-            });
-        case types.COMMENT_REMOVE:
-            return update(state, {
-                remove: {
-                    status: { $set: 'WAITING' },
-                    error: { $set: -1 }
-                }
-            });
-        case types.COMMENT_REMOVE_SUCCESS:
-            return update(state, {
-                remove:{
-                    status: { $set: 'SUCCESS' }
-                },
-                board: {
-                    data: { $splice: [[action.index, 1]] }
-                }
-            });
-        case types.COMMENT_REMOVE_FAILURE:
-            return update(state, {
-                remove: {
-                    status: { $set: 'FAILURE' },
-                    error: { $set: action.error }
-                }
-            });
+
         default:
             return state;
     }
+}
+
+function getTargetIndexByCommentIdInComments(id, comments) {
+    let index = 0;
+    for (let comment of comments) {
+        if (comment._id == id) {
+            return index;
+        }
+        index++;
+    }
+    return null;
 }

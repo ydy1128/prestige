@@ -88,8 +88,7 @@ var Present = ({ props, state, style, functions }) => {
                             userRole={userInfo.role}/>
                         <Comments 
                             key={selectedHw._id} 
-                            hwId={selectedHw._id} 
-                            comments={selectedHw ? selectedHw.comments : null}/>
+                            homeworkId={selectedHw._id} />
                     </div> 
                     :
                     <div className="col m12">

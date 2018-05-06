@@ -72,7 +72,7 @@ class HomeworkBoard extends React.Component {
         <textarea 
           style={style.editorStyle}
           onKeyDown={this.handleTapOnWritingContent}
-          placeholder="숙제 내용을 입력하세요."
+          placeholder={this.state.isStudent ? "" : "숙제 내용을 입력하세요."}
           onChange={this.changeContent.bind(this)}
           value={this.state.contents.content}
           disabled={this.state.isStudent ? "disabled" : ""}
@@ -94,20 +94,25 @@ class HomeworkBoard extends React.Component {
         justifyContent: 'space-between', height: '86px' },
       titleStyle : { 
         flex: '0 0 300px' , 
-        cursor: this.state.isStudent ? '' : 'inherit'
+        cursor: this.state.isStudent ? '' : 'inherit',
       },
       datePickerContainerStyle : { flex: '0 0 100px' },
       datePickerStyle: { 
         width: '120px', 
         fontSize: '16px', 
-        cursor: this.state.isStudent ? '' : 'inherit'
+        cursor: this.state.isStudent ? '' : 'inherit',
       },
     };
-    
+
+    if (this.state.isStudent) {
+      style.titleStyle.color ='black';
+      style.datePickerStyle.color ='black';
+    }
+
     return (
       <div id="hw-board-head" style={style.hwBoardHeadStyle}>
         <TextField id="homework-title"
-          style={style.titleStyle}
+          inputStyle={style.titleStyle}
           hintText="제목"
           floatingLabelText="제목"
           value={contents.title}
@@ -119,6 +124,7 @@ class HomeworkBoard extends React.Component {
           <DatePicker id="due-date"
             floatingLabelText="제출 기한"
             textFieldStyle={style.datePickerStyle}
+            inputStyle={style.datePickerStyle}
             hintText="Landscape Dialog"
             mode="landscape"
             defaultDate={contents.dueDate ? new Date(parseInt(contents.dueDate)) : new Date()}
@@ -250,7 +256,7 @@ class HomeworkBoard extends React.Component {
         </div>
         <div className="dropzone" style={style.fileDropZoneContainer}>
           <Dropzone ref={(node) => { this.dropzoneRef = node; }}
-            disable={this.state.isStudent ? true : false}
+            disableClick={this.state.isStudent ? true : false}
             style={style.fileDropZone}
             onDrop={this.appendFiles.bind(this)}
             onDragEnter={this.activateDropzone.bind(this)}

@@ -4,114 +4,81 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import axios from 'axios';
 
-// ACTIONS
-import {homeworkBoardRequest} from 'actions/homework';
 import { log } from "util";
 
-// STORE
-function mapStateToProps (state) {
-  let homework  = state.homework;
-  let userInfo = state.authentication.status.currentUser;
-  return { userInfo }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    homeworkBoardRequest: (id) => {
-      return dispatch(homeworkBoardRequest(id));
-    },
-  };
-};
+import {
+  getCommentsByHomeworkId,
+  appendCommentByHomeworkId
+} from 'actions/comment';
 
 var contain = (Present)  => {
   class Container extends React.Component {
-    // CLASS INNER FUNCTIONS
     constructor(props) {
       super(props);
-      this.state = {};      
-    }
-    break;
-    render() {
-      let presentState = [];
-      let presentProps = ['comments'];
-      let customProps = {
+      this.state = {
+        newComment: ''
       };
-      let presentFunctions = {
-        updateComment: this._updateComment.bind(this),
-        postComment: this._postComment.bind(this),
-        deleteComment: this._deleteComment.bind(this)
-      }
+    }
 
-      return (  // Do not modify!!
+    async componentWillMount() {
+      let requestResult = await this.props.getCommentsByHomeworkId(this.props.homeworkId);
+      if (!requestResult.success) {
+        console.log('fail to get comments' + JSON.stringify(requestResult));      
+      }
+    }
+
+    render() {
+      let presentState = ['newComment'];
+      let presentProps = ['comments'];
+      let customProps = {};
+      let presentFunctions = {
+        changeNewComment: this.changeNewComment.bind(this),
+        appendComment: this.appendComment.bind(this),
+      };
+
+      return (
         <Present
           props={{...(_.pick(this.props, presentProps)), ...customProps}}
           state={_.pick(this.state, presentState)}
           functions={presentFunctions}
         />
-      )
+      );
     }
 
-    // COMPONENT LIFE CYCLE
-    componentWillMount() {
+    changeNewComment(e) {
+      this.setState({newComment: e.target.value});
     }
 
-    componentWillReceiveProps(nextProps) {
-    }
-
-    // shouldComponentUpdate(nextProps, nextState) { return true }
-
-    componentWillUpdate(nextProps, nextState) {
-      return true
-    }
-
-    componentDidMount() {}
-
-    componentDidUpdate() {}
-
-    componentWillUnmount() {}
-
-    // CUSTOM FUNCTIONS
-    _postComment() {
-      return (e) => {
-        let content = document.getElementById('comment-poster-textarea').value;
-        
-        let contents = {
-          content,
-          homeworkId: this.props.hwId,
-        }
-        
-        axios.post('/api/comments',{ contents }).then((res)=>{
-          this.props.homeworkBoardRequest(this.props.hwId);
-        })
-      }
-    }
-
-    _updateComment(id, contents) {
-      axios.put('/api/comments/'+id,{ contents }).then((res)=>{
-        this.props.homeworkBoardRequest(this.props.hwId);
-      })
-    }
-
-    _deleteComment(id) {
-      return (e) => {
-        axios.delete('/api/comments/'+id).then((res)=>{
-          console.log(res.data.success);
-          this.props.homeworkBoardRequest(this.props.hwId);
-        })
-      }
+    appendComment(e) {
+      this.props.appendCommentByHomeworkId(this.props.homeworkId, {content: this.state.newComment});
+      this.setState({newComment: ''});
     }
   }
 
-  // PROPS SETTING
   Container.propTypes = {
   }
 
   Container.defaultProps = {
   }
 
-
   return connect(mapStateToProps, mapDispatchToProps)(Container);
 }
 
+const mapStateToProps = (state) => {
+  let comments = state.comment.data;
+  let userInfo = state.authentication.status.currentUser;
+  return { comments, userInfo }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getCommentsByHomeworkId: (homeworkId) => {
+      return dispatch(getCommentsByHomeworkId(homeworkId));
+    },
+    appendCommentByHomeworkId: (homeworkId, comment) => {
+      return dispatch(appendCommentByHomeworkId(homeworkId, comment));
+    }
+  };
+};
 
 export default contain

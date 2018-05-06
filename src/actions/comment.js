@@ -1,156 +1,87 @@
 import axios from 'axios';
 
 import {
-    COMMENT,
-    COMMENT_SUCCESS,
-    COMMENT_FAILURE,
-    COMMENT_POST,
-    COMMENT_POST_SUCCESS,
-    COMMENT_POST_FAILURE,
-    COMMENT_EDIT_PREP,
-    COMMENT_EDIT,
-    COMMENT_EDIT_SUCCESS,
-    COMMENT_EDIT_FAILURE,
-    COMMENT_REMOVE,
-    COMMENT_REMOVE_SUCCESS,
-    COMMENT_REMOVE_FAILURE
+    GET_COMMENTS,
+    APPEND_COMMENT,
+    UPDATE_COMMENT,
+    DELETE_COMMENT
 } from './ActionTypes';
 
-let url = '/api/comment'
+let baseUrl = '/api/comment';
 
-/* COMMENT */
-export function commentRequest(isInitial, listType, id, username) {
+export function getCommentsByHomeworkId(homeworkId) {
     return (dispatch) => {
-        dispatch(comment());
-        
-        return axios.get(url)
+        return axios.get(baseUrl + '/homework/' + homeworkId)
         .then((response) => {
-            dispatch(commentSuccess(response.data, isInitial, listType));
+            dispatch(getComments(response.data.comments));
+            return { success: true };
         }).catch((error) => {
-            dispatch(commentFailure());
+            dispatch(getComments());
+            return { success: false, error };
         });
     };
 }
 
-export function comment() {
+export function getComments(comments) {
     return {
-        type: COMMENT
+        type: GET_COMMENTS,
+        data: comments,
     };
 }
 
-export function commentSuccess(data, isInitial, listType) {
-    return {
-        type: COMMENT_SUCCESS,
-        data,
-        isInitial,
-        listType
-    };
-}
-
-export function commentFailure() {
-    return {
-        type: COMMENT_FAILURE
-    };
-}
-
-/*comment Post*/
-export function commentPostRequest(contents) {
+export function appendCommentByHomeworkId(homeworkId, comment) {
     return (dispatch) => {
-        dispatch(commentPost());
-
-        return axios.post(url, { contents })
+        return axios.post(baseUrl + '/homework/' + homeworkId, { comment })
         .then((response) => {
-            console.log(response.data.comment)
-            dispatch(commentPostSuccess(response.data.comment));
+            dispatch(appendComment(response.data.comment));
+            return { success: true };
         }).catch((error) => {
-            dispatch(commentPostFailure(error.response.data.comment));
+            return { success: false, error };
         });
     };
 }
 
-export function commentPost() {
+export function appendComment(comment) {
     return {
-        type: COMMENT_POST
+        type: APPEND_COMMENT,
+        comment,
     };
 }
 
-export function commentPostSuccess(data) {
-    return {
-        type: COMMENTPOST_SUCCESS,
-        data
-    };
-}
-
-export function commentPostFailure(error) {
-    return {
-        type: COMMENT_POST_FAILURE,
-        error
-    };
-}
-
-export function commentEditRequest(id, index, contents) {
+export function updateCommentByComment(comment) {
     return (dispatch) => {
-        dispatch(commentEdit());
-
-        return axios.put(url + id, { contents })
+        return axios.put(baseUrl, { comment })
         .then((response) => {
-            dispatch(commentEditSuccess(index, response.data.comment));
+            dispatch(updateComment(comment));
+            return { success: true };
         }).catch((error) => {
-            dispatch(commentEditFailure(error.response.data.code));
+            return { success: false, error };
         });
     };
 }
 
-export function commentEdit() {
+export function updateComment(comment) {
     return {
-        type: COMMENT_EDIT
+        type: UPDATE_COMMENT,
+        comment,
     };
 }
 
-export function commentEditSuccess(index, cls) {
-    return {
-        type: COMMENT_EDIT_SUCCESS,
-        index,
-        cls
-    };
-}
-
-export function commentEditFailure(error) {
-    return {
-        type: COMMENT_EDIT_FAILURE,
-        error
-    };
-}
-
-/* COMMENT REMOVE */
-export function commentRemoveRequest(id, index) {
+export function deleteCommentById(commentId) {
     return (dispatch) => {
-        dispatch(commentRemove());
-        return axios.delete(url + id)
+        return axios.delete(baseUrl + '/' + commentId )
         .then((response) => {
-            dispatch(commentRemoveSuccess(index));
+            dispatch(deleteComment(commentId));
+            return { success: true };
         }).catch((error) => {
-            dispatch(commentRemoveFailure());
+            return { success: false, error };
         });
     };
 }
 
-export function commentRemove() {
+export function deleteComment(commentId) {
     return {
-        type: COMMENT_REMOVE
-    };
-}
-
-export function commentRemoveSuccess(index) {
-    return {
-        type: COMMENT_REMOVE_SUCCESS,
-        index
-    };
-}
-
-export function commentRemoveFailure(error) {
-    return {
-        type: COMMENT_REMOVEF_FAILURE,
-        error
+        type: DELETE_COMMENT,
+        commentId,
     };
 }

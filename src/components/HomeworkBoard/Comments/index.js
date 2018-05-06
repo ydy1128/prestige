@@ -1,21 +1,13 @@
 import React from "react";
 import contain from './Container';
-
 import FontAwesome from 'react-fontawesome';
-
-import demoData from './demoData';
-
-
-
-// SUBCOMPONENTS
 import Paper from 'material-ui/Paper';
 import Comment from './Comment';
 
 var Present = ({ props, state, style, functions }) => {
     let { comments } = props;
-    let {  } = state;
-    let { updateComment, postComment, deleteComment
-    } = functions;
+    let { newComment } = state;
+    let { appendComment, changeNewComment } = functions;
         
     // STYLE
     let containerStyle = {
@@ -75,8 +67,6 @@ var Present = ({ props, state, style, functions }) => {
             }
         `
     }</style>
-
-    
     return (
         <Paper id="comment-paper" style={containerStyle}>
             {cssStyle}
@@ -85,20 +75,19 @@ var Present = ({ props, state, style, functions }) => {
             <div id="comment-poster">
                 <textarea 
                     id="comment-poster-textarea"
-                    placeholder="이곳에 댓글을 입력하세요." 
+                    placeholder="이곳에 댓글을 입력하세요."
+                    onChange={changeNewComment}
+                    value={newComment}
                 />
-                <div className="comment-post-button" onClick={postComment()} >
-                    Post
-                </div>
+                <div className="comment-post-button" 
+                    onClick={appendComment}>Post</div>
             </div>
 
             <div id="comments-board">
-                { comments.map((commentId) => 
-                    <Comment 
-                        key={commentId} 
-                        commentId={commentId}
-                        update={updateComment}
-                        delete={deleteComment}/>)
+                { 
+                    comments.map((comment) => 
+                        <Comment key={comment._id} 
+                            comment={comment}/>)
                 }
             </div>
         </Paper>
