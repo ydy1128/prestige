@@ -187,7 +187,7 @@ class CreateHomeworkBoard extends React.Component {
       return;
     }
     let contents = Object.assign({}, this.state.contents, {fileNames: this.state.files.map( file => file.name )});
-    this.props.homeworkPostRequest(this.state.contents).then((response) => {
+    this.props.homeworkPostRequest(contents).then((response) => {
         Materialize.toast('숙제가 추가되었습니다!', 2000);
         this.uploadSelectedFilesOnServerByHomeworkId(response.homework._id);
         this.props.closeBoard();
