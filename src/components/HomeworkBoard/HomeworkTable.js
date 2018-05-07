@@ -73,7 +73,7 @@ export default class TableExampleComplex extends Component {
 
   render() {
     return (
-      <div>
+      <div className="col m12" style={{marginTop: 20}}>
           <Table
             height={this.state.height}
             fixedHeader={this.state.fixedHeader}

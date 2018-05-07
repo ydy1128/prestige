@@ -16,7 +16,8 @@ var Present = ({ props, state, style, functions }) => {
         width: '100%',
         height: '400px',
         position: 'relative',
-        padding: '16px'
+        padding: '16px',
+        backgroundColor: 'white'
     };
 
     let cssStyle =
@@ -68,7 +69,7 @@ var Present = ({ props, state, style, functions }) => {
         `
     }</style>
     return (
-        <Paper id="comment-paper" style={containerStyle}>
+        <div id="comment-paper" style={containerStyle}>
             {cssStyle}
             <div id="comments-header" > Comments </div>
             
@@ -90,7 +91,7 @@ var Present = ({ props, state, style, functions }) => {
                             comment={comment}/>)
                 }
             </div>
-        </Paper>
+        </div>
     )
 }
 export default contain(Present)

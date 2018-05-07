@@ -7,11 +7,10 @@ const Homework = new Schema({
 	teacherId: String,
 	title: String,
 	content: String,
-	files: [String],
+	fileNames: [String],
 	accomplishments: [String],
 	dueDate: String,
-	writtenDate: String,
-	comments: [String]
+	writtenDate: String
 });
 
 
