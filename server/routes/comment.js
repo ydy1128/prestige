@@ -7,128 +7,84 @@ import { log } from 'util';
 
 const router = express.Router();
 
-router.post('/', (req, res) => { createComment(req, res); });
-router.get('/', (req, res) => { readComment(req, res); });
-router.put('/:id', (req, res) => { updateComment(req, res); });
-router.delete('/:id', (req, res) => { deleteComment(req, res); });
+router.get('/homework/:homeworkId', (req, res) => { getCommentByHomeworkId(req, res); });
+router.post('/homework/:homeworkId', (req, res) => { createComment(req, res); });
+router.put('/', (req, res) => { updateComment(req, res); });
+router.delete('/:commentId', (req, res) => { deleteComment(req, res); });
 
-const createComment = (req, res) => {
-    let commentJson = req.body.contents;
-    if(not(req.session.loginInfo)) { return throwError(res, 401, 'User not logged in.');}
-    // if(not(validateData(commentJson, "all"))) { return throwError(res, 400, "Data format not valid.");}
-    let date = (new Date()).getTime() + "";
-        
-    Object.assign( commentJson, {
-        writtenDate: date,
-        editedDate: date,
-        writer: req.session.loginInfo
-    });
+const getCommentByHomeworkId = (req, res) => {
+    console.log('params : ' + JSON.stringify(req.params));
+    console.log('body : ' + JSON.stringify(req.body));
+    let homeworkId = req.params.homeworkId;
+    if (!homeworkId) { return throwError(res, 404, 'homework id is required.'); }
 
-    let comment = new Comment(commentJson);
-
-    Homework.findById(commentJson.homeworkId, (err, hw) => {
+    Comment.find({ homeworkId }).exec((err, comments) => {
         if(err) return throwError(res, 409, 'DB error.');
-        if(not(hw)) return throwError(res, 409);
-        if(hw.teacherId != req.session.loginInfo.user._id) return throwError(res, 401, 'Unauthorized user');
-        Object.assign(hw, {comments: [...hw.comments, comment._id]})
-        console.log('hw', hw)
-
-        hw.save((err, hw) => {
-            if(err) return throwError(res, 409, 'DB error.');
-        });
-    })
-    
-    comment.save( err => {
-        if(err) return throwError(res, 409, 'DB error.');
-        return res.json({ success: true, comment });
+        res.json({success: true, comments});
     });
 }
 
-// comment id list를 받아 조회하고 조회된 복수개의 comment data를 리턴한다.
-const readComment = (req, res) => { 
-    console.log(req.query)
-    let commentIds = req.query.comments ? JSON.parse(req.query.comments) : [];
-    console.log('commentIds', commentIds)
-    let querys = null;
-    if(commentIds.length) {
-        querys = commentIds.map((id) =>
-        mongoose.Types.ObjectId(id));
-    }
+const createComment = (req, res) => {
+    console.log('params : ' + JSON.stringify(req.params));
+    console.log('body : ' + JSON.stringify(req.body));
+    if (!req.session.loginInfo) { return throwError(res, 401, 'User not logged in.'); }
+    if (!req.params.homeworkId) { return throwError(res, 404, 'homework id is required.'); }
+    if (!req.body.comment) { return throwError(res, 404, 'comment is required.'); }
 
-    Comment.find(querys ? { _id: querys } : {_id: null }).exec((err, comments) => {
-        if(err) return throwError(res, 409, 'DB error.');
-        res.json({success: true, comments});
-    })
+    let date = (new Date()).getTime() + "";
+    Object.assign(req.body.comment, {
+        writtenDate: date,
+        editedDate: date,
+        writer: req.session.loginInfo,
+        homeworkId: req.params.homeworkId
+    });
+
+    let comment = new Comment(req.body.comment);    
+    comment.save( err => {
+        if (err) return throwError(res, 409, 'DB error.');
+        res.json({ success: true, comment });
+    });
 }
 
 const updateComment = (req, res) => {
-    let commentInfo = req.body.contents;
-    let commentId = commentInfo._id;
-    let userId = req.session.loginInfo.user._id;
-    delete commentInfo._id
+    console.log('comment.updateComment');
+    console.log('params : ' + JSON.stringify(req.params));
+    console.log('body : ' + JSON.stringify(req.body));
+    if (!req.session.loginInfo) { return throwError(res, 401, 'User not logged in.'); }
+    if (!req.body.comment) { return throwError(res, 404, 'comment is required.'); }
+    
+    Comment.findById( req.body.comment._id, (err, comment) => {
+        let userId = req.session.loginInfo.user._id;
+        console.log('comment : ' + JSON.stringify(comment));
+        if (err) return throwError(res, 409, 'DB error.');
+        if (comment == null) return throwError(res, 404);
+        if (comment.writer.user._id != userId) return throwError(res, 401, 'Unauthorized user');
 
-    // Find Class
-    Comment.findById( commentId, (err, comment) => {
-        if(err) return throwError(res, 409, 'DB error.');
-        if(not(comment)) return throwError(res, 409);
-        if(comment.writer.user._id != userId) return throwError(res, 401, 'Unauthorized user');
+        Object.assign(comment, req.body.comment);
 
-        Object.assign(comment, commentInfo)
-
-        comment.save((err, comment) => {
-            if(err) return throwError(res, 409, 'DB error.');
-            return res.json({ success: true, comment });
+        comment.save((err) => {
+            if (err) return throwError(res, 409, 'DB error.');
+            res.json({ success: true, comment });
         });
     });
 }
 
 const deleteComment = (req, res) => {
-    let commentId = req.params.id;
-    let valid = mongoose.Types.ObjectId.isValid(commentId);
-    let loginInfo = req.session.loginInfo;
+    console.log('params : ' + JSON.stringify(req.params));
+    let valid = mongoose.Types.ObjectId.isValid(req.params.commentId);
+    if (!valid) { return throwError(res, 400, "Data format not valid."); }
 
-    if(not(valid)) { return throwError(res, 400, "Data format not valid."); }
-    if(not(loginInfo)) { throwError(res, 401, 'User not logged in.'); }
+    Comment.findOne({ _id: req.params.commentId }, (err, comment) => {
+        let userId = req.session.loginInfo.user._id;
+        if (err) return throwerror(res, 409, 'DB error.');
+        if (!comment) return throwError(res, 404);
+        if (comment.writer.user._id != userId) return throwError(res, 401, 'Unauthorized user');
 
-    Comment.findById(commentId, (err, comment) => {
-        let userId = loginInfo.user._id;
-        if(err) return throwerror(res, 409, 'DB error.');
-        if(not(comment)) return throwError(res, 409);
-        if(comment.writer.user._id != userId) return throwError(res, 401, 'Unauthorized user');
-        
-        Homework.findById(comment.homeworkId, (err, hw) => {
-            if(err) return throwError(res, 409, 'DB error.');
-            if(not(hw)) return throwError(res, 409);
-            if(hw.teacherId != req.session.loginInfo.user._id) return throwError(res, 401, 'Unauthorized user');
-            let comments = hw.comments.filter((cmtId) => { 
-                return cmtId != commentId
-            })
-            Object.assign(hw, {comments: comments.length ? comments : []})
-            hw.save((err, hw) => {
-                if(err) return throwError(res, 409, 'DB error.');
-                // Remove class
-                Comment.remove({ _id: commentId }, err => {
-                    if(err) return throwError(res, 409, 'DB error.');
-                    res.json({ success: true });
-                });
-            });
-        })
+        comment.remove((err) => {
+            if (err) return throwError(res, 409, 'DB error.');
+            res.json({ success: true });
+        });
     });
-}
-
-// Utils
-var not = (factor) => !factor;
-
-var validateData = (data, checkList) => {
-    if (typeof checkList == "string" && checkList == "all") {
-        checkList = Object.keys(data);
-    }
-
-    for(let checkItem of checkList) {
-        if(not(checkList.includes(checkItem))) return false
-    }
-
-    return true
 }
 
 export default router;

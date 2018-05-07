@@ -15,69 +15,68 @@ router.put('/:id', (req, res) => { updateHomework(req, res); });
 router.delete('/:id', (req, res) => { deleteHomework(req, res); });
 
 const createHomework = (req, res) => {
-    let hwInfo = req.body.contents;
+    let homeworkInfo = req.body.contents;
     if(not(req.session.loginInfo)) { return throwError(res, 401, 'User not logged in.');}
-    if(not(validateData(hwInfo, "all"))) { return throwError(res, 400, "Data format not valid.");}
+    if(not(validateData(homeworkInfo, "all"))) { return throwError(res, 400, "Data format not valid.");}
 
-    Object.assign(  hwInfo, {
-        accomplishments: [],
-        modifiedDate: "",
-        teacherId: req.session.loginInfo.user._id,
-    });
+    let homework = new Homework(Object.assign( req.body.contents, {
+            accomplishments: [],
+            modifiedDate: "",
+            teacherId: req.session.loginInfo.user._id,
+        }
+    ));
 
-    let hw = new Homework(hwInfo);
-
-    hw.save( err => {
+    homework.save( err => {
         if(err) return throwError(res, 409, 'DB error.');
-        return res.json({ success: true, homework: hw });
+        return res.json({ success: true, homework: homework });
     });
 }
 
 const readHomework = (req, res) => {
-    let hwId = req.params.id;
-    Homework.find(hwId ? { _id: hwId } : null).exec((err, hws) => {
+    let homeworkId = req.params.id;
+    Homework.find(homeworkId ? { _id: homeworkId } : null).sort({$natural:-1}).exec((err, homeworks) => {
         if(err) return throwError(res, 409, 'DB error.');
-        res.json(hws);
+        res.json(homeworks);
     })
 }
 
 const updateHomework = (req, res) => {
-    let modifiedHwInfo = req.body.contents;
-    let hwId = req.params.id;
-    let userId = modifiedHwInfo.teacherId;
+    let modifiedHwContents = req.body.contents;
+    let homeworkId = req.params.id;
+    let userId = modifiedHwContents.teacherId;
 
     // Find Class
-    Homework.findById( hwId, (err, hw) => {
+    Homework.findById( homeworkId, (err, homework) => {
         if(err) return throwError(res, 409, 'DB error.');
-        if(not(hw)) return throwError(res, 409);
-        if(hw.teacherId != userId) return throwError(res, 401, 'Unauthorized user');
+        if(not(homework)) return throwError(res, 409);
+        if(homework.teacherId != userId) return throwError(res, 401, 'Unauthorized user');
 
-        Object.assign(hw, modifiedHwInfo)
-        hw.save((err, hw) => {
+        Object.assign(homework, modifiedHwContents)
+        homework.save((err, homework) => {
             if(err) return throwError(res, 409, 'DB error.');
-            return res.json({ success: true, homework: hw });
+            return res.json({ success: true, homework: homework });
         });
     });
 }
 
 const deleteHomework = (req, res) => {
-    let hwId = req.params.id;
-    let valid = mongoose.Types.ObjectId.isValid(hwId);
+    let homeworkId = req.params.id;
+    let valid = mongoose.Types.ObjectId.isValid(homeworkId);
     let loginInfo = req.session.loginInfo;
 
     if(not(valid)) { return throwError(res, 400, "Data format not valid."); }
     if(not(loginInfo)) { throwError(res, 401, 'User not logged in.'); }
 
-    Homework.findById(hwId, (err, hw) => {
+    Homework.findById(homeworkId, (err, homework) => {
         let userId = req.session.loginInfo.user._id;
         if(err) return throwerror(res, 409, 'DB error.');
-        if(not(hw)) return throwError(res, 409);
-        if(hw.teacherId != userId) return throwError(res, 401, 'Unauthorized user');
+        if(not(homework)) return throwError(res, 409);
+        if(homework.teacherId != userId) return throwError(res, 401, 'Unauthorized user');
 
         // Remove class
-        Homework.remove({ _id: hwId }, err => {
+        Homework.remove({ _id: homeworkId }, err => {
             if(err) return throwError(res, 409, 'DB error.');
-            let filePath = path.join(__dirname, "../../", uploadBasePath , hwId);
+            let filePath = path.join(__dirname, "../../", uploadBasePath , homeworkId);
             rimraf(filePath, 
                 (res)=>{ }, 
                 (err)=>{ }

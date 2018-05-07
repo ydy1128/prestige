@@ -27,7 +27,7 @@ class Home extends React.Component {
         super(props);
 
         // TEACHER_DASHBOARD, TEACHER_STUDENTBOARD, TEACHER_CLASSBOARD, TEACHER_LECTUREBOARD, TEACHER_HWBOARD
-        // STUDENT_DASHBOARD, STUDENT_LECTUREBOARD, STUDENT_HWBOARD
+        // STUDENT_DASHBOARD, STUDENT_LECTUREBOARD, STUDENT_HWBOARDBOARD
         this.state = {
             view_type: getLoginData().role == 'teacher' ? 'TEACHER_DASHBOARD' : 'STUDENT_DASHBOARD'
         }
@@ -185,8 +185,6 @@ class Home extends React.Component {
             case 'STUDENT_LECTUREBOARD':
                 return (<StudentLectureBoard classData={this.props.classData}
                                 lectureData={this.props.lectureData} />);
-            case 'STUDENT_HWBOARD':
-                return (<div>HWBOARD</div>);
             default:
                 return (<div>Get View Error</div>);
         }
@@ -211,7 +209,6 @@ class Home extends React.Component {
 			<ul className="">
 				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_DASHBOARD')}    name="STUDENT_DASHBOARD"    ><FontAwesome name="dashboard"  onClick={this.handleMenuClick}/></a></li>
 				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_LECTUREBOARD')} name="STUDENT_LECTUREBOARD" ><FontAwesome name="tv" onClick={this.handleMenuClick} /></a></li>
-				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_HWBOARD')}      name="STUDENT_HWBOARD"      ><FontAwesome name="file-o" onClick={this.handleMenuClick} /></a></li>
 				<li><a className={'waves-effect '+this.setMenuActive('STUDENT_HOMEWORKBOARD')}name="STUDENT_HOMEWORKBOARD"      ><FontAwesome name="file-o" onClick={this.handleMenuClick} /></a></li>                
 			</ul>
     	)

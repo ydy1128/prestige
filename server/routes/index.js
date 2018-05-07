@@ -20,6 +20,6 @@ router.use('/homework', homework);
 router.use('/lecture', lecture);
 router.use('/upload', upload);
 router.use('/download', download);
-router.use('/comments', comment);
+router.use('/comment', comment);
 
 export default router;

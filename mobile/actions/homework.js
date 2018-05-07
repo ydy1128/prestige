@@ -88,21 +88,6 @@ export function homeworkPostFailure(error) {
     };
 }
 
-/* Homework Edit */
-// export function homeworkEditPrep(name, days, starttime, endtime, index, _id, students, flag){
-//     return {
-//         type: HOMEWORK_EDIT_PREP,
-//         name,
-//         days,
-//         starttime,
-//         endtime,
-//         index,
-//         _id,
-//         students,
-//         flag
-//     };
-// }
-
 export function homeworkEditRequest(id, index, contents) {
     return (dispatch) => {
         dispatch(homeworkEdit());

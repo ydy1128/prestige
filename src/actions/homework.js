@@ -60,11 +60,11 @@ export function homeworkPostRequest(contents) {
 
         return axios.post('/api/homework', { contents })
         .then((response) => {
-            console.log(response.data.homework)
             dispatch(homeworkPostSuccess(response.data.homework));
-            return response
+            return response.data;
         }).catch((error) => {
             dispatch(homeworkPostFailure(error.response.data.homework));
+            return error;
         });
     };
 }
@@ -88,21 +88,6 @@ export function homeworkPostFailure(error) {
         error
     };
 }
-
-/* Homework Edit */
-// export function homeworkEditPrep(name, days, starttime, endtime, index, _id, students, flag){
-//     return {
-//         type: HOMEWORK_EDIT_PREP,
-//         name,
-//         days,
-//         starttime,
-//         endtime,
-//         index,
-//         _id,
-//         students,
-//         flag
-//     };
-// }
 
 export function homeworkEditRequest(id, index, contents) {
     return (dispatch) => {

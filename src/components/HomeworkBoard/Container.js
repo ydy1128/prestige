@@ -8,7 +8,8 @@ import {
   homeworkBoardRequest,
   homeworkPostRequest,
   homeworkEditRequest,
-  homeworkRemoveRequest } from 'actions/homework';
+  homeworkRemoveRequest 
+} from 'actions/homework';
 
   // STORE
   function mapStateToProps (state) {
@@ -41,36 +42,36 @@ import {
 
   var contain = (Present)  => {
     class Container extends React.Component {
-
-      // CLASS INNER FUNCTIONS
       constructor(props) {
         super(props);
         this.state = {
-          boardOn: false,
-          selectedHw: null,
+          createBoardOn: false,
+          editBoardOn: false,
+
           deleteDialogOn: false,
+          selectedHw: null,
           selectedHwIndex: null,
 
           filteredClick: [],
           searchOpen: false,
           searchText: '',
           searchResult: [],
-          isNewHomework: false,
         };
       }
 
       render() {
         let presentState = [
-          "boardOn", 
-          "selectedHw", 
+          "createBoardOn",
+          "editBoardOn",
+
           "deleteDialogOn", 
+          "selectedHw", 
           "selectedHwIndex",
           
           "searchOpen",
           "searchText",
           "searchResult",
           "filteredClick",
-          "isNewHomework"
         ];
         let presentProps = [
           "hwData",
@@ -85,7 +86,7 @@ import {
           handleRowSelection: this._handleRowSelection.bind(this),
           onClickEditHomework: this._onClickEditHomework.bind(this),
           onClickCreateHomework: this._onClickCreateHomework.bind(this),
-          closeBoard: this._closeBoard.bind(this),
+          closeBoard: this.closeBoard.bind(this),
           toggleDeleteDialog: this._toggleDeleteDialog.bind(this),
           focusSearchInput: this._focusSearchInput.bind(this),
           blurSearchInput: this._blurSearchInput.bind(this),
@@ -119,34 +120,19 @@ import {
       componentWillUnmount() {}
 
       // CUSTOM FUNCTIONS
-      _closeBoard() {
+      closeBoard() {
+        this._loadHomeworkData();
         this.setState({
-          boardOn: false,
-          isNewHomework: false,
+          createBoardOn: false,
+          editBoardOn: false,
         })
       }
 
       _onClickCreateHomework(e) {
-        let contents = {
-          title: "",
-          files: [],
-          comments: [],
-          content: "",
-          accomplishments: [],
-          dueDate: Date.parse(new Date()),
-          writtenDate: Date.parse(new Date()),
-          teacherId: this.props.userInfo.user._id,
-        }
-
-        this.props.homeworkPostRequest(contents).then((res) => {
-          this.setState({
-            isNewHomework: true,
-            selectedHw: res.data.homework,
-            selectedHwIndex: this.props.hwData.length-1,
-            boardOn: true
-          })
+        this.setState({
+          createBoardOn: true,
         });
-     }
+      }
 
       _toggleDeleteDialog(open) {
         return (e) => {
@@ -158,11 +144,11 @@ import {
 
       _onClickEditHomework(index) {
         return (e) => {
-          e.stopPropagation();
+          if (e) e.stopPropagation();
           this.setState({
             selectedHw: this.props.hwData[index],
             selectedHwIndex: index,
-            boardOn: true
+            editBoardOn: true
           })
         }
       }
