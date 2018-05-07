@@ -11,6 +11,8 @@ import DatePicker from 'material-ui/DatePicker';
 import Dropzone from 'react-dropzone';
 import { log } from 'util';
 import Comments from './Comments';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 class EditHomeworkBoard extends React.Component {
   constructor(props) {
@@ -24,7 +26,8 @@ class EditHomeworkBoard extends React.Component {
       index: selectedHwIndex,
       contents: hw,
       files,
-      dropzoneActive: false
+      dropzoneActive: false,
+      className: (this.props.classData.find((item) => hw.classId == item._id)).name
     };
   }
 
@@ -114,6 +117,15 @@ class EditHomeworkBoard extends React.Component {
           disabled={this.state.isStudent ? true : false}
           underlineShow={this.state.isStudent ? false : true}
         />
+        <SelectField
+          floatingLabelText={'수업'}
+          value={this.state.className}
+          onChange={this.state.isStudent ? null : this.changeClass.bind(this)}
+        >
+          {this.props.classData.map(classItem => (
+            <MenuItem value={classItem.name} primaryText={classItem.name} />))}
+        </SelectField>
+
         <div style={style.datePickerContainerStyle}>
           <DatePicker id="due-date"
             floatingLabelText="제출 기한"
@@ -130,6 +142,14 @@ class EditHomeworkBoard extends React.Component {
       </div>
     );
   }
+
+  changeClass(e, index, name) {
+    console.log(this.props.classData[index]._id);
+    this.setState({
+      className: name,
+      contents: Object.assign({}, this.state.contents, { classId: this.props.classData[index]._id })
+    });
+  };
 
   showFileUploadSection(props) {
     let style = {
@@ -323,7 +343,8 @@ const mapStateToProps = (state) => {
   let homework = state.homework;
   return {
     homeworkPostState: homework.post,
-    homeworkEditState: homework.edit
+    homeworkEditState: homework.edit,
+    classData: state.makeclass.board.data,
   };
 };
 

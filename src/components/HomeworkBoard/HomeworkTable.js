@@ -48,6 +48,7 @@ export default class TableExampleComplex extends Component {
   constructor(props){
     super(props);
     this.state = {
+      isStudent: this.props.userInfo.role == 'teacher' ? false : true,
       fixedHeader: false,
       fixedFooter: true,
       stripedRows: false,
@@ -59,9 +60,6 @@ export default class TableExampleComplex extends Component {
       showCheckboxes: true,
       height: 'null',
     };
-
-    this._makeRows = this._makeRows.bind(this);
-
   }
 
   handleToggle(event, toggled) {
@@ -77,37 +75,42 @@ export default class TableExampleComplex extends Component {
           <Table
             height={this.state.height}
             fixedHeader={this.state.fixedHeader}
-            selectable={this.state.selectable}
-            multiSelectable={this.state.multiSelectable}
+            selectable={this.state.isStudent ? null : this.state.selectable}
+            multiSelectable={this.state.isStudent ? null : this.state.multiSelectable}
             onRowSelection={this.props.handleRowSelection}
+            onCellClick={this.state.isStudent ? this.onStudentRowSelection.bind(this) : null}
             style={style.table}
           >
             <TableHeader
-              displaySelectAll={this.state.showCheckboxes}
-              adjustForCheckbox={this.state.showCheckboxes}
-              enableSelectAll={this.state.enableSelectAll}
+              displaySelectAll={this.state.isStudent ? null : this.state.showCheckboxes}
+              adjustForCheckbox={this.state.isStudent ? null :this.state.showCheckboxes}
+              enableSelectAll={this.state.isStudent ? null :this.state.enableSelectAll}
             >
               <TableRow>
-                <TableHeaderColumn style={style.row.button}></TableHeaderColumn>
+                {this.state.isStudent ? null : <TableHeaderColumn style={style.row.button}></TableHeaderColumn>}
                 <TableHeaderColumn style={style.row.title}>제목</TableHeaderColumn>
                 <TableHeaderColumn style={style.row.date}>제출기한</TableHeaderColumn>
                 <TableHeaderColumn style={style.row.date}>작성일자</TableHeaderColumn>
               </TableRow>
             </TableHeader>
             <TableBody
-              displayRowCheckbox={this.state.showCheckboxes}
+              displayRowCheckbox={this.state.isStudent ? null : this.state.showCheckboxes}
               deselectOnClickaway={this.state.deselectOnClickaway}
               showRowHover={this.state.showRowHover}
               stripedRows={this.state.stripedRows}
             >
-              {this._makeRows()}
+              {this.showRows()}
             </TableBody>
           </Table>
       </div>
     );
   }
 
-  _makeRows(){
+  onStudentRowSelection(index,a,e) {
+    this.props.onClickEditHomework(index)();
+  }
+
+  showRows(){
     let hwData = this.props.hwData;
     let tableRows = [];
 
@@ -119,11 +122,15 @@ export default class TableExampleComplex extends Component {
       let readableWrittenDate = new Date(parseInt(writtenDate));
 
       tableRows.push(
-        <TableRow selected={this.props.clickedRowIndexes.includes(index)} key={index}>
-          <TableRowColumn>
-            <FontAwesome
-              style={style.button} onClick={this.props.onClickEditHomework(index)} name="pencil" />
-          </TableRowColumn>
+        <TableRow key={index}
+          selected={this.props.clickedRowIndexes.includes(index)} 
+          onClick={this.state.isStudent ? this.onStudentRowSelection.bind(this) : null}>
+          {this.state.isStudent ? null :
+            <TableRowColumn>
+              <FontAwesome
+                style={style.button} onClick={this.props.onClickEditHomework(index)} name="pencil" />
+            </TableRowColumn>
+          }
           <TableRowColumn>{title}</TableRowColumn>
           <TableRowColumn>{readableDate.toLocaleDateString()}</TableRowColumn>
           <TableRowColumn>{readableWrittenDate.toLocaleDateString()}</TableRowColumn>

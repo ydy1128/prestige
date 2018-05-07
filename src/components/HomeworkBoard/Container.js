@@ -144,7 +144,7 @@ import {
 
       _onClickEditHomework(index) {
         return (e) => {
-          e.stopPropagation();
+          if (e) e.stopPropagation();
           this.setState({
             selectedHw: this.props.hwData[index],
             selectedHwIndex: index,

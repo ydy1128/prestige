@@ -111,7 +111,7 @@ var Present = ({ props, state, style, functions }) => {
                             clickedRowIndexes={filteredClick}
                             handleRowSelection={handleRowSelection}
                             onClickEditHomework={onClickEditHomework}
-                            userRole={userInfo.role}/>
+                            userInfo={userInfo}/>
                         )  
                     }
             </div>

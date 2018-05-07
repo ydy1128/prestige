@@ -10,7 +10,8 @@ const Homework = new Schema({
 	fileNames: [String],
 	accomplishments: [String],
 	dueDate: String,
-	writtenDate: String
+	writtenDate: String,
+	classId: String
 });
 
 

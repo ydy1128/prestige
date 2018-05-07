@@ -10,6 +10,8 @@ import TextField from 'material-ui/TextField';
 import DatePicker from 'material-ui/DatePicker';
 import Dropzone from 'react-dropzone';
 import { log } from 'util';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 class CreateHomeworkBoard extends React.Component {
   constructor(props) {
@@ -25,6 +27,7 @@ class CreateHomeworkBoard extends React.Component {
         content: '',
         fileNames: [],
         teacherId: this.props.userInfo.user._id,
+        classId: '',
       },
       files: [],
       dropzoneActive: false
@@ -103,6 +106,15 @@ class CreateHomeworkBoard extends React.Component {
           value={contents.title}
           onChange={this.changeTitle.bind(this)}
         />
+        <SelectField
+          floatingLabelText={'수업'}
+          value={this.state.className}
+          onChange={this.changeClass.bind(this)}
+        >
+          {this.props.classData.map(classItem => (
+            <MenuItem value={classItem.name} primaryText={classItem.name} />))}
+        </SelectField>
+
         <div style={style.datePickerContainerStyle}>
           <DatePicker id="due-date"
             floatingLabelText="제출 기한"
@@ -117,6 +129,14 @@ class CreateHomeworkBoard extends React.Component {
       </div>
     );
   }
+
+  changeClass(e, index, name) {
+    console.log(this.props.classData[index]._id);
+    this.setState({
+      className: name,
+      contents: Object.assign({}, this.state.contents, { classId: this.props.classData[index]._id })
+    });
+  };
 
   showFileUploadSection(props) {
     let style = {
@@ -185,6 +205,12 @@ class CreateHomeworkBoard extends React.Component {
       let $toastContent = $('<span style="color: #FFB4BA">제목을 입력하세요.</span>');
       Materialize.toast($toastContent, 2000);
       return;
+    } else {
+      if (!this.state.contents.classId) {
+        let $toastContent = $('<span style="color: #FFB4BA">해당 수업을 선택하세요.</span>');
+        Materialize.toast($toastContent, 2000);
+        return;
+      }
     }
     let contents = Object.assign({}, this.state.contents, {fileNames: this.state.files.map( file => file.name )});
     this.props.homeworkPostRequest(contents).then((response) => {
@@ -296,7 +322,8 @@ const mapStateToProps = (state) => {
   let homework = state.homework;
   return {
     homeworkPostState: homework.post,
-    homeworkEditState: homework.edit
+    homeworkEditState: homework.edit,
+    classData: state.makeclass.board.data,
   };
 };
 
