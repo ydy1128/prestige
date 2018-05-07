@@ -1,39 +1,20 @@
-import React, { Component } from 'react';
-import {
-	Platform,
-	StyleSheet,
-	Text,
-	TextInput,
-	View,
-	Image,
-	TouchableHighlight
-} from 'react-native';
+export default {
+	headerTitle: 'Prestige',
+	headerStyle: {
+	    backgroundColor: '#86272d',
 
-const navigaionOptions = (left, right, title) => {
-	let options = {
-		headerTitle: title == undefined ? 'Prestige' : title,
-		headerStyle: {
-		    backgroundColor: '#86272d',
-
-		},
-		headerTextStyle:{
-			textAlign: 'center',
-		},
-		headerTitleStyle: {
-			color: 'white',
-		    flex: 1,
-		    textAlign: 'center'
-
-		},
-	}
-	if(right != undefined){
-		options.headerRight = right;
-	}
-	if(left != undefined){
-		options.headerLeft = left;
-	}
-
-	return options;
+	},
+	headerTextStyle:{
+		textAlign: 'center',
+		alignSelf: 'center'
+	},
+	headerTitleStyle: {
+		color: 'white',
+	    flex: 1,
+	    textAlign: 'center',
+	    alignSelf: 'center',
+	    paddingTop: 12.5
+	},
+	headerRight: undefined,
+	headerLeft: undefined,
 }
-
-export default navigaionOptions;

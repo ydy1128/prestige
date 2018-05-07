@@ -7,6 +7,7 @@ import {
 	View,
 	Image,
 	TouchableHighlight,
+  TouchableOpacity,
   Linking,
   AsyncStorage
 } from 'react-native';
@@ -14,7 +15,7 @@ import Icon from '../../node_modules/react-native-vector-icons/dist/FontAwesome'
 import { connect } from 'react-redux';
 import Toast from 'react-native-simple-toast';
 
-import { loginRequest, getStatusRequest, extendSession } from '../../actions/authentication';
+import { loginRequest, getStatusRequest, extendSession, logoutRequest } from '../../actions/authentication';
 import navOptions from './navigator';
 class Home extends Component<{}> {
     constructor(props) {
@@ -34,7 +35,13 @@ class Home extends Component<{}> {
     this.onLogin = this.onLogin.bind(this);
     this.onOpenUrl = this.onOpenUrl.bind(this);
 	}
-  static navigationOptions = navOptions(undefined, undefined, undefined);
+  static navigationOptions  = ({ navigation }) => {
+    let params = navigation.state.params;
+    // if(!params.title == undefined) navOptions.headerTitle = params.title;
+    // if(!params.right == undefined) navOptions.headerRight = params.right;
+    // if(!params.left == undefined) navOptions.headerLeft = params.left;
+    return navOptions;
+  }
   componentWillMount(){
     //add loading screen
     AsyncStorage.getItem('loginData').then((token) =>{
@@ -45,7 +52,6 @@ class Home extends Component<{}> {
           //success fail
           if(this.props.sessionStatus.valid){
             this.props.extendSession(loginData.user);
-            Toast.show(''+JSON.stringify(loginData.user))
             this.setState({loggedIn: true, loginData: loginData.user});
           }
 
@@ -137,7 +143,7 @@ class Home extends Component<{}> {
 						style={styles.divider}
 						source={require('../../img/divider.png')}
 						/>
-					<TouchableHighlight onPress={()=>navigate('Register')} style={styles.buttonRegister} underlayColor='#d6a50b'>
+					<TouchableHighlight onPress={()=>navigate('Register', {right: (<View></View>)})} style={styles.buttonRegister} underlayColor='#d6a50b'>
 						<Text style={styles.buttonText}>회원가입</Text>
 					</TouchableHighlight>
 		    </View>
@@ -149,19 +155,21 @@ class Home extends Component<{}> {
             <Text style={{color: '#f8c709', fontSize: 20}}>안녕하세요,</Text>
             <Text style={{color: '#f8c709', fontSize: 30}}>{this.state.loginData.name} 학생</Text>
           </View>
-          <View style={styles.introAlertDiv}>
+          <TouchableOpacity style={styles.introAlertDiv} onPress={()=>navigate('Notification', {title: '알림', right: (<View></View>)})} >
             <Icon name="envelope" size={65} color="#f8c709" />
-          </View>
+            <Icon name="circle" size={38} color="#dd0000" style={{position: 'absolute', right: 35, top: 20}} />
+            <Text style={{position: 'absolute', color: 'white', fontSize: 19, fontWeight: 'bold', right: 46, top: 25}}>5</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.mainButtonsDiv}>
           <View style={styles.mainButtonsCol}>
-            <TouchableHighlight style={{flex: 1, backgroundColor: '#03a9f4'}} onPress={()=>navigate('LectureList')} underlayColor="#0288d1">
+            <TouchableHighlight style={{flex: 1, backgroundColor: '#03a9f4'}} onPress={()=>navigate('LectureList', {title: '강의게시판', right: (<View></View>)})} underlayColor="#0288d1">
               <View style={styles.mainButtons}>
                 <Icon name="tv" size={45} color="#FFFFFF" />
                 <Text style={styles.mainButtonText}>강의게시판</Text>
               </View>
             </TouchableHighlight>
-            <TouchableHighlight style={{flex: 1, backgroundColor: '#ef5350'}} onPress={()=>navigate('Account')} underlayColor="#d32f2f">
+            <TouchableHighlight style={{flex: 1, backgroundColor: '#ef5350'}} onPress={()=>navigate('Account', {right: (<View></View>)})} underlayColor="#d32f2f">
               <View style={styles.mainButtons}>
                 <Icon name="user-circle-o" size={45} color="#FFFFFF" />
                 <Text style={styles.mainButtonText}>계정관리</Text>
@@ -175,10 +183,16 @@ class Home extends Component<{}> {
                 <Text style={styles.mainButtonText}>숙제게시판</Text>
               </View>
             </TouchableHighlight>
-            <TouchableHighlight style={{flex: 1, backgroundColor: '#ab47bc'}} onPress={()=>{}} underlayColor="#8e24aa">
+            <TouchableHighlight style={{flex: 1, backgroundColor: '#ab47bc'}} onPress={()=>{
+                AsyncStorage.removeItem('loginData').then(() =>{
+                  this.props.logoutRequest().then(() => {
+                    this.setState({loggedIn: false, loginData: {id: '',username: '',role: ''}})
+                  })
+                })
+              }} underlayColor="#8e24aa">
               <View style={styles.mainButtons}>
-                <Icon name="gear" size={45} color="#FFFFFF" />
-                <Text style={styles.mainButtonText}>설정</Text>
+                <Icon name="sign-out" size={45} color="#FFFFFF" />
+                <Text style={styles.mainButtonText}>로그아웃</Text>
               </View>
 
             </TouchableHighlight>
@@ -339,7 +353,10 @@ const mapDispatchToProps = (dispatch) => {
         },
         extendSession: (sessionData) => { 
             return dispatch(extendSession(sessionData)); 
-        }
+        },
+        logoutRequest: () => { 
+            return dispatch(logoutRequest('student')); 
+        },
     };
 };
 

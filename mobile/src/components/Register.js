@@ -16,7 +16,14 @@ import { registerRequest } from '../../actions/authentication';
 
 
 class Register extends Component<{}> {
-  static navigationOptions = navOptions(undefined, (<View></View>));
+    static navigationOptions  = ({ navigation }) => {
+      let params = navigation.state.params;
+      if(!params.title == undefined) navOptions.headerTitle = params.title;
+      if(!params.right == undefined) navOptions.headerRight = params.right;
+      if(!params.left == undefined) navOptions.headerLeft = params.left;
+      return navOptions;
+    }
+
     constructor(props) {
         super(props);
         this.state = {

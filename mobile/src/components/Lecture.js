@@ -23,6 +23,7 @@ class Lecture extends Component<{}> {
         super(props);
         this.state = {
             videoPlayer: null,
+            playerReady: false,
             playerHeight: 300,
             currObj: {
                 _id: '',
@@ -40,24 +41,13 @@ class Lecture extends Component<{}> {
         this.timeChange = this.timeChange.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
     }
-    static navigationOptions  = ({ navigation }) => {
-        return options = {
-            headerTitle: navigation.state.params.title,
-            headerStyle: {
-                backgroundColor: '#86272d',
-
-            },
-            headerTextStyle:{
-                textAlign: 'center',
-            },
-            headerTitleStyle: {
-                color: 'white',
-                flex: 1,
-                textAlign: 'center'
-            },
-            headerRight: (<View></View>)
-        };
-    }
+  static navigationOptions  = ({ navigation }) => {
+    let params = navigation.state.params;
+    if(params.title != undefined) navOptions.headerTitle = params.title;
+    if(params.right != undefined) navOptions.headerRight = params.right;
+    if(params.left != undefined) navOptions.headerLeft = params.left;
+    return navOptions;
+  }
     componentDidMount(){
         let lecture = Object.assign({},this.props.data);
 
@@ -65,18 +55,30 @@ class Lecture extends Component<{}> {
     }
     componentWillUnmount(){
         clearInterval(this.state.interval);
-        let time = this.state.currenttime / this.state.fulltime * 100;
-        time = time.toFixed(2);
-        AsyncStorage.getItem('loginData').then((token) =>{
-            let loginData = JSON.parse(token);
-            this.onAccChange(loginData.user._id, this.state.currenttime);
-            let index = -1;
-            this.props.lectureData.map((lec, i) =>{
-                if(lec._id == this.state.currObj._id)
-                    index = i;
-            })
-            this.handleEdit(true, index, this.state.currObj);
-        });
+        let state = Object.assign(this.state)
+        if(state.playerReady){
+            console.log(state.currenttime, state.fulltime)
+            let time = state.currenttime / state.fulltime * 100;
+            time = time.toFixed(2);
+            AsyncStorage.getItem('loginData').then((token) =>{
+                let loginData = JSON.parse(token);
+                let nextState = {
+                    currObj: state.currObj
+                }
+                let acc = nextState.currObj.accomplishments;
+                for(let i = 0; i < acc.length; i++){
+                    if(loginData.user._id == acc[i]._id){
+                        console.log(time)
+                        acc[i].accomplishments = time;
+                        acc[i].endTime = new Date();
+                        console.log(acc[i].endTime)
+                        // Toast.show(''+time);
+                    }
+                }
+                let index = nextState.currObj.index
+                this.handleEdit(true, index, nextState.currObj);
+            });
+        }
 
     }
     async getLoginData(){
@@ -100,25 +102,7 @@ class Lecture extends Component<{}> {
         })
     }
     updateVideo(){
-        this.refs.youtubePlayer.duration().then((dur)=>{
-            let time = 0;
-            let acc = this.state.currObj.accomplishments;
-            AsyncStorage.getItem('loginData').then((token) =>{
-                let loginData = JSON.parse(token);
-                let id = loginData.user._id;
-                for(let i = 0; i < acc.length; i++){
-                    if(id == acc[i]._id){
-                        time = dur * (acc[i].accomplishments / 100);
-                        this.setState({currenttime: acc[i].accomplishments})
-                    }
-                }
-                this.refs.youtubePlayer.seekTo(time);
-                let obj = this;
-                this.setState({interval: setInterval(() => {obj.saveTime(obj)}, 10000), fulltime: dur});
-            })
-             
-            
-        }).done();
+
         
     }
     onAccChange(id, time){
@@ -143,7 +127,8 @@ class Lecture extends Component<{}> {
                 if(!silent) { !Toast.show('강의가 수정 되었습니다!'); }
             }
             else{
-                return throwError(silent, '강의', this.props.lectureEditStatus.error, '');
+                Toast.show('저장 되지 않았습니다.');
+                // return throwError(silent, '강의', this.props.lectureEditStatus.error, '');
             }               
         }).done();
     }
@@ -156,16 +141,34 @@ class Lecture extends Component<{}> {
                     AsyncStorage.getItem('loginData').then((token) =>{
                         let loginData = JSON.parse(token);
                         this.onAccChange(loginData.user._id, time);
-                        let index = -1;
-                        this.props.lectureData.map((lec, i) =>{
-                            if(lec._id == this.state.currObj._id)
-                                index = i;
-                        })
+                        let index = this.state.currObj.index;
                         this.handleEdit(true, index, this.state.currObj);
                     });
                 });
 
             });
+        }
+        else if(e.state == 'playing' && !this.state.playerReady){
+            this.setState({playerReady: true});
+            this.refs.youtubePlayer.duration().then((dur)=>{
+                let currObj = this.state.currObj;
+                let time = 0;
+                let acc = currObj.accomplishments;
+                AsyncStorage.getItem('loginData').then((token) =>{
+                    let loginData = JSON.parse(token);
+                    let id = loginData.user._id;
+                    for(let i = 0; i < acc.length; i++){
+                        if(id == acc[i]._id){
+                            time = dur * (acc[i].accomplishments / 100);
+                            acc[i].startTime = new Date();
+                            this.setState({currenttime: acc[i].accomplishments, currObj: currObj});
+                        }
+                    }
+                    this.refs.youtubePlayer.seekTo(time);
+                    let obj = this;
+                    this.setState({interval: setInterval(() => {obj.saveTime(obj)}, 10000), fulltime: dur});
+                })
+            }).done();
         }
     }
     render(){
@@ -179,6 +182,7 @@ class Lecture extends Component<{}> {
                     this.setState({playerHeight: height})}}>
                 <YouTube 
                     ref="youtubePlayer"
+                    controls={1}
                     style={{alignSelf: 'center', height: this.state.playerHeight, width: '100%'}} 
                     apiKey="AIzaSyApkQQpOcjzlxtH3uK7sZilS8RUemt-IJY" videoId={this.getVideoId(lecture.link)} play={true} fullscreen={false} loop={false} 
                     onReady={e => this.updateVideo()}

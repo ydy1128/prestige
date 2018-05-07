@@ -13,18 +13,16 @@ import Icon from '../../node_modules/react-native-vector-icons/dist/FontAwesome'
 import { connect } from 'react-redux';
 import Toast from 'react-native-simple-toast';
 import { List, ListItem, CheckBox } from 'react-native-elements';
-import Thumbnail from 'react-native-thumbnail-video';
+
 import { lectureBoardRequest, passLecture } from '../../actions/lecture';
 import navOptions from './navigator';
 
-class LectureList extends Component<{}> {
+class Notification extends Component<{}> {
     constructor(props) {
         super(props);
         this.state = {
 
         }
-        this.displayLecture = this.displayLecture.bind(this);
-
     }
     static navigationOptions  = ({ navigation }) => {
         let params = navigation.state.params;
@@ -34,32 +32,32 @@ class LectureList extends Component<{}> {
         return navOptions;
     }
     componentDidMount(){
-        this.props.lectureBoardRequest().then(() => {
-        })  
-    }
-    displayLecture(i){
-        let lecture = Object.assign({}, this.props.lectureData[i]);
-        lecture.index = i;
-        this.props.passLecture(lecture);
-        this.props.navigation.navigate('Lecture', {title: lecture.name, right: (<View></View>)});
+        // if(this.props.lectureData.length == 0){
+            this.props.lectureBoardRequest().then(() => {
+
+            })
+        // }
+        // this.props.lectureData.map()
     }
     render(){
         const { navigate } = this.props.navigation;
     	const listBody = () =>{
     		return(
 			    this.props.lectureData.map((lecture, i) => {
-                    if(lecture != undefined){
-                        let date = new Date(lecture.date);
+                    let expiryDate = new Date();
+                    let lectureDate = new Date(lecture.date);
+                    expiryDate.setDate(expiryDate.getDate() - 10);
+                    console.log(expiryDate, lectureDate)
+                    if(lecture != undefined && lectureDate >= expiryDate){
     					return (<ListItem key={i} title={
                             <View style={{flexDirection: 'row'}}>
-                                <Thumbnail url={'https://www.youtube.com/watch?v=' + lecture.link.replace('https://www.youtube.com/embed/', '')}
-                                    style={{width: 70, height: 50}}/>
+                                <Icon name="tv" size={30} color="black" style={{padding: 10}} />
                                 <View style={{flexDirection: 'column', marginLeft: 10}}>
-                                    <Text style={{fontSize: 18, fontWeight: 'bold'}}>{lecture.name}</Text>
-                                    <Text style={{fontSize: 15}}>{date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate()}</Text>
+                                    <Text style={{fontSize: 20}}>{lecture.name}</Text>
+                                    <Text style={{fontSize: 15}}>{'등록일: ' + lectureDate.getFullYear() + '-' + lectureDate.getMonth() + '-' + lectureDate.getDate()}</Text>
                                 </View>
                             </View>
-                        } onPress={() => this.displayLecture(i)} 
+                        }
                         containerStyle={{padding: 0, height: 70}} />);
                     }
 				})
@@ -111,4 +109,4 @@ const styles = {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LectureList);
+export default connect(mapStateToProps, mapDispatchToProps)(Notification);
