@@ -36,15 +36,19 @@ class Header extends React.Component {
         this.dataChange = this.dataChange.bind(this);
         this.findClassById = this.findClassById.bind(this);
     }
-    componentDidMount(){        
-        this.props.loginStatus().then(()=>{
-            console.log(this.props.userinfo)
-            if(this.props.userinfo != undefined){
-                let userInfo = Object.assign({}, this.props.userInfo.user);
-                userInfo.role = this.props.userInfo.role;
-                this.setState({userInfo: userInfo});
-            }
-        })
+    componentDidMount(){
+        if(this.props.loginStatus() == undefined){
+            throwError(true, '', {code: 401}, undefined);      
+        }
+        else
+            this.props.loginStatus().then(()=>{
+                console.log(this.props.userinfo)
+                if(this.props.userinfo != undefined){
+                    let userInfo = Object.assign({}, this.props.userInfo.user);
+                    userInfo.role = this.props.userInfo.role;
+                    this.setState({userInfo: userInfo});
+                }
+            })
     }
     handlePopover(event){
         event.preventDefault();

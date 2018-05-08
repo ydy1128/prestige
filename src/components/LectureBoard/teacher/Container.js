@@ -170,11 +170,13 @@ var container = (Present) =>{
 	    		currObj: this.state.currObj
 	    	};
 	    	let cls = this.getClassById(chosenRequest.value);
-
+	    	if(cls == undefined || cls == ''){
+	    		throwError(false, '', {code: 400}, '수업을 선택해주세요');
+	    		return '';
+	    	}
 	    	for(let i = 0; i < cls.students.length; i++){
 	    		nextState.currObj.accomplishments.push({_id: cls.students[i], accomplishments: 0, startTime: '', endTime: ''});
 	    	}
-	    	console.log(nextState.currObj.accomplishments)
 	    	nextState.currObj.class = chosenRequest.value;
 	    	this.setState(nextState);
 	    }
@@ -205,6 +207,7 @@ var container = (Present) =>{
 	    			this.closeEditMode();
 	    		}
 	    		else{
+	    			console.log(this.props.lecturePostStatus)
                     return throwError(false, '강의', this.props.lecturePostStatus.error, '');
 	    		}	    		
 	    	});

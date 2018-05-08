@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import session from 'express-session';
+
 import api from './routes';
 
 //===============EXPRESS SERVER SETUP===============
@@ -49,12 +50,23 @@ db.once('open', () => {
 
 mongoose.connect('mongodb://localhost/prestige', { useMongoClient: true });
 
+//===============Session Store Setup===============
+const MongoStore = require('connect-mongo')(session);
+
+
 //MongoDB Session
 app.use(session({
     secret: 'Prestige$1$234', //Change it to Env var later
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    store: new MongoStore({
+                    mongooseConnection: db,
+                    ttl: 30 * 24 * 60 * 60 // create new session every 30 days
+                })
 }));
+console.log('Session Storage Created');
+
+
 
 //===============API ROUTING===============
 app.use('/api', api);

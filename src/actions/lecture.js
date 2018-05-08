@@ -26,7 +26,7 @@ export function lecturePostRequest(contents) {
             dispatch(lecturePostSuccess(response.data.lecture));
         }).catch((error) => {
             if(error.response == undefined) console.error(error);
-            dispatch(lecturePostFailure(error.response.data.code));
+            dispatch(lecturePostFailure(error.response.data));
         });
     };
 }
@@ -98,7 +98,7 @@ export function lectureEditRequest(index, contents) {
         }).catch((error) => {
             if(error.response == undefined) console.error(error);
 
-            dispatch(lectureEditFailure(error.response.data.code));
+            dispatch(lectureEditFailure(error.response.data));
         });
     };
 }

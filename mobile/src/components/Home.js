@@ -37,7 +37,7 @@ class Home extends Component<{}> {
 	}
   static navigationOptions  = ({ navigation }) => {
     let params = navigation.state.params;
-    // if(!params.title == undefined) navOptions.headerTitle = params.title;
+    navOptions.headerTitle = 'Prestige';
     // if(!params.right == undefined) navOptions.headerRight = params.right;
     // if(!params.left == undefined) navOptions.headerLeft = params.left;
     return navOptions;
@@ -169,7 +169,7 @@ class Home extends Component<{}> {
                 <Text style={styles.mainButtonText}>강의게시판</Text>
               </View>
             </TouchableHighlight>
-            <TouchableHighlight style={{flex: 1, backgroundColor: '#ef5350'}} onPress={()=>navigate('Account', {right: (<View></View>)})} underlayColor="#d32f2f">
+            <TouchableHighlight style={{flex: 1, backgroundColor: '#ef5350'}} onPress={()=>navigate('Account', {title: 'Prestige', right: (<View></View>)})} underlayColor="#d32f2f">
               <View style={styles.mainButtons}>
                 <Icon name="user-circle-o" size={45} color="#FFFFFF" />
                 <Text style={styles.mainButtonText}>계정관리</Text>
