@@ -7,6 +7,8 @@ import ClassList from './ClassList';
 import ClassDialog from './ClassDialog';
 import BoardHeader from 'components/commons/BoardHeader';
 import DeleteDialog from './DeleteDialog';
+import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest } from 'actions/makeclass';
+import { lectureEditRequest } from 'actions/lecture';
 
 class ClassBoard extends React.Component{
 	constructor(props){
@@ -82,6 +84,8 @@ class ClassBoard extends React.Component{
         this.blurStudentSearchInput = this.blurStudentSearchInput.bind(this);
         this.onStudentSearchChange = this.onStudentSearchChange.bind(this);
 
+        this.handleClassPost = this.handleClassPost.bind(this);
+        this.handleClassRemove = this.handleClassRemove.bind(this);
 	}
     //Dialog Mode and Open state
     toggleDialog(setOpen){
@@ -178,9 +182,11 @@ class ClassBoard extends React.Component{
         return value;
     }
     onCellClick(type, rowNumber, columnId){
+        console.log(type, rowNumber)
         let nextState = {};
         let clicked = [...this.state[type]];
         let index = clicked.indexOf(rowNumber);
+        console.log(index)
         if(index == -1)
             clicked.push(rowNumber);
         else
@@ -295,10 +301,25 @@ class ClassBoard extends React.Component{
         }
         return daystring;
     }
+    handleClassPost(contents){
+        return this.props.classPostRequest(contents).then(() => {
+            if(this.props.classPostStatus.status === "SUCCESS") {
+                Materialize.toast('수업이 개설 되었습니다!', 2000);
+                return true;
+            }
+            else {
+                let errorMessage = {
+                    'Empty contents.':'모든 정보를 채워주세요',
+                    'Class name already exists.':'존재하는 수업 이름입니다'
+                };
+                return throwError(false, '수업', this.props.classPostStatus.error, errorMessage[this.props.classPostStatus.error.message]);
+            }
+        });
+    }
     handlePost(){
         let contents = Object.assign({}, this.state.editClass);
         contents.days = this.processDays(this.state.editClass.days);
-        this.props.onClassPost(contents).then((success) =>{
+        this.handleClassPost(contents).then((success) =>{
             if(success) this.closeDialog();
         })
     }
@@ -306,31 +327,30 @@ class ClassBoard extends React.Component{
         let contents = Object.assign({}, this.state.editClass);
         contents.days = this.processDays(this.state.editClass.days);
         let classindex = this.props.data.findIndex(x => x._id == contents._id);
-        let props = this.props;
-        this.state.selectedStudents.map(function(obj, i){
-            let index = props.studentsData.findIndex(x => x._id==obj._id);
-            if(props.studentsData[index].class != obj.class){
-                props.onStudentEdit(obj, index, true);
+        this.state.selectedStudents.map((obj, i) => {
+            let index = this.props.studentsData.findIndex(x => x._id==obj._id);
+            if(this.props.studentsData[index].class != obj.class){
+                this.props.onStudentEdit(obj, index, true);
                 contents.students.push(obj._id);
-                props.lectureData.map((lec, j) => {
+                this.props.lectureData.map((lec, j) => {
                     if(lec.class == contents._id){
                         let accs = [...lec.accomplishments];
                         if(!lec.accomplishments.includes(obj._id)){
                             accs.push({_id: obj._id, accomplishments: 0, startTime: '', endTime: ''})
                         }
                         lec.accomplishments = accs;
-                        props.onLectureEdit(j, lec);
+                        this.props.lectureEditRequest(j, lec);
                     }
                 })
             }
         });
-        this.state.allStudents.map(function(obj, i){
-            let index = props.studentsData.findIndex(x => x._id==obj._id);
+        this.state.allStudents.map((obj, i) =>{
+            let index = this.props.studentsData.findIndex(x => x._id==obj._id);
             let indexInClass = contents.students.findIndex(x => x == obj._id);
-            if(props.studentsData[index].class != obj.class){
-                props.onStudentEdit(obj, index, true);
+            if(this.props.studentsData[index].class != obj.class){
+                this.props.onStudentEdit(obj, index, true);
                 contents.students.splice(indexInClass, 1);
-                props.lectureData.map((lec, j) => {
+                this.props.lectureData.map((lec, j) => {
                     if(lec.class == contents._id){
                         let accs = [...lec.accomplishments];
                         lec.accomplishments.map((acc, k) => {
@@ -338,7 +358,7 @@ class ClassBoard extends React.Component{
                                 accs.splice(k, 1);
                         })
                         lec.accomplishments = accs;
-                        props.onLectureEdit(j, lec);
+                        this.props.lectureEditRequest(j, lec);
                     }
                 })
             }
@@ -348,23 +368,32 @@ class ClassBoard extends React.Component{
         })
     }
     handleRemove(){
-        let props = this.props;
         let clicked = [...this.state.clicked];
         let student_ids = [];
-        this.state.clicked.map(function(index, i){
-            student_ids = [...student_ids, ...props.data[index].students];
-            props.onRemove(props.data[index]._id, index);
+        this.state.clicked.map((index, i) => {
+            student_ids = [...student_ids, ...this.props.data[index].students];
+            this.handleClassRemove(this.props.data[index]._id, index);
         });
         for (let i = 0; i < student_ids.length; i++){
             let std_idx = this.props.studentsData.findIndex(x => x._id == student_ids[i]);
             let std_obj = this.props.studentsData[std_idx]
             std_obj.class = '';
-            props.onStudentEdit(std_obj, std_idx, true);
+            this.props.onStudentEdit(std_obj, std_idx, true);
         }
         this.setState({
             clicked: [],
             remove_active: true
         })
+    }
+    handleClassRemove(id, index){
+        this.props.classRemoveRequest(id, index).then(() => {
+            if(this.props.classRemoveStatus.status==="SUCCESS") {
+                Materialize.toast('수업이 삭제 되었습니다!', 2000);
+                return true;
+            } else {
+                return throwError(false, '수업', this.props.classRemoveStatus.error, '');
+            }
+        });
     }
     focusSearchInput(){
         this.setState({searchOpen: true});
@@ -491,13 +520,36 @@ class ClassBoard extends React.Component{
 ClassBoard.propTypes = {
     data: React.PropTypes.array,
     currentUser: React.PropTypes.string,
-    onRemove: React.PropTypes.func,
 };
 
 ClassBoard.defaultProps = {
     data: [],
     currentUser: '',
-    onRemove: (id, index) => { console.error('remove function not defined'); }
 };
 
-export default ClassBoard;
+const mapDispatchToProps = (dispatch) => {
+    return {
+        classPostRequest: (contents) => {
+            return dispatch(classPostRequest(contents));
+        },
+        classRemoveRequest: (id, index) => {
+            return dispatch(classRemoveRequest(id, index));
+        },
+        lectureEditRequest: (index, contents) =>{
+            return dispatch(lectureEditRequest(index, contents));
+        }
+    }
+}
+
+const mapStateToProps = (state) => {
+    return {
+        data: state.makeclass.board.data,
+        studentsData: state.studentinfo.getStudents.data,
+        lectureData: state.lecture.board.data,
+
+        classPostStatus: state.makeclass.post,
+        classRemoveStatus: state.makeclass.removeClass,
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ClassBoard);

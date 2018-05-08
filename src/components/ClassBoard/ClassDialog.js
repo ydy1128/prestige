@@ -60,8 +60,10 @@ class ClassDialog extends React.Component{
 
         const mapToComponents = (data, type) => {
             return data.map((stdobj, i) => {
-                return(
-                    <TableRow key={stdobj._id} selected={this.props[type].includes(i)}>
+                // console.log('filtered'+type.replace('c', 'C').replace('ed', ''));
+                return( 
+                    <TableRow key={stdobj._id} selected={this.props.searchStart ? this.props[type.replace('clicked', 'filteredClick')].includes(i)
+                                        : this.props[type].includes(i)}>
                         <TableRowColumn>{stdobj.name}</TableRowColumn>
                         <TableRowColumn>{stdobj.school}</TableRowColumn>
                         <TableRowColumn>{stdobj.level}학년</TableRowColumn>
@@ -79,8 +81,8 @@ class ClassDialog extends React.Component{
                                 onChange={this.props.onSearchEngineChange } onFocus={this.props.focusSearchInput} onBlur={this.props.blurSearchInput} />
                     </div>
                     <div className="col s6">
-                        <Table style={styles.studentTable} height={'300px'} onCellClick={this.onCellClick.bind(this, 'clickedInAllStudents')} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={false}>
-                            <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
+                        <Table style={styles.studentTable} height={'300px'} onCellClick={this.onCellClick.bind(this, 'clickedInAllStudents')} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
+                            <TableHeader displaySelectAll={false} adjustForCheckbox={true} enableSelectAll={true}>
                                 <TableRow>
                                     <TableHeaderColumn colSpan="3" style={{textAlign: 'center'}}>
                                         전체 학생
@@ -107,8 +109,8 @@ class ClassDialog extends React.Component{
                         </Table>
                     </div>
                     <div className="col s6">
-                        <Table style={styles.studentTable} height={'300px'} onCellClick={this.onCellClick.bind(this, 'clickedInSelectedStudents')} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={false}>
-                            <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={true}>
+                        <Table style={styles.studentTable} height={'300px'} onCellClick={this.onCellClick.bind(this, 'clickedInSelectedStudents')} fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
+                            <TableHeader displaySelectAll={false} adjustForCheckbox={true} enableSelectAll={true}>
                                 <TableRow>
                                     <TableHeaderColumn colSpan="3" style={{textAlign: 'center'}}>
                                         반 학생

@@ -31,31 +31,23 @@ class Home extends React.Component {
         this.state = {
             view_type: getLoginData().role == 'teacher' ? 'TEACHER_DASHBOARD' : 'STUDENT_DASHBOARD'
         }
-        this.handleClassPost = this.handleClassPost.bind(this);
         this.handleClassEdit = this.handleClassEdit.bind(this);
-        this.handleClassRemove = this.handleClassRemove.bind(this);
 
         this.handleStudentEdit = this.handleStudentEdit.bind(this);
-        this.handleStudentPwChange = this.handleStudentPwChange.bind(this);
-        this.handleStudentRemove = this.handleStudentRemove.bind(this);
 
         this.handleMenuClick = this.handleMenuClick.bind(this);
         this.setMenuActive = this.setMenuActive.bind(this);
     }
-    componentWillMount(){
+    componentDidMount(){
         if(getLoginData().role == 'teacher'){
             this.props.getStudentsInfoRequest().then(() =>{
-                console.log('studentsData', this.props.studentsData)
             });
             this.props.getMemoListRequest().then(() =>{
-                console.log('memoListData', this.props.memoListData)
             });
         }
         this.props.classBoardRequest().then(() => {
-            console.log('classData', this.props.classData)
         });
         this.props.lectureBoardRequest().then(() =>{
-            console.log('lectureData', this.props.lectureData)
         });
     }
     handleStudentEdit(stdobj, index, silent){
@@ -68,47 +60,7 @@ class Home extends React.Component {
             }
         })
     }
-    handleStudentPwChange(id, pw, check_pw){
-        return this.props.studentsInfoPwChangeRequest(id, pw, check_pw).then(() => {
-            if(this.props.studentPwChangeStatus.status==="SUCCESS") {
-                Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
-                return true;
-            } else {
-                let errorMessage = {
-                    'Bad password.':'비밀번호는 4자  이상이어야 합니다',
-                    'Passwords do not match.': '입력하신 비밀번호가 틀립니다'
-                };
-                return throwError(false, '학생', this.props.classEditStatus.error, errorMessage[this.props.status.error.message]);
-            }
-        });
-    }
-    handleStudentRemove(index, id, silent){
-        return this.props.studentsInfoRemoveRequest(id, index).then(() => {
-            if(!silent){
-                if(this.props.studentRemoveStatus.status==="SUCCESS") {
-                    Materialize.toast('학생 정보가 삭제 되었습니다!', 2000);
-                    return true;
-                } else {
-                    return throwError(false, '학생', this.props.classRemoveStatus.error, '');
-                }
-            }
-        });
-    }
-    handleClassPost(contents){
-        return this.props.classPostRequest(contents).then(() => {
-            if(this.props.classPostStatus.status === "SUCCESS") {
-                Materialize.toast('수업이 개설 되었습니다!', 2000);
-                return true;
-            }
-            else {
-                let errorMessage = {
-                    'Empty contents.':'모든 정보를 채워주세요',
-                    'Class name already exists.':'존재하는 수업 이름입니다'
-                };
-                return throwError(false, '수업', this.props.classPostStatus.error, errorMessage[this.props.classPostStatus.error.message]);
-            }
-        });
-    }
+
     handleClassEdit(id, index, contents){
         return this.props.classEditRequest(id, index, contents).then(() => {
                 if(this.props.classEditStatus.status==="SUCCESS") {
@@ -124,16 +76,6 @@ class Home extends React.Component {
                 }
             }
         );
-    }
-    handleClassRemove(id, index){
-        this.props.classRemoveRequest(id, index).then(() => {
-            if(this.props.classRemoveStatus.status==="SUCCESS") {
-                Materialize.toast('수업이 삭제 되었습니다!', 2000);
-                return true;
-            } else {
-                return throwError(false, '수업', this.props.classRemoveStatus.error, '');
-            }
-        });
     }
     handleMenuClick(e){
         console.log(e.target.parentNode.name)
@@ -151,31 +93,17 @@ class Home extends React.Component {
         switch(this.state.view_type){
             case 'TEACHER_DASHBOARD':
                 return (
-                            <TeacherDashBoard memoListData={this.props.memoListData} />
+                            <TeacherDashBoard />
                             /*<button onClick={this.loadCsvClassData}>load classes</button>
                             <button onClick={this.loadCsvStudentsData}>load students</button>*/
                         );
             case 'TEACHER_STUDENTBOARD':
-                return (<StudentBoard studentsData={this.props.studentsData}
-                                classData={this.props.classData}
-                                onStudentEdit={this.handleStudentEdit}
-                                onStudentPwChange={this.handleStudentPwChange}
-                                onStudentRemove={this.handleStudentRemove}
-                                onClassEdit={this.handleClassEdit}/>);
+                return (<StudentBoard onStudentEdit={this.handleStudentEdit} onClassEdit={this.handleClassEdit}/>);
             case 'TEACHER_CLASSBOARD':
-                return (<ClassBoard data={this.props.classData}
-                                onClassPost={this.handleClassPost}
-                                onClassEdit={this.handleClassEdit}
-                                studentsData={this.props.studentsData}
-                                lectureData={this.props.lectureData}
-                                onRemove={this.handleClassRemove}
-                                onStudentEdit={this.handleStudentEdit}
-                                onLectureEdit={this.props.lectureEditRequest}
+                return (<ClassBoard onClassEdit={this.handleClassEdit} onStudentEdit={this.handleStudentEdit}
                                 />);
             case 'TEACHER_LECTUREBOARD':
-                return (<TeacherLectureBoard classData={this.props.classData}
-                                studentsData={this.props.studentsData}
-                                lectureData={this.props.lectureData} />);
+                return (<TeacherLectureBoard />);
             case 'TEACHER_HOMEWORKBOARD':
                 return (<HomeworkBoard userType='teacher'/>);
             case 'STUDENT_HOMEWORKBOARD':
@@ -183,8 +111,7 @@ class Home extends React.Component {
             case 'STUDENT_DASHBOARD':
                 return (<StudentDashBoard />);
             case 'STUDENT_LECTUREBOARD':
-                return (<StudentLectureBoard classData={this.props.classData}
-                                lectureData={this.props.lectureData} />);
+                return (<StudentLectureBoard />);
             default:
                 return (<div>Get View Error</div>);
         }
@@ -243,19 +170,10 @@ const mapStateToProps = (state) => {
     return {
         isLoggedIn: state.authentication.status.isLoggedIn,
 
-        memoListData: state.memolist.get.data,
-
-        classData: state.makeclass.board.data,
-        classPostStatus: state.makeclass.post,
         classEditStatus: state.makeclass.editClass,
         classRemoveStatus: state.makeclass.removeClass,
 
-        studentsData: state.studentinfo.getStudents.data,
         studentEditStatus: state.studentinfo.editStudents,
-        studentPwChangeStatus: state.studentinfo.pwChange,
-        studentRemoveStatus: state.studentinfo.removeStudents,
-
-        lectureData: state.lecture.board.data,
     };
 };
 
@@ -270,29 +188,15 @@ const mapDispatchToProps = (dispatch) => {
         studentsInfoEditRequest: (id, index, obj) => {
             return dispatch(studentsInfoEditRequest(id, index, obj));
         },
-        studentsInfoPwChangeRequest: (id, pw, check_pw) => {
-            return dispatch(studentsInfoPwChangeRequest(id, pw, check_pw));
-        },
-        studentsInfoRemoveRequest: (id, index) => {
-            return dispatch(studentsInfoRemoveRequest(id, index));
-        },
+
         classBoardRequest: (isInitial, listType, id, username) => {
             return dispatch(classBoardRequest(isInitial, listType, id, username));
-        },
-        classPostRequest: (contents) => {
-            return dispatch(classPostRequest(contents));
         },
         classEditRequest: (id, index, contents) => {
             return dispatch(classEditRequest(id, index, contents));
         },
-        classRemoveRequest: (id, index) => {
-            return dispatch(classRemoveRequest(id, index));
-        },
         lectureBoardRequest: () => {
             return dispatch(lectureBoardRequest());
-        },
-        lectureEditRequest: (index, contents) =>{
-            return dispatch(lectureEditRequest(index, contents));
         }
     };
 };

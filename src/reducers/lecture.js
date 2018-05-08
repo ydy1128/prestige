@@ -32,7 +32,6 @@ export default function lecture(state, action) {
                 }
             });
         case types.LECTURE_POST_SUCCESS:
-        	console.log('actions: '+action.data)
             return update(state, {
                 post: {
                     status: { $set: 'SUCCESS' }
@@ -57,7 +56,6 @@ export default function lecture(state, action) {
                 }
             });
         case types.LECTURE_BOARD_SUCCESS: 
-        	console.log('SUCCESS');
             return update(state, {
                 board: {
                     status: { $set: 'SUCCESS' },

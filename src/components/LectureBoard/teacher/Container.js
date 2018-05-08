@@ -329,6 +329,11 @@ const mapStateToProps = (state) => {
     	lecturePostStatus: state.lecture.post,
     	lectureEditStatus: state.lecture.edit,
     	lectureRemoveStatus: state.lecture.remove,
+
+		lectureData: state.lecture.board.data,
+        studentsData: state.studentinfo.getStudents.data,
+        classData: state.makeclass.board.data,
+
     }
 }
 export default container;
