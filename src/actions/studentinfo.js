@@ -14,6 +14,7 @@ import {
     STUDENTS_IN_CLASS_GET,
     STUDENTS_IN_CLASS_GET_SUCCESS,
     STUDENTS_IN_CLASS_GET_FAILURE,
+    STUDENT_NOTI
 } from './ActionTypes';
 
 import axios from 'axios';
@@ -190,4 +191,11 @@ export function getStudentsInClassFailure(error) {
         type: STUDENTS_IN_CLASS_GET_FAILURE,
         error
     };
+}
+
+export function passNotificationInfo(noti){
+    return {
+        type: STUDENT_NOTI,
+        noti
+    }
 }

@@ -5,7 +5,11 @@ import FontAwesome from 'react-fontawesome';
 import axios from 'axios';
 
 import { classBoardRequest, classPostRequest, classEditRequest, classRemoveRequest } from 'actions/makeclass';
-import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest, studentsInfoPwChangeRequest } from 'actions/studentinfo';
+import { getStudentsInfoRequest, 
+        studentsInfoEditRequest,
+        studentsInfoRemoveRequest, 
+        studentsInfoPwChangeRequest,
+        passNotificationInfo } from 'actions/studentinfo';
 import { lectureBoardRequest, lectureEditRequest } from 'actions/lecture';
 import { getMemoListRequest } from 'actions/memolist';
 import { homeworkBoardRequest } from 'actions/homework';
@@ -45,12 +49,41 @@ class Home extends React.Component {
             });
             this.props.getMemoListRequest().then(() =>{
             });
+            this.props.lectureBoardRequest().then(() =>{
+            });
+            this.props.homeworkBoardRequest().then(() =>{
+            });
+        }
+        else{
+            this.props.lectureBoardRequest().then(() => {
+              this.props.homeworkBoardRequest().then(() => {
+                let fullArray = [...this.props.lectureData, ...this.props.homeworkData];
+                fullArray.sort((a, b) =>{
+                  let date = new Date();
+
+                  let aNum = a.dueDate == undefined ? a.date : a.dueDate;
+                  let aDate = a.dueDate == undefined ? new Date(aNum) : new Date(parseInt(aNum));
+                  if (a.dueDate == undefined) aDate = new Date(aDate.getDate() + 7);
+                  let bNum = b.dueDate == undefined ? b.date : b.dueDate;
+                  let bDate = b.dueDate == undefined ? new Date(bNum) : new Date(parseInt(bNum));
+                  if (b.dueDate == undefined) bDate = new Date(bDate.getDate() + 7);
+                  return aDate - bDate;
+                })
+                fullArray = fullArray.filter((obj) => {
+                  let isLecture = obj.dueDate == undefined;
+                  let date = isLecture ? new Date(obj.date) : new Date(parseInt(obj.dueDate));
+                  let expiryDate = new Date();
+                  let checkDate = isLecture ? new Date(obj.date) : new Date(parseInt(obj.dueDate));
+                  if(isLecture)
+                      checkDate.setDate(date.getDate() + 7);
+                  return checkDate >= expiryDate;
+
+                })
+                this.props.passNotificationInfo(fullArray);
+              })
+            })
         }
         this.props.classBoardRequest().then(() => {
-        });
-        this.props.lectureBoardRequest().then(() =>{
-        });
-        this.props.homeworkBoardRequest().then(() =>{
         });
     }
     handleStudentEdit(stdobj, index, silent){
@@ -177,6 +210,9 @@ const mapStateToProps = (state) => {
         classRemoveStatus: state.makeclass.removeClass,
 
         studentEditStatus: state.studentinfo.editStudents,
+
+        lectureData: state.lecture.board.data,
+        homeworkData: state.homework.board.data,
     };
 };
 
@@ -203,6 +239,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         homeworkBoardRequest: (id) => {
             return dispatch(homeworkBoardRequest(id));
+        },
+        passNotificationInfo: (noti) => {
+            return dispatch(passNotificationInfo(noti));
         },
     };
 };

@@ -22,6 +22,7 @@ import ipaddress from './ipconfig'
 
 /* Homework Board */
 export function homeworkBoardRequest(id) {
+    console.log('hwboardrequest')
     return (dispatch) => {
         dispatch(homeworkBoard());
         id = id || "";

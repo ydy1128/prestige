@@ -33,47 +33,23 @@ class NotiCard extends React.Component{
         }
     }
     componentDidMount(){
-		this.props.lectureBoardRequest().then(() =>{
-            this.props.homeworkBoardRequest().then(() =>{
-                let fullArray = [...this.props.lectureData, ...this.props.homeworkData]
-                console.log(this.props.lectureData, this.props.homeworkData)
-                let loadedArray = fullArray.slice(0, 20);
-
-                if(loadedArray != undefined && loadedArray.length > 0)
-                    this.setState({fullArray: fullArray, loadedArray: loadedArray, loadIndex: 20});
-
-                let tble = $('#cardText > div');
-                let win = $('#cardText');
-                let containerBottom = win.offset().top + win.height() + 1;
-                $('#cardText').scroll(() => {
-                    let tableBottom = tble.offset().top + tble.height();
-                    if(containerBottom > tableBottom && this.state.loadedArray.length > 19){
-                        console.log('hit')
-                        this.loadData();
-                    }
-                });
-            })
-
-		})
-
+        let tble = $('#cardText > div');
+        let win = $('#cardText');
+        let containerBottom = win.offset().top + win.height() + 1;
+        $('#cardText').scroll(() => {
+            let tableBottom = tble.offset().top + tble.height();
+            if(containerBottom > tableBottom && this.state.loadedArray.length > 19){
+                console.log('hit')
+                this.loadData();
+            }
+        });
     }
     componentWillReceiveProps(nextProps){
-    	console.log(nextProps.lectureData, nextProps.homeworkData)
-        if(nextProps.lectureData != undefined && nextProps.homeworkData != undefined && 
-            nextProps.lectureData.length > 0 && nextProps.homeworkData.length > 0){
-        	let fullArray = [...nextProps.lectureData, ...nextProps.homeworkData];
-            fullArray.sort((a, b) =>{
-                let date = new Date();
-
-                let aNum = a.dueDate == undefined ? a.date : a.dueDate;
-                let aDate = a.dueDate == undefined ? new Date(aNum) : new Date(parseInt(aNum));
-                if (a.dueDate == undefined) aDate = new Date(aDate.getDate() + 7);
-                let bNum = b.dueDate == undefined ? b.date : b.dueDate;
-                let bDate = b.dueDate == undefined ? new Date(bNum) : new Date(parseInt(bNum));
-                if (b.dueDate == undefined) bDate = new Date(bDate.getDate() + 7);
-                return aDate - bDate;
-            })
-            this.setState({loadIndex: 20, loadedArray: fullArray.slice(0, 20), fullArray: fullArray})
+        if(nextProps.notifications){
+            let fullArray = [...nextProps.notifications];
+            console.log(nextProps.notifications)
+            let loadedArray = fullArray.slice(0, 20);
+            this.setState({loadedArray, fullArray})
         }
     }
     loadData(){
@@ -93,8 +69,6 @@ class NotiCard extends React.Component{
                 let checkDate = isLecture ? new Date(obj.date) : new Date(parseInt(obj.dueDate));
                 if(isLecture)
                     checkDate.setDate(date.getDate() + 7);
-         
-                    
                 if(checkDate >= expiryDate){
             		return(
     		            <TableRow key={obj._id}>
@@ -164,6 +138,8 @@ const mapStateToProps = (state) => {
     return {
         lectureData: state.lecture.board.data,
         homeworkData: state.homework.board.data,
+        notifications: state.studentinfo.notifications.data,
+
     }
 }
 
