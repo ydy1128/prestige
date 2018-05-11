@@ -102,8 +102,9 @@ let Present = ({ props, state, style, functions }) => {
 	}
 	return(
 		<div className="Boards">
-            <BoardHeader title='대시보드' remove_active={remove_active} 
-                            plus_button={true} back_button={dialogMode == 0 ? false : true} remove_button={dialogMode == 0 ? true : false}
+            <BoardHeader title='대시보드' screenType={'DASHBOARD'}
+            				remove_active={remove_active} plus_button={true} reload_button={true}
+                            back_button={dialogMode == 0 ? false : true} remove_button={dialogMode == 0 ? true : false}
                             openDialog={openDialog.bind(undefined, dialogMode, undefined, false)} backAction={backAction} handleActive={getRemoveActive}
                             handleRemove={openDeleteDialog}
                             />

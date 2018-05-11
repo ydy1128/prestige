@@ -15,7 +15,7 @@ let Present = ({ props, state, style, functions }) => {
 	} = functions;
 	return(
 		<div className="Boards">
-            <BoardHeader title='대시보드' />
+            <BoardHeader title='대시보드'/>
             <div className="Board-contents row">
                 <div className="col m12 boardTable">
                 	<NotiCard />
