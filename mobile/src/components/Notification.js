@@ -32,35 +32,32 @@ class Notification extends Component<{}> {
         return navOptions;
     }
     componentDidMount(){
-        // if(this.props.lectureData.length == 0){
-            this.props.lectureBoardRequest().then(() => {
-
-            })
-        // }
-        // this.props.lectureData.map()
     }
     render(){
         const { navigate } = this.props.navigation;
     	const listBody = () =>{
     		return(
-			    this.props.lectureData.map((lecture, i) => {
+			    this.props.notifications.map((obj, i) =>{
+                    let isLecture = obj.dueDate == undefined;
+                    let date = isLecture ? new Date(obj.date) : new Date(parseInt(obj.dueDate));
                     let expiryDate = new Date();
-                    let lectureDate = new Date(lecture.date);
-                    expiryDate.setDate(expiryDate.getDate() - 10);
-                    console.log(expiryDate, lectureDate)
-                    if(lecture != undefined && lectureDate >= expiryDate){
-    					return (<ListItem key={i} title={
-                            <View style={{flexDirection: 'row'}}>
-                                <Icon name="tv" size={30} color="black" style={{padding: 10}} />
+                    let checkDate = isLecture ? new Date(obj.date) : new Date(parseInt(obj.dueDate));
+                    if(isLecture)
+                        checkDate.setDate(date.getDate() + 7);
+             
+                        
+                    if(checkDate >= expiryDate){
+                        return(
+                            <View style={{flexDirection: 'row'}} key={obj._id}>
+                                <Icon name={isLecture ? 'tv' : 'file-o'} size={30} color="black" style={{padding: 10}} />
                                 <View style={{flexDirection: 'column', marginLeft: 10}}>
-                                    <Text style={{fontSize: 20}}>{lecture.name}</Text>
-                                    <Text style={{fontSize: 15}}>{'등록일: ' + lectureDate.getFullYear() + '-' + lectureDate.getMonth() + '-' + lectureDate.getDate()}</Text>
+                                    <Text style={{fontSize: 20}}>{isLecture ? obj.name : obj.title}</Text>
+                                    <Text style={{fontSize: 15}}>{'등록일: ' + date.toLocaleDateString()}</Text>
                                 </View>
                             </View>
-                        }
-                        containerStyle={{padding: 0, height: 70}} />);
+                        );
                     }
-				})
+                })
     		)
     	}
     	return(
@@ -77,7 +74,7 @@ class Notification extends Component<{}> {
 
 const mapStateToProps = (state) => {
     return {
-        lectureData: state.lecture.board.data,
+        notifications: state.studentinfo.notifications.data,
     };
 };
 

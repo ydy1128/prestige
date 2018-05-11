@@ -1,5 +1,6 @@
 import * as types from '../actions/ActionTypes';
 import update from 'react-addons-update';
+import Toast from 'react-native-simple-toast';
 
 const initialState = {
     board: {
@@ -31,10 +32,7 @@ const initialState = {
     }
 };
 
-export default function makeclass(state, action) {
-
-    if(typeof state === "undefined")
-        state = initialState;
+export default function makeclass(state = initialState, action) {
     switch(action.type) {
         case types.HOMEWORK_BOARD:
             return update(state, {
@@ -132,9 +130,9 @@ export default function makeclass(state, action) {
                 remove:{
                     status: { $set: 'SUCCESS' }
                 },
-                board: {
-                    data: { $splice: [[action.index, 1]] }
-                }
+                // board: {
+                //     data: { $splice: [[action.index, 1]] }
+                // }
             });
         case types.HOMEWORK_REMOVE_FAILURE:
             return update(state, {

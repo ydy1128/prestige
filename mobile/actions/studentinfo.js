@@ -11,6 +11,7 @@ import {
     STUDENT_INFO_PW_CHANGE,
     STUDENT_INFO_PW_CHANGE_SUCCESS,
     STUDENT_INFO_PW_CHANGE_FAILURE,
+    STUDENT_NOTI,
 } from './ActionTypes';
 
 import axios from 'axios';
@@ -151,4 +152,11 @@ export function studentsInfoRemoveFailure(error) {
         type: STUDENT_INFO_REMOVE_FAILURE,
         error
     };
+}
+
+export function passNotificationInfo(noti){
+    return {
+        type: STUDENT_NOTI,
+        noti
+    }
 }

@@ -8,6 +8,7 @@ import { classBoardRequest, classPostRequest, classEditRequest, classRemoveReque
 import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest, studentsInfoPwChangeRequest } from 'actions/studentinfo';
 import { lectureBoardRequest, lectureEditRequest } from 'actions/lecture';
 import { getMemoListRequest } from 'actions/memolist';
+import { homeworkBoardRequest } from 'actions/homework';
 
 import { ClassBoard,
           TeacherDashBoard,
@@ -48,6 +49,8 @@ class Home extends React.Component {
         this.props.classBoardRequest().then(() => {
         });
         this.props.lectureBoardRequest().then(() =>{
+        });
+        this.props.homeworkBoardRequest().then(() =>{
         });
     }
     handleStudentEdit(stdobj, index, silent){
@@ -197,7 +200,10 @@ const mapDispatchToProps = (dispatch) => {
         },
         lectureBoardRequest: () => {
             return dispatch(lectureBoardRequest());
-        }
+        },
+        homeworkBoardRequest: (id) => {
+            return dispatch(homeworkBoardRequest(id));
+        },
     };
 };
 
