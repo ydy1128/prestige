@@ -226,6 +226,7 @@ const mapStateToProps = (state) => {
     return {
         status: state.authentication.update,
         classData: state.makeclass.board.data,
+        userinfo: state.authentication.status.currentUser,
     };
 };
 const mapDispatchToProps = (dispatch) => {

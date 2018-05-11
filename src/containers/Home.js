@@ -128,11 +128,7 @@ class Home extends React.Component {
     getView(){
         switch(this.state.view_type){
             case 'TEACHER_DASHBOARD':
-                return (
-                            <TeacherDashBoard />
-                            /*<button onClick={this.loadCsvClassData}>load classes</button>
-                            <button onClick={this.loadCsvStudentsData}>load students</button>*/
-                        );
+                return (<TeacherDashBoard />);
             case 'TEACHER_STUDENTBOARD':
                 return (<StudentBoard onStudentEdit={this.handleStudentEdit} onClassEdit={this.handleClassEdit}/>);
             case 'TEACHER_CLASSBOARD':

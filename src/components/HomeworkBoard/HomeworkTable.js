@@ -82,9 +82,9 @@ export default class TableExampleComplex extends Component {
             style={style.table}
           >
             <TableHeader
-              displaySelectAll={this.state.isStudent ? null : this.state.showCheckboxes}
+              displaySelectAll={false}
               adjustForCheckbox={this.state.isStudent ? null :this.state.showCheckboxes}
-              enableSelectAll={this.state.isStudent ? null :this.state.enableSelectAll}
+              enableSelectAll={false}
             >
               <TableRow>
                 {this.state.isStudent ? null : <TableHeaderColumn style={style.row.button}></TableHeaderColumn>}
