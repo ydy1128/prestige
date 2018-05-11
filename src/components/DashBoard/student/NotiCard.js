@@ -33,6 +33,12 @@ class NotiCard extends React.Component{
         }
     }
     componentDidMount(){
+        if(this.props.notifications){
+            let fullArray = [...this.props.notifications];
+            console.log(this.props.notifications)
+            let loadedArray = fullArray.slice(0, 20);
+            this.setState({loadedArray, fullArray})
+        }
         let tble = $('#cardText > div');
         let win = $('#cardText');
         let containerBottom = win.offset().top + win.height() + 1;
