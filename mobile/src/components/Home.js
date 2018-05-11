@@ -175,7 +175,7 @@ class Home extends Component<{}> {
 						style={styles.divider}
 						source={require('../../img/divider.png')}
 						/>
-					<TouchableHighlight onPress={()=>navigate('Register', {right: (<View></View>)})} style={styles.buttonRegister} underlayColor='#d6a50b'>
+					<TouchableHighlight onPress={()=>navigate('Register', {title: 'Prestige', right: (<View></View>)})} style={styles.buttonRegister} underlayColor='#d6a50b'>
 						<Text style={styles.buttonText}>회원가입</Text>
 					</TouchableHighlight>
 		    </View>
