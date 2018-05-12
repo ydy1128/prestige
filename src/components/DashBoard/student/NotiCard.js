@@ -21,61 +21,69 @@ import DatePicker from 'material-ui/DatePicker';
 
 import { getLoginData } from 'components/commons/SessionData';
 import { lectureBoardRequest } from 'actions/lecture';
+import { homeworkBoardRequest } from 'actions/homework';
 
 class NotiCard extends React.Component{
     constructor(props){
         super(props);
         this.state = {
             loadIndex: 0,
+            fullArray: [],
             loadedArray: [],
         }
     }
     componentDidMount(){
-		this.props.lectureBoardRequest().then(() =>{
-	        let loadedArray = this.props.lectureData.slice(0, 20);
-	        console.log(loadedArray)
-	        if(loadedArray != undefined && loadedArray.length > 0)
-		        this.setState({loadedArray: loadedArray, loadIndex: 20});
-
-	        let tble = $('#cardText > div');
-	        let win = $('#cardText');
-	        let containerBottom = win.offset().top + win.height() + 1;
-	        $('#cardText').scroll(() => {
-	            let tableBottom = tble.offset().top + tble.height();
-	            if(containerBottom > tableBottom && this.state.loadedArray.length > 19){
-	            	console.log('hit')
-	                this.loadData();
-	            }
-	        });
-		})
-
+        if(this.props.notifications){
+            let fullArray = [...this.props.notifications];
+            console.log(this.props.notifications)
+            let loadedArray = fullArray.slice(0, 20);
+            this.setState({loadedArray, fullArray})
+        }
+        let tble = $('#cardText > div');
+        let win = $('#cardText');
+        let containerBottom = win.offset().top + win.height() + 1;
+        $('#cardText').scroll(() => {
+            let tableBottom = tble.offset().top + tble.height();
+            if(containerBottom > tableBottom && this.state.loadedArray.length > 19){
+                console.log('hit')
+                this.loadData();
+            }
+        });
     }
     componentWillReceiveProps(nextProps){
-    	console.log(nextProps.lectureData, this.state.loadedArray)
-        if(nextProps.lectureData != undefined && nextProps.lectureData.length > 0){
-        	console.log('in')
-        	console.log(this.state.loadIndex, this.props.lectureData.slice(0, 20))
-            this.setState({loadIndex: 20, loadedArray: this.props.lectureData.slice(0, 20)})
+        if(nextProps.notifications){
+            let fullArray = [...nextProps.notifications];
+            console.log(nextProps.notifications)
+            let loadedArray = fullArray.slice(0, 20);
+            this.setState({loadedArray, fullArray})
         }
     }
     loadData(){
         let loadIndex = this.state.loadIndex;
-        let lastIndex = (loadIndex+10) > this.props.lectureData.length ? this.props.lectureData.length : loadIndex+10;
-        let loadedArray = [...this.state.loadedArray, ...this.props.lectureData.slice(loadIndex, lastIndex)];
-        loadIndex = (loadIndex+10) > this.props.lectureData.length ? this.props.lectureData.length : loadIndex += 10;
-        if(loadIndex - 1 < this.props.lectureData.length)
+        let lastIndex = (loadIndex+10) > this.state.fullArray.length ? this.state.fullArray.length : loadIndex+10;
+        let loadedArray = [...this.state.loadedArray, ...this.state.fullArray.slice(loadIndex, lastIndex)];
+        loadIndex = (loadIndex+10) > this.state.fullArray.length ? this.state.fullArray.length : loadIndex += 10;
+        if(loadIndex - 1 < this.state.fullArray.length)
             this.setState({loadIndex: loadIndex, loadedArray: loadedArray});
     }
     render(){
     	const tableBody = (data) =>{
     		return data.map((obj, i) =>{
-        		return(
-		            <TableRow key={obj._id}>
-		                <TableRowColumn>강의</TableRowColumn>
-		                <TableRowColumn>{obj.name}</TableRowColumn>
-		                <TableRowColumn><DatePicker id={'tp'+obj._id} value={new Date(obj.date)} textFieldStyle={styles.datePickerStyle} disabled={true} /></TableRowColumn>
-		            </TableRow>
-	            );
+                let isLecture = obj.dueDate == undefined;
+                let date = isLecture ? new Date(obj.date) : new Date(parseInt(obj.dueDate));
+                let expiryDate = new Date();
+                let checkDate = isLecture ? new Date(obj.date) : new Date(parseInt(obj.dueDate));
+                if(isLecture)
+                    checkDate.setDate(date.getDate() + 7);
+                if(checkDate >= expiryDate){
+            		return(
+    		            <TableRow key={obj._id}>
+    		                <TableRowColumn>{isLecture ? '강의' : '숙제'}</TableRowColumn>
+    		                <TableRowColumn>{isLecture ? obj.name : obj.title}</TableRowColumn>
+    		                <TableRowColumn>{date.toLocaleDateString()}</TableRowColumn>
+    		            </TableRow>
+    	            );
+                }
         	})
     	}
     	return(
@@ -126,6 +134,9 @@ const mapDispatchToProps = (dispatch) => {
 		lectureBoardRequest: () => {
             return dispatch(lectureBoardRequest());
         },
+        homeworkBoardRequest: (id) => {
+            return dispatch(homeworkBoardRequest(id));
+        },
     }
 }
 
@@ -133,6 +144,8 @@ const mapStateToProps = (state) => {
     return {
         lectureData: state.lecture.board.data,
         homeworkData: state.homework.board.data,
+        notifications: state.studentinfo.notifications.data,
+
     }
 }
 

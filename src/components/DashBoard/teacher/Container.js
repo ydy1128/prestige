@@ -377,6 +377,8 @@ const mapStateToProps = (state) => {
         memoGroupRemoveStatus: state.memogroup.remove,
         removeMemoGroupsByListStatus: state.memogroup.removelist,
 
+        memoListData: state.memolist.get.data,
+        classData: state.makeclass.board.data,
         memoGroupData: state.memogroup.get.data,
     }
 }

@@ -86,7 +86,7 @@ class LectureTable extends React.Component{
             <Table  style={styles.table} 
                     onCellClick={this.props.searchStart ? this.props.handleFilteredRowClick : this.props.handleRowClick} 
                     fixedHeader={true} fixedFooter={true} selectable={true} multiSelectable={true}>
-                <TableHeader displaySelectAll={true} adjustForCheckbox={true} enableSelectAll={false}>
+                <TableHeader displaySelectAll={false} adjustForCheckbox={true} enableSelectAll={false}>
                     { tableHeader }
                 </TableHeader>
                 <TableBody displayRowCheckbox={true} deselectOnClickaway={false} showRowHover={true} stripedRows={false}>

@@ -12,6 +12,9 @@ import {
     AUTH_GET_STATUS_SUCCESS,
     AUTH_GET_STATUS_FAILURE,
     AUTH_LOGOUT,
+    AUTH_UPDATE,
+    AUTH_UPDATE_SUCCESS,
+    AUTH_UPDATE_FAILURE,
     EXTEND_SESSION
 } from './ActionTypes';
 
@@ -133,9 +136,51 @@ export function getStatusFailure() {
     };
 }
 
+
+//update
+export function updateUserRequest(obj, url_ref) {
+    return (dispatch) => {
+        // inform Get Status API is starting
+        dispatch(updateUser());
+
+        let get_url = ipaddress + '/api/' + url_ref + '/updateinfo'
+
+        return axios.put(get_url, {obj})
+        .then((response) => {
+            // console.log(response.data.account)
+            dispatch(updateUserSuccess(response.data.account));
+        })
+        .catch((error) => {
+            dispatch(updateUserFailure(error.response.data));
+        });
+    };
+
+}
+
+export function updateUser() {
+    return {
+        type: AUTH_UPDATE
+    };
+}
+
+export function updateUserSuccess(user) {
+    return {
+        type: AUTH_UPDATE_SUCCESS,
+        user
+    };
+}
+
+export function updateUserFailure(error) {
+    return {
+        type: AUTH_UPDATE_FAILURE,
+        error: error
+    };
+}
+
+
 //Logout
 export function logoutRequest(url_ref) {
-    let post_url = '/api/' + url_ref + '/logout';
+    let post_url = ipaddress + '/api/' + url_ref + '/logout';
     return (dispatch) => {
         return axios.post(post_url)
         .then((response) => {

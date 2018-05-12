@@ -135,24 +135,33 @@ const updateUser = (req, res) =>{
         return throwerror(res, 401, 'User not logged in.');
     console.log(req.session.loginInfo.user._id)
     Student.findById(req.session.loginInfo.user._id , (err, account) => {
+        if(err) return throwerror(res, 409, 'DB error.');
+        if(!account) return throwerror(res, 409, 'DB error.');
+        console.log(account)
         if(req.body.obj.password != ''){
             if(req.body.obj.password.length < 4 || typeof req.body.obj.password !== "string")
                 return throwerror(res, 400, 'Bad password.');
             account.password = account.generateHash(req.body.obj.password);
         }
+        console.log(req.body.obj)
         for (let key in req.body.obj){
-            if(key != 'password' && account.hasOwnProperty(key)){
+            console.log(key, account[key], req.body.obj[key])
+            if(key != 'password' && account[key] != undefined){
                 if(req.body.obj[key] == undefined || req.body.obj[key] == '')
                     return throwerror(res, 400, 'Bad contents.');
+                console.log(key)
                 account[key] = req.body.obj[key];
             }
         }
+        console.log(account)
         account.save((err, account) => {
             if(err) return throwerror(res, 409, 'DB error.');
+            if(!account) return throwerror(res, 409, 'DB error.');
             // ALTER SESSION
             let session = req.session;
             account.password = '';
-            console.log(session)
+            console.log(account)
+            console.log(session.loginInfo)
             session.loginInfo.user = account;
             // RETURN SUCCESS
             return res.json({

@@ -7,6 +7,7 @@ import {
 	View,
 	Image,
 	TouchableHighlight,
+  TouchableOpacity,
   Linking,
   AsyncStorage
 } from 'react-native';
@@ -14,7 +15,10 @@ import Icon from '../../node_modules/react-native-vector-icons/dist/FontAwesome'
 import { connect } from 'react-redux';
 import Toast from 'react-native-simple-toast';
 
-import { loginRequest, getStatusRequest, extendSession } from '../../actions/authentication';
+import { loginRequest, getStatusRequest, extendSession, logoutRequest } from '../../actions/authentication';
+import { homeworkBoardRequest } from '../../actions/homework';
+import { lectureBoardRequest } from '../../actions/lecture';
+import { passNotificationInfo } from '../../actions/studentinfo'
 import navOptions from './navigator';
 class Home extends Component<{}> {
     constructor(props) {
@@ -34,7 +38,13 @@ class Home extends Component<{}> {
     this.onLogin = this.onLogin.bind(this);
     this.onOpenUrl = this.onOpenUrl.bind(this);
 	}
-  static navigationOptions = navOptions(undefined, undefined, undefined);
+  static navigationOptions  = ({ navigation }) => {
+    let params = navigation.state.params;
+    navOptions.headerTitle = 'Prestige';
+    // if(!params.right == undefined) navOptions.headerRight = params.right;
+    // if(!params.left == undefined) navOptions.headerLeft = params.left;
+    return navOptions;
+  }
   componentWillMount(){
     //add loading screen
     AsyncStorage.getItem('loginData').then((token) =>{
@@ -45,7 +55,6 @@ class Home extends Component<{}> {
           //success fail
           if(this.props.sessionStatus.valid){
             this.props.extendSession(loginData.user);
-            Toast.show(''+JSON.stringify(loginData.user))
             this.setState({loggedIn: true, loginData: loginData.user});
           }
 
@@ -59,6 +68,35 @@ class Home extends Component<{}> {
       Toast.show(''+error);
     })
     .done();
+  }
+  componentDidMount(){
+    this.props.lectureBoardRequest().then(() => {
+      this.props.homeworkBoardRequest().then(() => {
+        let fullArray = [...this.props.lectureData, ...this.props.homeworkData];
+        fullArray.sort((a, b) =>{
+          let date = new Date();
+
+          let aNum = a.dueDate == undefined ? a.date : a.dueDate;
+          let aDate = a.dueDate == undefined ? new Date(aNum) : new Date(parseInt(aNum));
+          if (a.dueDate == undefined) aDate = new Date(aDate.getDate() + 7);
+          let bNum = b.dueDate == undefined ? b.date : b.dueDate;
+          let bDate = b.dueDate == undefined ? new Date(bNum) : new Date(parseInt(bNum));
+          if (b.dueDate == undefined) bDate = new Date(bDate.getDate() + 7);
+          return aDate - bDate;
+        })
+        fullArray = fullArray.filter((obj) => {
+          let isLecture = obj.dueDate == undefined;
+          let date = isLecture ? new Date(obj.date) : new Date(parseInt(obj.dueDate));
+          let expiryDate = new Date();
+          let checkDate = isLecture ? new Date(obj.date) : new Date(parseInt(obj.dueDate));
+          if(isLecture)
+              checkDate.setDate(date.getDate() + 7);
+          return checkDate >= expiryDate;
+
+        })
+        this.props.passNotificationInfo(fullArray);
+      })
+    })
   }
 	onLogin(){
 		this.props.loginRequest(this.state.username, this.state.password).then(()=>{
@@ -137,7 +175,7 @@ class Home extends Component<{}> {
 						style={styles.divider}
 						source={require('../../img/divider.png')}
 						/>
-					<TouchableHighlight onPress={()=>navigate('Register')} style={styles.buttonRegister} underlayColor='#d6a50b'>
+					<TouchableHighlight onPress={()=>navigate('Register', {title: 'Prestige', right: (<View></View>)})} style={styles.buttonRegister} underlayColor='#d6a50b'>
 						<Text style={styles.buttonText}>회원가입</Text>
 					</TouchableHighlight>
 		    </View>
@@ -149,19 +187,27 @@ class Home extends Component<{}> {
             <Text style={{color: '#f8c709', fontSize: 20}}>안녕하세요,</Text>
             <Text style={{color: '#f8c709', fontSize: 30}}>{this.state.loginData.name} 학생</Text>
           </View>
-          <View style={styles.introAlertDiv}>
+          <TouchableOpacity style={styles.introAlertDiv} onPress={()=>navigate('Notification', {title: '알림', right: (<View></View>)})} >
             <Icon name="envelope" size={65} color="#f8c709" />
-          </View>
+            { this.props.notifications == undefined || this.props.notifications.length == 0 ? null :
+              <Icon name="circle" size={38} color="#dd0000" style={{position: 'absolute', right: 35, top: 20}} />
+            }
+            { this.props.notifications == undefined || this.props.notifications.length == 0 ? null :
+              <Text style={{position: 'absolute', color: 'white', fontSize: 19, fontWeight: 'bold', right: 46, top: 25}}>
+                {''+this.props.notifications.length}
+              </Text>
+            }
+          </TouchableOpacity>
         </View>
         <View style={styles.mainButtonsDiv}>
           <View style={styles.mainButtonsCol}>
-            <TouchableHighlight style={{flex: 1, backgroundColor: '#03a9f4'}} onPress={()=>navigate('LectureList')} underlayColor="#0288d1">
+            <TouchableHighlight style={{flex: 1, backgroundColor: '#03a9f4'}} onPress={()=>navigate('LectureList', {title: '강의게시판', right: (<View></View>)})} underlayColor="#0288d1">
               <View style={styles.mainButtons}>
                 <Icon name="tv" size={45} color="#FFFFFF" />
                 <Text style={styles.mainButtonText}>강의게시판</Text>
               </View>
             </TouchableHighlight>
-            <TouchableHighlight style={{flex: 1, backgroundColor: '#ef5350'}} onPress={()=>navigate('Account')} underlayColor="#d32f2f">
+            <TouchableHighlight style={{flex: 1, backgroundColor: '#ef5350'}} onPress={()=>navigate('Account', {title: 'Prestige', right: (<View></View>)})} underlayColor="#d32f2f">
               <View style={styles.mainButtons}>
                 <Icon name="user-circle-o" size={45} color="#FFFFFF" />
                 <Text style={styles.mainButtonText}>계정관리</Text>
@@ -175,10 +221,16 @@ class Home extends Component<{}> {
                 <Text style={styles.mainButtonText}>숙제게시판</Text>
               </View>
             </TouchableHighlight>
-            <TouchableHighlight style={{flex: 1, backgroundColor: '#ab47bc'}} onPress={()=>{}} underlayColor="#8e24aa">
+            <TouchableHighlight style={{flex: 1, backgroundColor: '#ab47bc'}} onPress={()=>{
+                AsyncStorage.removeItem('loginData').then(() =>{
+                  this.props.logoutRequest().then(() => {
+                    this.setState({loggedIn: false, loginData: {id: '',username: '',role: ''}})
+                  })
+                })
+              }} underlayColor="#8e24aa">
               <View style={styles.mainButtons}>
-                <Icon name="gear" size={45} color="#FFFFFF" />
-                <Text style={styles.mainButtonText}>설정</Text>
+                <Icon name="sign-out" size={45} color="#FFFFFF" />
+                <Text style={styles.mainButtonText}>로그아웃</Text>
               </View>
 
             </TouchableHighlight>
@@ -325,7 +377,10 @@ const mapStateToProps = (state) => {
     return {
         status: state.authentication.login.status,
         sessionStatus: state.authentication.status,
-        user: state.authentication.status.currentUser
+        user: state.authentication.status.currentUser,
+        lectureData: state.lecture.board.data,
+        homeworkData: state.homework.board.data,
+        notifications: state.studentinfo.notifications.data,
     };
 };
 
@@ -339,6 +394,18 @@ const mapDispatchToProps = (dispatch) => {
         },
         extendSession: (sessionData) => { 
             return dispatch(extendSession(sessionData)); 
+        },
+        logoutRequest: () => { 
+            return dispatch(logoutRequest('student')); 
+        },
+        lectureBoardRequest: () => {
+          return dispatch(lectureBoardRequest());
+        },
+        homeworkBoardRequest: (id) => {
+          return dispatch(homeworkBoardRequest(id));
+        },
+        passNotificationInfo: (noti) =>{
+          return dispatch(passNotificationInfo(noti));
         }
     };
 };

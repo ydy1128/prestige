@@ -10,6 +10,9 @@ import StudentDialog from './StudentDialog';
 import StudentTable from './StudentTable';
 import DeleteDialog from './DeleteDialog';
 
+import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest, studentsInfoPwChangeRequest } from 'actions/studentinfo';
+import { lectureEditRequest } from 'actions/lecture';
+
 class StudentBoard extends React.Component{
 	constructor(props){
 		super(props);
@@ -41,6 +44,7 @@ class StudentBoard extends React.Component{
         this.handlePassOpen = this.handlePassOpen.bind(this);
         //handle student data in modal
         this.handleChange = this.handleChange.bind(this);
+        this.handleStudentPwChange = this.handleStudentPwChange.bind(this);
         this.handlePwChange = this.handlePwChange.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
         this.handleClose = this.handleClose.bind(this);
@@ -84,14 +88,32 @@ class StudentBoard extends React.Component{
     handleEdit(){
         this.props.onStudentEdit(this.state.editstd, this.state.editidx, false).then(() => {
             if(studentEditStatus.status != "SUCCESS"){
+                Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
                 this.handleClose();
+            }
+            else{
+                return throwError(false, '학생', this.props.classEditStatus.error);
             }
         });
         
     }
+    handleStudentPwChange(id, pw, check_pw){
+        return this.props.studentsInfoPwChangeRequest(id, pw, check_pw).then(() => {
+            if(this.props.studentPwChangeStatus.status==="SUCCESS") {
+                Materialize.toast('학생 정보가 수정 되었습니다!', 2000);
+                this.handleClose();
+                return true;
+            } else {
+                let errorMessage = {
+                    'Bad password.':'비밀번호는 4자  이상이어야 합니다',
+                    'Passwords do not match.': '입력하신 비밀번호가 틀립니다'
+                };
+                return throwError(false, '학생', this.props.classEditStatus.error, errorMessage[this.props.status.error.message]);
+            }
+        });
+    }
     handlePwChange(){
-        this.props.onStudentPwChange(this.state.editstd._id, this.state.editstd.password, this.state.editstd.check_password);
-        this.handleClose();
+        this.handleStudentPwChange(this.state.editstd._id, this.state.editstd.password, this.state.editstd.check_password);
     }
     handleClose(){
         this.setState({
@@ -102,10 +124,23 @@ class StudentBoard extends React.Component{
             remove_active: false
         })
     }
+    handleStudentRemove(index, id, silent){
+        return this.props.studentsInfoRemoveRequest(id, index).then(() => {
+            if(!silent){
+                if(this.props.studentRemoveStatus.status==="SUCCESS") {
+                    Materialize.toast('학생 정보가 삭제 되었습니다!', 2000);
+                    return true;
+                } else {
+                    return throwError(false, '학생', this.props.classRemoveStatus.error, '');
+                }
+            }
+        });
+    }
     handleRemove(){
         let clicked = [...this.state.clicked];
         let deleting_stds = [];
         let editting_classes = {};
+        //map corresponding classes for deleting students
         for (let i = 0; i < clicked.length; i++){
             let stdidx = clicked[i];
             let std_id = this.props.studentsData[stdidx]._id;
@@ -118,14 +153,32 @@ class StudentBoard extends React.Component{
             }
             deleting_stds.push({index: stdidx, id: std_id});
         }
+        // delete students from accomplishments list of lectures
+        this.props.lectureData.map((lec, i) => {
+            deleting_stds.map((obj, j) => {
+                let std = this.props.studentsData[obj.index];
+                if(lec.class == std.class){
+                    let accs = [...lec.accomplishments];
+                    lec.accomplishments.map((acc, k) => {
+                        if(acc._id == std._id)
+                            accs.splice(k, 1);
+                    })
+                    lec.accomplishments = accs;
+                    this.props.lectureEditRequest(i, lec);
+                }
+            })
+        })
+        // delete students
         for(let i = 0; i < deleting_stds.length; i++){
-            this.props.onStudentRemove(deleting_stds[i].index, deleting_stds[i].id).then(()=>{ console.log(this.props.studentsData)});
+            this.handleStudentRemove(deleting_stds[i].index, deleting_stds[i].id).then(()=>{ console.log(this.props.studentsData)});
             for(let j = 0; j < deleting_stds.length; j++){
                 deleting_stds[j].index -= 1;
             }
         }
+        // delete students in classes
         for (let key in editting_classes) {
-            let classidx = this.props.classData.findIndex(x => { return x.name == key; });
+            let classidx = this.props.classData.findIndex(x => { return x._id == key; });
+            console.log(classidx)
             let class_obj = this.props.classData[classidx];
             for(let i = 0; i < editting_classes[key].length; i++){
                 console.log(class_obj);
@@ -220,7 +273,8 @@ class StudentBoard extends React.Component{
     render(){
         return(
             <div className="Boards">
-                <BoardHeader title='학생관리' remove_active={this.state.remove_active} handleRemove={this.toggleDeleteDialog.bind(undefined, true)}
+                <BoardHeader title='학생관리'  screenType={'STUDENTBOARD'} reload_button={true} 
+                            remove_active={this.state.remove_active} handleRemove={this.toggleDeleteDialog.bind(undefined, true)}
                             plus_button={false} remove_button={true} search_engine={true} searchOpen={this.state.searchOpen}
                             openDialog={null} handleActive={this.handleActive}
                             onSearchEngineChange={this.onSearchEngineChange} 
@@ -248,19 +302,27 @@ class StudentBoard extends React.Component{
 const mapStateToProps = (state) => {
     return {
         studentEditStatus: state.studentinfo.editStudents,
+        studentRemoveStatus: state.studentinfo.removeStudents,
+        studentPwChangeStatus: state.studentinfo.pwChange,
+
+        studentsData: state.studentinfo.getStudents.data,
+        classData: state.makeclass.board.data,
+        lectureData: state.lecture.board.data,
 
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        
+        studentsInfoRemoveRequest: (id, index) => {
+            return dispatch(studentsInfoRemoveRequest(id, index));
+        },
+        lectureEditRequest: (index, contents) => {
+            return dispatch(lectureEditRequest(index, contents));
+        },
+        studentsInfoPwChangeRequest: (id, pw, check_pw) => {
+            return dispatch(studentsInfoPwChangeRequest(id, pw, check_pw));
+        },
     }
-}
-StudentBoard.propTypes = {
-    studentsData: React.PropTypes.array,
-}
-StudentBoard.defaultProps = {
-    studentsData: [],
 }
 export default connect(mapStateToProps, mapDispatchToProps)(StudentBoard);

@@ -9,16 +9,18 @@ import Register from './src/components/Register';
 import LectureList from './src/components/LectureList';
 import Lecture from './src/components/Lecture';
 import Account from './src/components/Account';
+import Notification from './src/components/Notification';
 
 import reducers from './reducers'
 import thunk from 'redux-thunk';
 
 const Navigation = StackNavigator({
-  Home: { screen: Home },
+  Home: { screen: Home, params: {title: 'Prestige'} },
   Register: { screen: Register },
   LectureList: { screen: LectureList},
   Lecture: { screen: Lecture},
   Account: { screen: Account},
+  Notification: { screen: Notification},
 })
 
 const store = createStore(reducers, applyMiddleware(thunk));

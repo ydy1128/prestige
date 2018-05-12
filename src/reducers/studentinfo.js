@@ -21,6 +21,9 @@ const initialState = {
     getInClassStudents: {
         status: 'INIT',
         data: []
+    },
+    notifications: {
+        date: []
     }
 }
 
@@ -139,6 +142,12 @@ export default function studentinfo(state, action) {
             return update(state, {
                 getInClassStudents: {
                     status: { $set: 'FAILURE' }
+                }
+            })
+        case types.STUDENT_NOTI:
+            return update(state, {
+                notifications: { 
+                    data: { $set: action.noti }
                 }
             })
         default:
