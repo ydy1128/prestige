@@ -350,8 +350,7 @@ td div hr, .studyTime hr{
 	display: none;
 }
 
-//////////////////////draft-js////////////////////////
-.public-DraftEditorPlaceholder-root {
-    position: absolute;
-    color: #cccccc;
+
+div > div > label {
+	font-size: 1.4rem !important;
 }
