@@ -18,6 +18,9 @@ const initialState = {
         status: 'INIT',
         error: -1,
     },
+    notifications: {
+        date: []
+    }
 }
 
 
@@ -117,6 +120,12 @@ export default function studentinfo(state, action) {
                     error: { $set: action.error }
                 }
             });
+        case types.STUDENT_NOTI:
+            return update(state, {
+                notifications: { 
+                    data: { $set: action.noti }
+                }
+            })
         default:
             return state;
     }

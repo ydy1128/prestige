@@ -117,14 +117,25 @@ class EditHomeworkBoard extends React.Component {
           disabled={this.state.isStudent ? true : false}
           underlineShow={this.state.isStudent ? false : true}
         />
-        <SelectField
-          floatingLabelText={'수업'}
-          value={this.state.className}
-          onChange={this.state.isStudent ? null : this.changeClass.bind(this)}
-        >
-          {this.props.classData.map(classItem => (
-            <MenuItem value={classItem.name} primaryText={classItem.name} />))}
-        </SelectField>
+        {this.state.isStudent ?
+          <TextField
+            inputStyle={style.titleStyle}
+            hintText="수업"
+            floatingLabelText="수업"
+            value={this.state.className}
+            disabled={true}
+            underlineShow={false}
+          />
+          :
+          <SelectField
+            floatingLabelText={'수업'}
+            value={this.state.className}
+            onChange={this.state.isStudent ? null : this.changeClass.bind(this)}
+          >
+            {this.props.classData.map(classItem => (
+              <MenuItem value={classItem.name} primaryText={classItem.name} />))}
+          </SelectField>
+      }
 
         <div style={style.datePickerContainerStyle}>
           <DatePicker id="due-date"

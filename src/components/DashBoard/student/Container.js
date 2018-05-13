@@ -48,8 +48,6 @@ const mapDispatchToProps = (dispatch) => {
 
 const mapStateToProps = (state) => {
     return {
-        classData: state.makeclass.board.data,
-
         lectureData: state.lecture.board.data,
         homeworkData: state.homework.board.data,
     }

@@ -15,7 +15,7 @@ import reducers from './reducers'
 import thunk from 'redux-thunk';
 
 const Navigation = StackNavigator({
-  Home: { screen: Home },
+  Home: { screen: Home, params: {title: 'Prestige'} },
   Register: { screen: Register },
   LectureList: { screen: LectureList},
   Lecture: { screen: Lecture},

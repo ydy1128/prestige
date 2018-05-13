@@ -16,6 +16,9 @@ import { connect } from 'react-redux';
 import Toast from 'react-native-simple-toast';
 
 import { loginRequest, getStatusRequest, extendSession, logoutRequest } from '../../actions/authentication';
+import { homeworkBoardRequest } from '../../actions/homework';
+import { lectureBoardRequest } from '../../actions/lecture';
+import { passNotificationInfo } from '../../actions/studentinfo'
 import navOptions from './navigator';
 class Home extends Component<{}> {
     constructor(props) {
@@ -37,6 +40,7 @@ class Home extends Component<{}> {
 	}
   static navigationOptions  = ({ navigation }) => {
     let params = navigation.state.params;
+    navOptions.headerTitle = 'Prestige';
     return navOptions;
   }
   componentWillMount(){
@@ -64,6 +68,35 @@ class Home extends Component<{}> {
       Toast.show(''+error);
     })
     .done();
+  }
+  componentDidMount(){
+    this.props.lectureBoardRequest().then(() => {
+      this.props.homeworkBoardRequest().then(() => {
+        let fullArray = [...this.props.lectureData, ...this.props.homeworkData];
+        fullArray.sort((a, b) =>{
+          let date = new Date();
+
+          let aNum = a.dueDate == undefined ? a.date : a.dueDate;
+          let aDate = a.dueDate == undefined ? new Date(aNum) : new Date(parseInt(aNum));
+          if (a.dueDate == undefined) aDate = new Date(aDate.getDate() + 7);
+          let bNum = b.dueDate == undefined ? b.date : b.dueDate;
+          let bDate = b.dueDate == undefined ? new Date(bNum) : new Date(parseInt(bNum));
+          if (b.dueDate == undefined) bDate = new Date(bDate.getDate() + 7);
+          return aDate - bDate;
+        })
+        fullArray = fullArray.filter((obj) => {
+          let isLecture = obj.dueDate == undefined;
+          let date = isLecture ? new Date(obj.date) : new Date(parseInt(obj.dueDate));
+          let expiryDate = new Date();
+          let checkDate = isLecture ? new Date(obj.date) : new Date(parseInt(obj.dueDate));
+          if(isLecture)
+              checkDate.setDate(date.getDate() + 7);
+          return checkDate >= expiryDate;
+
+        })
+        this.props.passNotificationInfo(fullArray);
+      })
+    })
   }
 	onLogin(){
 		this.props.loginRequest(this.state.username, this.state.password).then(()=>{
@@ -142,7 +175,7 @@ class Home extends Component<{}> {
 						style={styles.divider}
 						source={require('../../img/divider.png')}
 						/>
-					<TouchableHighlight onPress={()=>navigate('Register', {right: (<View></View>)})} style={styles.buttonRegister} underlayColor='#d6a50b'>
+					<TouchableHighlight onPress={()=>navigate('Register', {title: 'Prestige', right: (<View></View>)})} style={styles.buttonRegister} underlayColor='#d6a50b'>
 						<Text style={styles.buttonText}>회원가입</Text>
 					</TouchableHighlight>
 		    </View>
@@ -156,8 +189,14 @@ class Home extends Component<{}> {
           </View>
           <TouchableOpacity style={styles.introAlertDiv} onPress={()=>navigate('Notification', {title: '알림', right: (<View></View>)})} >
             <Icon name="envelope" size={65} color="#f8c709" />
-            <Icon name="circle" size={38} color="#dd0000" style={{position: 'absolute', right: 35, top: 20}} />
-            <Text style={{position: 'absolute', color: 'white', fontSize: 19, fontWeight: 'bold', right: 46, top: 25}}>5</Text>
+            { this.props.notifications == undefined || this.props.notifications.length == 0 ? null :
+              <Icon name="circle" size={38} color="#dd0000" style={{position: 'absolute', right: 35, top: 20}} />
+            }
+            { this.props.notifications == undefined || this.props.notifications.length == 0 ? null :
+              <Text style={{position: 'absolute', color: 'white', fontSize: 19, fontWeight: 'bold', right: 46, top: 25}}>
+                {''+this.props.notifications.length}
+              </Text>
+            }
           </TouchableOpacity>
         </View>
         <View style={styles.mainButtonsDiv}>
@@ -168,7 +207,7 @@ class Home extends Component<{}> {
                 <Text style={styles.mainButtonText}>강의게시판</Text>
               </View>
             </TouchableHighlight>
-            <TouchableHighlight style={{flex: 1, backgroundColor: '#ef5350'}} onPress={()=>navigate('Account', {right: (<View></View>)})} underlayColor="#d32f2f">
+            <TouchableHighlight style={{flex: 1, backgroundColor: '#ef5350'}} onPress={()=>navigate('Account', {title: 'Prestige', right: (<View></View>)})} underlayColor="#d32f2f">
               <View style={styles.mainButtons}>
                 <Icon name="user-circle-o" size={45} color="#FFFFFF" />
                 <Text style={styles.mainButtonText}>계정관리</Text>
@@ -338,7 +377,10 @@ const mapStateToProps = (state) => {
     return {
         status: state.authentication.login.status,
         sessionStatus: state.authentication.status,
-        user: state.authentication.status.currentUser
+        user: state.authentication.status.currentUser,
+        lectureData: state.lecture.board.data,
+        homeworkData: state.homework.board.data,
+        notifications: state.studentinfo.notifications.data,
     };
 };
 
@@ -356,6 +398,15 @@ const mapDispatchToProps = (dispatch) => {
         logoutRequest: () => { 
             return dispatch(logoutRequest('student')); 
         },
+        lectureBoardRequest: () => {
+          return dispatch(lectureBoardRequest());
+        },
+        homeworkBoardRequest: (id) => {
+          return dispatch(homeworkBoardRequest(id));
+        },
+        passNotificationInfo: (noti) =>{
+          return dispatch(passNotificationInfo(noti));
+        }
     };
 };
 
