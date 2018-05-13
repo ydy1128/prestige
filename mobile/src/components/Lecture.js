@@ -35,11 +35,13 @@ class Lecture extends Component<{}> {
             interval: -1,
             fulltime: 0,
             currenttime: 0,
+            onProgressCalled: false,
         }
         this.updateVideo = this.updateVideo.bind(this);
         this.getLoginData = this.getLoginData.bind(this);
         this.timeChange = this.timeChange.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
+        this.setIOSTime = this.setIOSTime.bind(this);
     }
   static navigationOptions  = ({ navigation }) => {
     let params = navigation.state.params;
@@ -57,7 +59,6 @@ class Lecture extends Component<{}> {
         clearInterval(this.state.interval);
         let state = Object.assign(this.state)
         if(state.playerReady){
-            console.log(state.currenttime, state.fulltime)
             let time = state.currenttime / state.fulltime * 100;
             time = time.toFixed(2);
             AsyncStorage.getItem('loginData').then((token) =>{
@@ -122,58 +123,100 @@ class Lecture extends Component<{}> {
     }
     handleEdit(silent, index, contents){
         this.props.lectureEditRequest(index, contents).then(()=>{
-            console.log(index);
             if(this.props.lectureEditStatus.status === 'SUCCESS'){
                 if(!silent) { !Toast.show('강의가 수정 되었습니다!'); }
             }
             else{
-                Toast.show('저장 되지 않았습니다.');
+                // Toast.show('저장 되지 않았습니다.');
                 // return throwError(silent, '강의', this.props.lectureEditStatus.error, '');
             }               
         }).done();
     }
     timeChange(e){ // do this evert N seconds
         if(e.state == 'paused' || e.state == 'seeking'){
-            this.refs.youtubePlayer.currentTime().then((time)=>{
-                this.refs.youtubePlayer.duration().then((fulltime) => {
-                    time = time / fulltime * 100;
-                    time = time.toFixed(2);
-                    AsyncStorage.getItem('loginData').then((token) =>{
-                        let loginData = JSON.parse(token);
-                        this.onAccChange(loginData.user._id, time);
-                        let index = this.state.currObj.index;
-                        this.handleEdit(true, index, this.state.currObj);
-                    });
-                });
-
-            });
-        }
-        else if(e.state == 'playing' && !this.state.playerReady){
-            this.setState({playerReady: true});
-            this.refs.youtubePlayer.duration().then((dur)=>{
-                let currObj = this.state.currObj;
-                let time = 0;
-                let acc = currObj.accomplishments;
+            if(Platform.OS === 'ios'){
+                let time = this.state.currenttime;
+                let fulltime = this.state.fulltime;
+                time = time / fulltime * 100;
+                time = time.toFixed(2);
                 AsyncStorage.getItem('loginData').then((token) =>{
                     let loginData = JSON.parse(token);
-                    let id = loginData.user._id;
-                    for(let i = 0; i < acc.length; i++){
-                        if(id == acc[i]._id){
-                            time = dur * (acc[i].accomplishments / 100);
-                            acc[i].startTime = new Date();
-                            this.setState({currenttime: acc[i].accomplishments, currObj: currObj});
-                        }
-                    }
-                    this.refs.youtubePlayer.seekTo(time);
-                    let obj = this;
-                    this.setState({interval: setInterval(() => {obj.saveTime(obj)}, 10000), fulltime: dur});
-                })
-            }).done();
+                    this.onAccChange(loginData.user._id, time);
+                    let index = this.state.currObj.index;
+                    // Toast.show(''+this.state.currObj._id);
+                    this.handleEdit(true, index, this.state.currObj);
+                });
+            }
+            else{
+                this.refs.youtubePlayer.currentTime().then((time)=>{
+                    this.refs.youtubePlayer.duration().then((fulltime) => {
+                        time = time / fulltime * 100;
+                        time = time.toFixed(2);
+                        AsyncStorage.getItem('loginData').then((token) =>{
+                            let loginData = JSON.parse(token);
+                            this.onAccChange(loginData.user._id, time);
+                            let index = this.state.currObj.index;
+                            this.handleEdit(true, index, this.state.currObj);
+                        });
+                    });
+
+                });
+            }
         }
+        else if(e.state == 'playing' && !this.state.playerReady){
+            if(Platform.OS !== 'ios'){
+                this.setState({playerReady: true});
+                this.refs.youtubePlayer.duration().then((dur)=>{
+                    let currObj = this.state.currObj;
+                    let time = 0;
+                    let acc = currObj.accomplishments;
+                    AsyncStorage.getItem('loginData').then((token) =>{
+                        let loginData = JSON.parse(token);
+                        let id = loginData.user._id;
+                        for(let i = 0; i < acc.length; i++){
+                            if(id == acc[i]._id){
+                                time = dur * (acc[i].accomplishments / 100);
+                                acc[i].startTime = new Date();
+                                this.setState({currenttime: acc[i].accomplishments, currObj: currObj});
+                            }
+                        }
+                        this.refs.youtubePlayer.seekTo(time);
+                        let obj = this;
+                        this.setState({interval: setInterval(() => {obj.saveTime(obj)}, 10000), fulltime: dur});
+                    })
+                }).done();
+            }
+        }
+    }
+    setIOSTime(e){
+        if(!this.state.playerReady){
+            let dur = e.duration;
+            let currObj = this.state.currObj;
+            let time = 0;
+            let acc = currObj.accomplishments;
+            AsyncStorage.getItem('loginData').then((token) =>{
+                let loginData = JSON.parse(token);
+                let id = loginData.user._id;
+                for(let i = 0; i < acc.length; i++){
+                    if(id == acc[i]._id){
+                        time = dur * (acc[i].accomplishments / 100);
+                        Toast.show(''+dur + ' ' + acc[i].accomplishments)
+                        // Toast.show(''+time)
+                        acc[i].startTime = new Date();
+                        this.setState({currenttime: acc[i].accomplishments, currObj: currObj});
+                    }
+                }
+                this.refs.youtubePlayer.seekTo(time);
+                let obj = this;
+                this.setState({interval: setInterval(() => {obj.saveTime(obj)}, 10000), fulltime: dur});
+            })
+        }
+        this.setState({playerReady: true, currenttime: e.currentTime, fulltime: e.duration});
     }
     render(){
         const { navigate } = this.props.navigation;
         const lecture = this.props.data;
+        // Toast.show(lecture.link.replace('https://www.youtube.com/embed/', ''));
     	return(
     		<View onLayout={(e)=>{
                     let {width} = e.nativeEvent.layout;
@@ -184,9 +227,12 @@ class Lecture extends Component<{}> {
                     ref="youtubePlayer"
                     controls={1}
                     style={{alignSelf: 'center', height: this.state.playerHeight, width: '100%'}} 
-                    apiKey="AIzaSyApkQQpOcjzlxtH3uK7sZilS8RUemt-IJY" videoId={this.getVideoId(lecture.link)} play={true} fullscreen={false} loop={false} 
+                    apiKey="AIzaSyApkQQpOcjzlxtH3uK7sZilS8RUemt-IJY" 
+                    videoId={this.getVideoId(lecture.link)} 
+                    play={true} fullscreen={false} loop={false} 
                     onReady={e => this.updateVideo()}
                     onChangeState={e => this.timeChange(e)}
+                    onProgress={Platform.OS === 'ios' ? e=>this.setIOSTime(e) : undefined}
                     />
 
     		</View>
