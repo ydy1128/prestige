@@ -37,9 +37,6 @@ class Home extends Component<{}> {
 	}
   static navigationOptions  = ({ navigation }) => {
     let params = navigation.state.params;
-    // if(!params.title == undefined) navOptions.headerTitle = params.title;
-    // if(!params.right == undefined) navOptions.headerRight = params.right;
-    // if(!params.left == undefined) navOptions.headerLeft = params.left;
     return navOptions;
   }
   componentWillMount(){
@@ -54,7 +51,9 @@ class Home extends Component<{}> {
             this.props.extendSession(loginData.user);
             this.setState({loggedIn: true, loginData: loginData.user});
           }
-
+          else{
+            Toast.show('자동로그인 실패')
+          }
         })
         .done();
       }
@@ -107,7 +106,7 @@ class Home extends Component<{}> {
     });
   }
   onOpenTel(){
-    
+    // Platform.OS === "ios" ? Communications.phonecall('0629558505', true) :
     Linking.canOpenURL('tel:0629558505').then(supported => {
       if (supported) {
         Linking.openURL('tel:0629558505');
