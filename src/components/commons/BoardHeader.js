@@ -33,6 +33,7 @@ class BoardHeader extends React.Component{
     	if(this.props.remove_button) buttonCount++;
     	if(this.props.plus_button) buttonCount++;
     	if(this.props.search_engine) buttonCount++;
+    	if(this.props.reload_button) buttonCount++;
     	console.log(buttonCount);
     	this.setState({buttonCount: buttonCount});
     }

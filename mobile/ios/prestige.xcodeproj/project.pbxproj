@@ -50,6 +50,7 @@
 		8E9610EF996E4E6AADF513B8 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0B6E69AD169F4100B26F1A77 /* Octicons.ttf */; };
 		9BB6737255944B9CB3427E55 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9E678588E3654F2DBDFD843E /* SimpleLineIcons.ttf */; };
 		28A5FC12246A4A5C85C3C9A7 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4817C5E34E8F4F15AC5E05E0 /* Zocial.ttf */; };
+		9D548E2AB5144F5EA13F63D5 /* YTPlayerView-iframe-player.html in Resources */ = {isa = PBXBuildFile; fileRef = 6ECCCECD6D24420B94DB80BC /* YTPlayerView-iframe-player.html */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -316,6 +317,7 @@
 		0B6E69AD169F4100B26F1A77 /* Octicons.ttf */ = {isa = PBXFileReference; name = "Octicons.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		9E678588E3654F2DBDFD843E /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; name = "SimpleLineIcons.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		4817C5E34E8F4F15AC5E05E0 /* Zocial.ttf */ = {isa = PBXFileReference; name = "Zocial.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		6ECCCECD6D24420B94DB80BC /* YTPlayerView-iframe-player.html */ = {isa = PBXFileReference; name = "YTPlayerView-iframe-player.html"; path = "../node_modules/react-native-youtube/assets/YTPlayerView-iframe-player.html"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -589,6 +591,7 @@
 				0B6E69AD169F4100B26F1A77 /* Octicons.ttf */,
 				9E678588E3654F2DBDFD843E /* SimpleLineIcons.ttf */,
 				4817C5E34E8F4F15AC5E05E0 /* Zocial.ttf */,
+				6ECCCECD6D24420B94DB80BC /* YTPlayerView-iframe-player.html */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -995,6 +998,7 @@
 				8E9610EF996E4E6AADF513B8 /* Octicons.ttf in Resources */,
 				9BB6737255944B9CB3427E55 /* SimpleLineIcons.ttf in Resources */,
 				28A5FC12246A4A5C85C3C9A7 /* Zocial.ttf in Resources */,
+				9D548E2AB5144F5EA13F63D5 /* YTPlayerView-iframe-player.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

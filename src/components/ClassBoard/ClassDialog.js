@@ -157,7 +157,8 @@ class ClassDialog extends React.Component{
                 actions={actions}
                 open={this.props.open}
                 onRequestClose={this.props.handleClose}
-                autoScrollBodyContent={false}
+                autoScrollBodyContent={true}
+
                 >
 
             	{this.props.mode ? classMode : studentMode}
