@@ -27,6 +27,7 @@ const style = {
   },
   button: {
       fontSize: '18px',
+      cursor: 'pointer',
   },
   row: {
     button: {
