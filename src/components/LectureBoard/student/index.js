@@ -31,7 +31,8 @@ let Present = ({ props, state, style, functions }) => {
     )
 	return(
         <div className="Boards">
-            <BoardHeader title='강의게시판' search_engine={true} searchOpen={searchOpen}
+            <BoardHeader title='강의게시판' screenType={'LECTUREBOARD'} reload_button={true}  
+                            search_engine={true} searchOpen={searchOpen}
                             onSearchEngineChange={onSearchEngineChange} 
                             focusSearchInput={focusSearchInput} blurSearchInput={blurSearchInput} />
             <div className="Board-contents row">

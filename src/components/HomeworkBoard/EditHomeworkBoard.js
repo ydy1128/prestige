@@ -11,7 +11,7 @@ import DatePicker from 'material-ui/DatePicker';
 import Dropzone from 'react-dropzone';
 import { log } from 'util';
 import Comments from './Comments';
-import SelectField from 'material-ui/SelectField';
+import AutoComplete from 'material-ui/AutoComplete';
 import MenuItem from 'material-ui/MenuItem';
 
 class EditHomeworkBoard extends React.Component {
@@ -20,14 +20,17 @@ class EditHomeworkBoard extends React.Component {
     let { hw, selectedHwIndex } = props;
     let homeworkId = hw._id;
     let files = getHwFilesWithHwFileNamesByHomeworkId(homeworkId, hw.fileNames);
+    let isStudent = this.props.userInfo.role == 'teacher' ? false : true
+    let classItem = this.props.classData.find((item) => hw.classId == item._id);
 
     this.state = {
-      isStudent: this.props.userInfo.role == 'teacher' ? false : true,
+      isStudent,
       index: selectedHwIndex,
       contents: hw,
       files,
       dropzoneActive: false,
-      className: (this.props.classData.find((item) => hw.classId == item._id)).name
+      className: classItem ? classItem.name : null,
+      isFileChanged: false,
     };
   }
 
@@ -60,7 +63,23 @@ class EditHomeworkBoard extends React.Component {
         WebkitBoxShadow: 'none',
         MozBoxShadow: 'none',
         boxShadow: 'none'
-      }
+      }, 
+      inputLine: {
+        borderBottom: "1px solid #bdbdbd"
+      },
+      inputLineFocus:{
+        borderBottom: "2px solid #00bcd4"
+      },
+      inputLabel: {
+        color: "#bdbdbd",
+        fontSize: "18px",
+        fontWeight: "600"
+      },
+      inputLabelFocus: {
+        color: "#00bcd4",
+        fontSize: "18px",
+        fontWeight: "600"
+      },
     };
 
     return (
@@ -117,14 +136,29 @@ class EditHomeworkBoard extends React.Component {
           disabled={this.state.isStudent ? true : false}
           underlineShow={this.state.isStudent ? false : true}
         />
-        <SelectField
-          floatingLabelText={'수업'}
-          value={this.state.className}
-          onChange={this.state.isStudent ? null : this.changeClass.bind(this)}
-        >
-          {this.props.classData.map(classItem => (
-            <MenuItem value={classItem.name} primaryText={classItem.name} />))}
-        </SelectField>
+        {this.state.isStudent ?
+          <TextField
+            inputStyle={style.titleStyle}
+            hintText="수업"
+            floatingLabelText="수업"
+            value={this.state.className}
+            disabled={true}
+            underlineShow={false}
+            />
+          :
+          <AutoComplete
+            floatingLabelText="수업"
+            searchText={this.state.className}
+            onUpdateInput={this.handleUpdateInput.bind(this)}
+            onNewRequest={this.handleNewRequest.bind(this)}
+            dataSource={this.props.classData.map(classItem => classItem.name)}
+            filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
+            openOnFocus={true}
+            floatingLabelStyle={style.inputLabel} floatingLabelFocusStyle={style.inputLabelFocus} 
+            underlineStyle={style.inputLine} underlineFocusStyle={style.inputLineFocus}
+            maxSearchResults = {8}
+          />
+        }
 
         <div style={style.datePickerContainerStyle}>
           <DatePicker id="due-date"
@@ -137,19 +171,32 @@ class EditHomeworkBoard extends React.Component {
             onChange={this.changeDate.bind(this)}
             disabled={this.state.isStudent ? true : false}
             underlineShow={this.state.isStudent ? false : true}
-          />
+            />
         </div>
       </div>
     );
   }
 
-  changeClass(e, index, name) {
-    console.log(this.props.classData[index]._id);
+  handleUpdateInput(newText, dataSources, a) {
+    this.setState({className: newText});
+  }
+
+  handleNewRequest(newText, index) {
+    let classId = null;
+    if (index == -1) {
+      let classItem = this.props.classData.find((classItem) => classItem.name == newText);
+      if (classItem) {
+        classId = classItem._id;
+      }
+    } else {
+      classId = this.props.classData[index]._id;
+    }
+
     this.setState({
-      className: name,
-      contents: Object.assign({}, this.state.contents, { classId: this.props.classData[index]._id })
+      className: newText,
+      contents: Object.assign({}, this.state.contents, { classId })
     });
-  };
+  }
 
   showFileUploadSection(props) {
     let style = {
@@ -222,20 +269,25 @@ class EditHomeworkBoard extends React.Component {
       Materialize.toast($toastContent, 2000);
       return;
     }
-    let contents = Object.assign({}, this.state.contents, {fileNames: this.state.files.map( file => file.name )});
+    if (!this.state.contents.classId) {
+      let $toastContent = $('<span style="color: #FFB4BA">수업이 입력되지 않았거나 잘못된 수업입니다.</span>');
+      Materialize.toast($toastContent, 2000);
+      return;
+    }
 
+    let contents = Object.assign({}, this.state.contents, {fileNames: this.state.files.map( file => file.name )});
+    this.props.closeBoard();
     this.props.homeworkEditRequest(contents._id, index, contents).then((response) => {
         Materialize.toast('숙제가 갱신되었습니다!', 2000);
         this.uploadSelectedFilesOnServerByHomeworkId(contents._id);
-        this.props.closeBoard();
       }, (error) => { 
         this._handleError(this.props.homeworkEditState.error); 
-        this.props.closeBoard();
       }
     );
   }
 
   uploadSelectedFilesOnServerByHomeworkId(homeworkId) {
+    if (!this.state.isFileChanged) return;
     let files = this.state.files;
     if (files.length == 0) { return; }
     let data = new FormData();
@@ -287,6 +339,7 @@ class EditHomeworkBoard extends React.Component {
     this.setState({ 
       files: newFiles,
       dropzoneActive: false,
+      isFileChanged: true,
     });
   }
 
@@ -296,7 +349,8 @@ class EditHomeworkBoard extends React.Component {
       let files = this.state.files;
       let newFiles = [...files.slice(0,index), ...files.slice(index+1, files.length)];
       this.setState({
-        files: newFiles
+        files: newFiles,
+        isFileChanged: true
       });
     }
   }

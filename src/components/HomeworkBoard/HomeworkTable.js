@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import { connect } from 'react-redux';
 
 import {
   Table,
@@ -36,15 +37,17 @@ const style = {
     },
     date: {
       width: "124px",
-
     },
   },
   table: {
     border: '1px solid #d3d3d3'
+  },
+  dueDate: {
+    color: '#aaaaaa'
   }
 };
 
-export default class TableExampleComplex extends Component {
+class HomeworkTable extends Component {
   constructor(props){
     super(props);
     this.state = {
@@ -82,9 +85,9 @@ export default class TableExampleComplex extends Component {
             style={style.table}
           >
             <TableHeader
-              displaySelectAll={this.state.isStudent ? null : this.state.showCheckboxes}
+              displaySelectAll={false}
               adjustForCheckbox={this.state.isStudent ? null :this.state.showCheckboxes}
-              enableSelectAll={this.state.isStudent ? null :this.state.enableSelectAll}
+              enableSelectAll={false}
             >
               <TableRow>
                 {this.state.isStudent ? null : <TableHeaderColumn style={style.row.button}></TableHeaderColumn>}
@@ -116,28 +119,50 @@ export default class TableExampleComplex extends Component {
 
     hwData.map((rowData, index) => {
       let {
-        _id, title, content, dueDate, writtenDate, modifiedDate, teacherId
+        _id, title, content, dueDate, writtenDate, modifiedDate, teacherId, classId
       } = rowData;
-      let readableDate = new Date(parseInt(dueDate));
+      let readableDueDate = new Date(parseInt(dueDate));
       let readableWrittenDate = new Date(parseInt(writtenDate));
-
-      tableRows.push(
-        <TableRow key={index}
-          selected={this.props.clickedRowIndexes.includes(index)} 
-          onClick={this.state.isStudent ? this.onStudentRowSelection.bind(this) : null}>
-          {this.state.isStudent ? null :
-            <TableRowColumn>
-              <FontAwesome
-                style={style.button} onClick={this.props.onClickEditHomework(index)} name="pencil" />
-            </TableRowColumn>
-          }
-          <TableRowColumn>{title}</TableRowColumn>
-          <TableRowColumn>{readableDate.toLocaleDateString()}</TableRowColumn>
-          <TableRowColumn>{readableWrittenDate.toLocaleDateString()}</TableRowColumn>
-        </TableRow>
-      );
+      let checkDueDate
+      if (this.props.studentClassId == classId || !this.state.isStudent ) {
+        tableRows.push(
+          <TableRow key={index}
+            selected={this.props.clickedRowIndexes.includes(index)} 
+            onClick={this.state.isStudent ? this.onStudentRowSelection.bind(this) : null}>
+            {this.state.isStudent ? null :
+              <TableRowColumn>
+                <FontAwesome
+                  style={style.button} onClick={this.props.onClickEditHomework(index)} name="pencil" />
+              </TableRowColumn>
+            }
+            <TableRowColumn>{title}</TableRowColumn>
+            <TableRowColumn style={beforeDueDate(readableDueDate) ? {} : style.dueDate}>{
+              beforeDueDate(readableDueDate) ? readableDueDate.toLocaleDateString() :'기한이 지났습니다'}</TableRowColumn>
+            <TableRowColumn>{readableWrittenDate.toLocaleDateString()}</TableRowColumn>
+          </TableRow>
+        ); 
+      }
     });
 
     return tableRows
   }
 }
+
+function beforeDueDate(dueDate) {
+  let currentDate = new Date();
+  if (dueDate.getDate() >= currentDate.getDate() 
+    && dueDate.getMonth() >= currentDate.getMonth()
+    && dueDate.getFullYear() >= currentDate.getFullYear()) {
+      return true;
+  }
+  return false;
+}
+
+const mapStateToProps = (state) => {
+  let studentClasses = state.studentinfo.getInClassStudents.data;
+  return {
+    studentClassId: studentClasses[0] ? studentClasses[0].class : null,
+  };
+};
+
+export default connect(mapStateToProps, undefined)(HomeworkTable);

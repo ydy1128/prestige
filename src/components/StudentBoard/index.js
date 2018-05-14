@@ -281,7 +281,8 @@ class StudentBoard extends React.Component{
     render(){
         return(
             <div className="Boards">
-                <BoardHeader title='학생관리' remove_active={this.state.remove_active} handleRemove={this.toggleDeleteDialog.bind(undefined, true)}
+                <BoardHeader title='학생관리'  screenType={'STUDENTBOARD'} reload_button={true} 
+                            remove_active={this.state.remove_active} handleRemove={this.toggleDeleteDialog.bind(undefined, true)}
                             plus_button={false} remove_button={true} search_engine={true} searchOpen={this.state.searchOpen}
                             openDialog={null} handleActive={this.handleActive}
                             onSearchEngineChange={this.onSearchEngineChange} 

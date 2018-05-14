@@ -51,7 +51,8 @@ let Present = ({ props, state, style, functions }) => {
     }
     return (
         <div className="Boards">
-            <BoardHeader title='강의관리' remove_active={remove_active} handleRemove={toggleDeleteDialog.bind(undefined, true)}
+            <BoardHeader title='강의관리' screenType={'LECTUREBOARD'} reload_button={true} 
+                            remove_active={remove_active} handleRemove={toggleDeleteDialog.bind(undefined, true)}
                             plus_button={true} remove_button={true} search_engine={true} searchOpen={searchOpen}
                             openDialog={openDialog.bind(undefined, true, true)} handleActive={getRemoveActive}
                             onSearchEngineChange={onSearchEngineChange} 

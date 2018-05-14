@@ -26,7 +26,7 @@ var Present = ({ props, state, style, functions }) => {
             #comments-board {
                 height: auto;
                 max-height: 250px;
-                overflow: scroll;
+                overflow-y: scroll;
             }
 
             #comments-header {
@@ -84,7 +84,7 @@ var Present = ({ props, state, style, functions }) => {
                     onClick={appendComment}>Post</div>
             </div>
 
-            <div id="comments-board">
+            <div id="comments-board" >
                 { 
                     comments.map((comment) => 
                         <Comment key={comment._id} 

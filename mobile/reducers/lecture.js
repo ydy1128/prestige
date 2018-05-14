@@ -120,7 +120,6 @@ export default function lecture(state, action) {
                 }
             });
         case types.LECTURE_PASS:
-            Toast.show('ac: '+action.lecture.link);
             return update(state, {
                 pass: { 
                     data: {$set: action.lecture }

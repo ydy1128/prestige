@@ -129,7 +129,7 @@ class LectureDialog extends React.Component{
 
 		return (
             <Dialog
-                title={this.props.editMode? '강의생성' : '('+this.props.searchClassNameById(this.props.currObj.class)+') '+this.props.currObj.name}
+                title={this.props.editMode? '강의생성' : '강의수정('+this.props.searchClassNameById(this.props.currObj.class)+') '+this.props.currObj.name}
                 modal={false}
                 actions={actions}
                 open={this.props.open}

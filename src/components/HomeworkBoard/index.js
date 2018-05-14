@@ -79,7 +79,7 @@ var Present = ({ props, state, style, functions }) => {
     let selectedHw = hwData[selectedHwIndex] ? hwData[selectedHwIndex] : null ;
     return (
         <div className="Boards" id='homework-section'>
-            <BoardHeader title={isTeacher ? '숙제관리' : '숙제공지'} 
+            <BoardHeader title={isTeacher ? '숙제관리' : '숙제게시판'} screenType={'HWBOARD'} reload_button={true}
                 homeworkButtons={createBoardOn || editBoardOn ? boardButtons : tableButtons}
                 search_engine={createBoardOn || editBoardOn ? false : true}
                 searchOpen={searchOpen}

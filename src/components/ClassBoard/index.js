@@ -486,7 +486,8 @@ class ClassBoard extends React.Component{
 	render(){
 		return(
             <div className="Boards">
-                <BoardHeader title='수업관리' remove_active={this.state.remove_active} handleRemove={this.toggleDeleteDialog.bind(undefined, true)}
+                <BoardHeader title='수업관리'  screenType={'CLASSBOARD'} reload_button={true} 
+                                remove_active={this.state.remove_active} handleRemove={this.toggleDeleteDialog.bind(undefined, true)}
                                 plus_button={true} remove_button={true} search_engine={true} searchOpen={this.state.searchOpen}
                                 openDialog={this.openDialog.bind(undefined, true)} handleActive={this.removeActive}
                                 onSearchEngineChange={this.onSearchEngineChange} 

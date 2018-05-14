@@ -78,7 +78,8 @@ export const STUDENT_INFO_REMOVE_FAILURE = "STUDENT_INFO_REMOVE_FAILURE";
 export const STUDENTS_IN_CLASS_GET = "STUDENTS_IN_CLASS_GET";
 export const STUDENTS_IN_CLASS_GET_SUCCESS = "STUDENTS_IN_CLASS_GET_SUCCESS";
 export const STUDENTS_IN_CLASS_GET_FAILURE = "STUDENTS_IN_CLASS_GET_FAILURE"; 
-
+/* Student Notifications */
+export const STUDENT_NOTI = "STUDENT_NOTI";
 
 //===============CLASS===============
 /* Class Board*/

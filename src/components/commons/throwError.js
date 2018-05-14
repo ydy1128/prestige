@@ -18,7 +18,7 @@ const throwError = (silent, data, error, message) =>{
                 setTimeout(()=> {location.reload(false);}, 2000);
                 break;
             case 403: // 감춰진 리소스에 접근하려 할 때
-                default_message = '권한이 없습니다. <br />관리자에게 문의하세요.';
+                default_message = '해당 자료에 대해 권한이 없습니다.';
                 setTimeout(()=> {location.reload(false);}, 2000);
                 break;
             case 404: // URI와 매치되는 리소스가 없다
