@@ -16,7 +16,7 @@ const port = process.env.PORT || 5000;
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 
-app.use('/', express.static(path.join(__dirname, './../public')));
+app.use('/', express.static(path.join(__dirname, './../public/index.html')));
 app.use('/uploads', express.static('uploads'));
 app.get('/hello', (req, res) => {
     return res.send('Hello CodeLab');
