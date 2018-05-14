@@ -32,11 +32,12 @@ const throwError = (silent, data, error, message) =>{
                 default_message = '서버 에러. <br />관리자에게 문의하세요.';
                 break;
         }
+        if(message == undefined || message == '')
+            message = default_message;
+        $toastContent = message_head + message + message_tail;
+        Materialize.toast($toastContent, 2000);
     }
-    if(message == undefined || message == '')
-        message = default_message;
-    $toastContent = message_head + message + message_tail;
-    Materialize.toast($toastContent, 2000);
+    
     return false;
 }
 

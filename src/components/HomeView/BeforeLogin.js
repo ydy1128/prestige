@@ -43,8 +43,6 @@ class BeforeLogin extends React.Component {
     rotateOpposite(event){
         let fullCount = Object.keys(this.refs).length;
         let rotateCounter = this.state.rotateCounter;
-        console.log(rotateCounter)
-        console.log($('#rotateDiv').css('marginLeft'))
         if(rotateCounter == 0){
             rotateCounter = fullCount-1;
             $('#rotateDiv').animate({marginLeft: '-' + 100*(fullCount - 1) + '%'})
@@ -64,7 +62,7 @@ class BeforeLogin extends React.Component {
             <div style={{position: 'relative', height: '100%', width: '100%', textAlign: 'center'}}>
                 <div style={{position: 'absolute', height: '35%', width: '100%', backgroundColor: '#86272d', backgroundImage: 'url("img/backpattern.png")'}}>
                 </div>
-                <div style={{position: 'relative', display: 'flex', flexDirection: 'column', height: 'calc(100% - 100px)', width: '90%', margin: 'auto ', paddingTop: 100}}>
+                <div style={{position: 'relative', display: 'flex', flexDirection: 'column', height: 'calc(90% - 100px)', width: '85%', margin: 'auto ', paddingTop: 100}}>
                     <div style={{position: 'absolute', width: '100%', height: 'calc(100% - 100px)', zIndex: 0, overflow: 'hidden', whiteSpace: 'nowrap', backgroundColor: 'black'}}>
                         <div id="rotateDiv" style={{width: 100 * Object.keys(this.refs).length + '%', height: '100%'}}>
                             <img ref="img1" style={{display: 'inline-block', width: 100 / Object.keys(this.refs).length + '%', height: '100%'}} src="img/1.jpg" />
@@ -100,6 +98,20 @@ class BeforeLogin extends React.Component {
                             </h6>
                         </div>
                     </div>
+                </div>
+                <div id="footer" style={{position: 'absolute', bottom: 20, width: '100%'}}>
+                    <div style={{marginBottom: 10}}>
+                        <a href="https://www.facebook.com/prestige.english/">
+                            <FontAwesome name="facebook-official" style={{fontSize: 28, marginRight: 20, color: '#d3b0b3'}}/>
+                        </a>
+                        <a href="http://cafe.naver.com/prestigeenglish">
+                            <FontAwesome name="coffee" style={{fontSize: 28, marginRight: 20, color: '#d3b0b3'}}/>
+                        </a>
+                        <FontAwesome name="phone" style={{fontSize: 28, marginRight: 20, color: '#d3b0b3'}}/>
+                        <span style={{fontSize: 20, color: '#d3b0b3'}}>062-955-8505</span>
+
+                    </div>
+                    <div style={{color: '#d3b0b3'}}>© 2018 PRESTIGE ALL RIGHTS RESERVED</div>
                 </div>
             </div>
         )

@@ -17,11 +17,11 @@ class App extends React.Component {
         if(!loginData.isLoggedIn) return;
         let url_ref = loginData.role;
         // page refreshed & has a session in cookie,
-        // check whether this cookie is valid or not
+        // check whether this cookie is valid or notS
         return this.props.getStatusRequest(url_ref).then(
             () => {
-                console.log(this.props.status);
                 // if session is not valid
+                console.log(this.props.status.valid)
                 if(!this.props.status.valid) {
                     // logout the session
                     loginData = {
@@ -33,7 +33,7 @@ class App extends React.Component {
                     document.cookie='key=' + btoa(JSON.stringify(loginData));
 
                     // and notify
-                    let $toastContent = $('<span style="color: #FFB4BA">Your session is expired, please log in again</span>');
+                    let $toastContent = $('<span style="color: #FFB4BA">세션이 만료 되었습니다. <br />로그인 하세요.</span>');
                     Materialize.toast($toastContent, 4000);
 
                 }
@@ -46,8 +46,8 @@ class App extends React.Component {
 
         this.props.logoutRequest(url_ref).then(
             () => {
-                Materialize.toast('Good Bye!', 2000);
-
+                
+                Materialize.toast('로그아웃 되었습니다!', 2000);
                 // EMPTIES THE SESSION
                 let loginData = {
                     isLoggedIn: false,
@@ -56,7 +56,7 @@ class App extends React.Component {
                 };
 
                 document.cookie = 'key=' + btoa(JSON.stringify(loginData));
-                this.forceUpdate();
+                
             }
         );
     }
