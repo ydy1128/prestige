@@ -1,5 +1,4 @@
 node_modules
-build
 public/lib
 public/index.html
 public/bundle.js
