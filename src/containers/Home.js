@@ -185,19 +185,20 @@ const mapDispatchToProps = (dispatch) => {
         getStudentsInfoRequest: (classname) => {
             return dispatch(getStudentsInfoRequest(classname));
         },
-        studentsInfoEditRequest: (id, index, obj) => {
-            return dispatch(studentsInfoEditRequest(id, index, obj));
-        },
-
         classBoardRequest: (isInitial, listType, id, username) => {
             return dispatch(classBoardRequest(isInitial, listType, id, username));
+        },
+        lectureBoardRequest: () => {
+            return dispatch(lectureBoardRequest());
+        },
+
+        studentsInfoEditRequest: (id, index, obj) => {
+            return dispatch(studentsInfoEditRequest(id, index, obj));
         },
         classEditRequest: (id, index, contents) => {
             return dispatch(classEditRequest(id, index, contents));
         },
-        lectureBoardRequest: () => {
-            return dispatch(lectureBoardRequest());
-        }
+
     };
 };
 

@@ -14,7 +14,6 @@ class Register extends React.Component {
     }
     
     handleRegister(id, pw, name, school, level, url_ref) {
-    	console.log(url_ref, '2')
         return this.props.registerRequest(id, pw, name, school, level, url_ref).then(
             () => {
                 if(this.props.status === "SUCCESS") {
@@ -22,24 +21,14 @@ class Register extends React.Component {
                     browserHistory.push('/login');
                     return true;
                 } else {
-                    /*
-                        ERROR CODES:
-                            1: BAD USERNAME
-                            2: BAD PASSWORD
-                            3: USERNAME EXISTS
-                    */
                     let errorMessage = {
                         'Empty content exists.':'모든 필드를 채워주세요',
                         'Bad username.':'아이디는 영문 숫자 포함 4자 이상이어야 합니다',
                         'Bad password.':'비밀번호는 4자  이상이어야 합니다',
                         'Username already exists.':'존재하는 아이디 입니다'
                     };
-                    console.log(this.props.errorCode, errorMessage[this.props.errorCode.message]);
-                    // let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.errorCode - 1] + '</span>');
-                    // Materialize.toast($toastContent, 2000);
-
-                    throwError(false, "", this.props.errorCode, errorMessage[this.props.errorCode.message])
-                    return false;
+                    return throwError(false, "", this.props.errorCode, errorMessage[this.props.errorCode.message]);
+                    
                 }
             }
         );

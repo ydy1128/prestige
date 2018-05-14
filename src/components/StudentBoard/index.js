@@ -13,6 +13,8 @@ import DeleteDialog from './DeleteDialog';
 import { getStudentsInfoRequest, studentsInfoEditRequest, studentsInfoRemoveRequest, studentsInfoPwChangeRequest } from 'actions/studentinfo';
 import { lectureEditRequest } from 'actions/lecture';
 
+import throwError from 'components/commons/throwError';
+
 class StudentBoard extends React.Component{
 	constructor(props){
 		super(props);
@@ -141,17 +143,23 @@ class StudentBoard extends React.Component{
         let deleting_stds = [];
         let editting_classes = {};
         //map corresponding classes for deleting students
-        for (let i = 0; i < clicked.length; i++){
-            let stdidx = clicked[i];
-            let std_id = this.props.studentsData[stdidx]._id;
-            let std_class = this.props.studentsData[stdidx].class;
-            if(std_class != ''){
-                if(editting_classes[std_class] == undefined){
-                    editting_classes[std_class] = [];
+        try{
+            for (let i = 0; i < clicked.length; i++){
+                let stdidx = clicked[i];
+                let std_id = this.props.studentsData[stdidx]._id;
+                let std_class = this.props.studentsData[stdidx].class;
+                console.log(std_class.class.class);
+                if(std_class != ''){
+                    if(editting_classes[std_class] == undefined){
+                        editting_classes[std_class] = [];
+                    }
+                    editting_classes[std_class].push(std_id);
                 }
-                editting_classes[std_class].push(std_id);
+                deleting_stds.push({index: stdidx, id: std_id});
             }
-            deleting_stds.push({index: stdidx, id: std_id});
+        } catch(err){
+            err.code = 0;
+            return throwError(false, '', err, '');
         }
         // delete students from accomplishments list of lectures
         this.props.lectureData.map((lec, i) => {
@@ -170,7 +178,7 @@ class StudentBoard extends React.Component{
         })
         // delete students
         for(let i = 0; i < deleting_stds.length; i++){
-            this.handleStudentRemove(deleting_stds[i].index, deleting_stds[i].id).then(()=>{ console.log(this.props.studentsData)});
+            this.handleStudentRemove(deleting_stds[i].index, deleting_stds[i].id);
             for(let j = 0; j < deleting_stds.length; j++){
                 deleting_stds[j].index -= 1;
             }

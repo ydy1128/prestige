@@ -6,6 +6,10 @@ const throwError = (silent, data, error, message) =>{
     if(!silent){
         console.log(error.code)
         switch(error.code){
+            case 0: // 클라이언트 버그, try / catch
+                default_message = '클라이언트 에러. <br />관리자에게 문의하세요.';
+                console.log(error.lineNumber)
+                break;
             case 400: // 일반적인 요청실패
                 default_message = '입력하신 정보가 잘못되었습니다.';
                 break

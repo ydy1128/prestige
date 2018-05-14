@@ -32,7 +32,7 @@ class Authentication extends React.Component {
     }
     handleChange(e) {
         let nextState = {};
-        if(e.target.name == 'school' && e.target.value[2] == '초'){
+        if(e.target.name == 'school' && e.target.value.includes('초')){
             nextState['level_max'] = '6';
         }
         else{

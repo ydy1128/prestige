@@ -23,12 +23,10 @@ class Login extends React.Component {
                         role: url_ref
                     };
                     changeLoginData(loginData)
-                    // document.cookie = 'key=' + btoa(JSON.stringify(loginData));
                     let msg = '환영합니다,\n' + this.props.user.user.name + 
                         (url_ref == 'teacher' ? ' 선생님' : ' 학생') + ' !';
                     Materialize.toast(msg, 2000);
                     browserHistory.push('/');
-                    console.log(getLoginData())
                     return true;
 				}
 				else {
