@@ -42,7 +42,7 @@ if(process.env.NODE_ENV == 'development') {
 }
 
 //===============DB Setup===============
-let uriString = process.env.MONGOLAB_URI || 'mongodb://localhost/prestige';
+let uriString = process.env.MONGODB_URI || process.env.MONGOLAB_URI || 'mongodb://localhost/prestige';
 const db = mongoose.connection;
 db.on('error', console.error);
 db.once('open', () => {
