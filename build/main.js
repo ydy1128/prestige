@@ -45,7 +45,7 @@ var port = process.env.PORT || 5000;
 app.use((0, _morgan2.default)('dev'));
 app.use(_bodyParser2.default.json());
 
-app.use('/', _express2.default.static(_path2.default.join(__dirname, './../public')));
+app.use('/', _express2.default.static(_path2.default.join(__dirname, './../public/index.html')));
 app.use('/uploads', _express2.default.static('uploads'));
 app.get('/hello', function (req, res) {
     return res.send('Hello CodeLab');
