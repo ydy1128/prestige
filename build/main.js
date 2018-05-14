@@ -40,7 +40,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 //===============EXPRESS SERVER SETUP===============
 var app = (0, _express2.default)();
-var port = 2929;
+var port = process.env.PORT || 5000;
 
 app.use((0, _morgan2.default)('dev'));
 app.use(_bodyParser2.default.json());
@@ -69,13 +69,14 @@ if (process.env.NODE_ENV == 'development') {
 }
 
 //===============DB Setup===============
+var uriString = process.env.MONGODB_URI || process.env.MONGOLAB_URI || 'mongodb://localhost/prestige';
 var db = _mongoose2.default.connection;
 db.on('error', console.error);
 db.once('open', function () {
     console.log('Connected to mongodb server');
 });
 
-_mongoose2.default.connect('mongodb://localhost/prestige', { useMongoClient: true });
+_mongoose2.default.connect(uriString, { useMongoClient: true });
 
 //===============Session Store Setup===============
 var MongoStore = require('connect-mongo')(_expressSession2.default);
@@ -116,6 +117,8 @@ var _temp = function () {
     __REACT_HOT_LOADER__.register(port, 'port', 'server/main.js');
 
     __REACT_HOT_LOADER__.register(devPort, 'devPort', 'server/main.js');
+
+    __REACT_HOT_LOADER__.register(uriString, 'uriString', 'server/main.js');
 
     __REACT_HOT_LOADER__.register(db, 'db', 'server/main.js');
 
