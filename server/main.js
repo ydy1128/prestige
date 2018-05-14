@@ -42,13 +42,14 @@ if(process.env.NODE_ENV == 'development') {
 }
 
 //===============DB Setup===============
+let uriString = process.env.MONGOLAB_URI || 'mongodb://localhost/prestige';
 const db = mongoose.connection;
 db.on('error', console.error);
 db.once('open', () => {
 	console.log('Connected to mongodb server');
 });
 
-mongoose.connect('mongodb://localhost/prestige', { useMongoClient: true });
+mongoose.connect(uriString, { useMongoClient: true });
 
 //===============Session Store Setup===============
 const MongoStore = require('connect-mongo')(session);
