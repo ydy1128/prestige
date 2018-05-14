@@ -11,7 +11,7 @@ import api from './routes';
 
 //===============EXPRESS SERVER SETUP===============
 const app = express();
-const port = 2929;
+const port = process.env.PORT || 2929;
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
